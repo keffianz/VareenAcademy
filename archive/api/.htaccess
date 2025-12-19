@@ -1,0 +1,24 @@
+# API folder protection
+# Deny direct access to config files and disable directory listing
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Deny access to config.php
+    RewriteRule ^config\.php$ - [F,L]
+</IfModule>
+
+Options -Indexes
+
+<IfModule mod_authz_core.c>
+    <FilesMatch "\.(ini|env|sql|phar|sh|inc|bak)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+    <FilesMatch "\.(ini|env|sql|phar|sh|inc|bak)$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</IfModule>
+
