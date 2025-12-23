@@ -1209,16 +1209,31 @@ textarea:focus {
   transform: scale(1.1);
 }
 
+.testimonials-slider { position: relative; }
+
 .slick-prev:before,
 .slick-next:before {
-  content: '';
+  /* Use simple chevrons for arrows */
+  font-family: inherit;
+  font-weight: 700;
+  color: white;
 }
 
 .slick-prev {
-  left: 15px;
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
 }
 
+.slick-prev:before { content: '\2039'; font-size: 22px; }
+
 .slick-next {
-  right: 15px;
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
 }
+
+.slick-next:before { content: '\203A'; font-size: 22px; }
 
