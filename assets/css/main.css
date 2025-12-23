@@ -183,6 +183,28 @@ p {
   background-color: rgba(59, 130, 246, 0.1);
 }
 
+.navbar-toggler .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23000000' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+  background-size: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 1.5em;
+  height: 1.5em;
+  display: inline-block;
+}
+
+/* Ensure the hamburger icon is always visible (high specificity) */
+nav.navbar.navbar-expand-lg.fixed-top button.navbar-toggler > span.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='%23000000' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  background-size: 18px 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+  display: inline-block !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
 .navbar-collapse {
   background: var(--white);
   backdrop-filter: blur(10px);
@@ -552,8 +574,11 @@ a:focus, button:focus, input:focus, textarea:focus, .nav-link:focus, .btn:focus 
   box-shadow: 0 4px 6px var(--shadow-light);
   position: relative;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  min-height: 200px;
+  min-height: 250px;
   margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .testimonial-card-small:hover {
@@ -1160,5 +1185,40 @@ textarea:focus {
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+}
+
+/* Slick Carousel Navigation Buttons */
+.slick-prev,
+.slick-next {
+  z-index: 1000;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  background-color: rgba(30, 58, 138, 0.8);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  transition: var(--transition-normal);
+}
+
+.slick-prev:hover,
+.slick-next:hover {
+  background-color: var(--primary-color);
+  transform: scale(1.1);
+}
+
+.slick-prev:before,
+.slick-next:before {
+  content: '';
+}
+
+.slick-prev {
+  left: 15px;
+}
+
+.slick-next {
+  right: 15px;
 }
 

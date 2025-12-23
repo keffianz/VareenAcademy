@@ -24,6 +24,39 @@ const initializeWebsite = () => {
     initializeTypingEffect();
     initializeMorphingElements();
     initializeFloatingElements();
+    initializeTestimonials();
+};
+
+// Initialize testimonials slider with Slick
+const initializeTestimonials = () => {
+    if (typeof $ !== 'undefined' && $('.testimonials-slider').length > 0) {
+        $('.testimonials-slider').slick({
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            autoplay: true,
+            autoplaySpeed: 5000,
+            dots: true,
+            arrows: true,
+            infinite: true,
+            pauseOnHover: true,
+            responsive: [
+                {
+                    breakpoint: 768,
+                    settings: {
+                        slidesToShow: 2,
+                        slidesToScroll: 1
+                    }
+                },
+                {
+                    breakpoint: 576,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1
+                    }
+                }
+            ]
+        });
+    }
 };
 
 // Enhanced Navigation with smooth animations
