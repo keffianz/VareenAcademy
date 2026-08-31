@@ -1,0 +1,18 @@
+# API directory configuration for PHP backend
+RewriteEngine On
+
+# Allow access to API endpoints but protect config.php
+<IfModule mod_authz_core.c>
+    Require all granted
+    <Files "config.php">
+        Require all denied
+    </Files>
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Allow from all
+    <Files "config.php">
+        Deny from all
+    </Files>
+</IfModule>
+

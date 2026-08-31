@@ -1,0 +1,19 @@
+{
+  "name": "vareen-academy-visual-tests",
+  "version": "1.0.0",
+  "description": "Visual regression helper (Puppeteer) for the VAREEN Academy static site",
+  "main": "tools/visual-check.js",
+  "scripts": {
+    "visual-check": "node tools/visual-check.js",
+    "visual-check:light": "node tools/visual-check.js --scheme=light",
+    "visual-check:dark": "node tools/visual-check.js --scheme=dark"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer": "^21.2.0",
+    "minimist": "^1.2.8"
+  }
+}
+
+
