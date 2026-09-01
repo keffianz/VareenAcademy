@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Block access to admin areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /sql/
+
+# Allow access to CSS and JS
+Allow: /assets/css/
+Allow: /assets/js/
+
+# Sitemap
+Sitemap: https://vareenacademy.com/sitemap.xml
+
+
+

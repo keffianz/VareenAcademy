@@ -1,0 +1,42 @@
+Step 1: Comment out initializeMobileMenu function
+
+Search:
+const initializeMobileMenu = () => {
+    const navbarToggler = document.querySelector('.navbar-toggler');
+    const navbarCollapse = document.querySelector('.navbar-collapse');
+
+    if (navbarToggler && navbarCollapse) {
+        navbarToggler.addEventListener('click', () => {
+            const isExpanded = navbarToggler.getAttribute('aria-expanded') === 'true';
+            navbarToggler.setAttribute('aria-expanded', !isExpanded);
+            navbarCollapse.classList.toggle('show');
+        });
+    }
+};
+
+Replace with:
+/*
+const initializeMobileMenu = () => {
+    const navbarToggler = document.querySelector('.navbar-toggler');
+    const navbarCollapse = document.querySelector('.navbar-collapse');
+
+    if (navbarToggler && navbarCollapse) {
+        navbarToggler.addEventListener('click', () => {
+            const isExpanded = navbarToggler.getAttribute('aria-expanded') === 'true';
+            navbarToggler.setAttribute('aria-expanded', !isExpanded);
+            navbarCollapse.classList.toggle('show');
+        });
+    }
+};
+*/
+
+Step 2: Comment out invocation call in initializeWebsite:
+
+Search:
+initializeMobileMenu();
+
+Replace with:
+//initializeMobileMenu();
+
+This text file details the diff patch plan to apply in multiple small steps for safe editing.
+
