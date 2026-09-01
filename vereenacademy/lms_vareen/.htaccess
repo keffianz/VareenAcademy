@@ -1,0 +1,74 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # 1. FIXED: Set base directory to match your subfolder name
+    RewriteBase /lms_vareen/
+    
+    # Remove trailing slashes
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.+)/$ $1 [L,R=301]
+    
+    # Prevent access to sensitive directories, BUT allow API under /src/api/
+    # (so login/logout/etc can work)
+    RewriteCond %{REQUEST_URI} !^/lms_vareen/src/api/ [NC]
+    RewriteRule ^(src|assets/uploads|database)(/|$) - [F,L]
+
+    
+    # 2. FIXED: Allow access to public assets inside subfolder
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteCond %{REQUEST_URI} ^/lms_vareen/public/ [OR]
+    RewriteCond %{REQUEST_FILENAME} ^index\.php$ [OR]
+    RewriteCond %{REQUEST_FILENAME} ^\.htaccess$
+    RewriteRule ^ - [L]
+    
+    # Route all requests to index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L,QSA]
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Caching
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # Images
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+    
+    # Fonts
+    ExpiresByType font/ttf "access plus 1 year"
+    ExpiresByType font/otf "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    
+    # CSS and JS
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType text/javascript "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    
+    # Default
+    ExpiresDefault "access plus 2 days"
+</IfModule>
+
+# Compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript
+</IfModule>
+
+# Prevent access to internal files but allow index.php
+<FilesMatch "\.env$|\.htaccess$|\.gitignore$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

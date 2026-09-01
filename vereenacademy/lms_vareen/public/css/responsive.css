@@ -1,0 +1,376 @@
+/* VEREEN Academy - Responsive Design */
+
+/* Tablets (768px and above) */
+@media (max-width: 1024px) {
+    .container {
+        padding: 0 15px;
+    }
+
+    .nav-links {
+        gap: 20px;
+    }
+
+    .grid-2,
+    .grid-3,
+    .grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .footer-content {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+}
+
+/* Mobile Phones (768px and below) */
+@media (max-width: 768px) {
+    /* Navigation */
+    .navbar-toggle {
+        display: flex;
+    }
+
+    .navbar-menu {
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background: white;
+        box-shadow: var(--box-shadow);
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s;
+    }
+
+    .navbar-menu.active {
+        max-height: 500px;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        gap: 0;
+        align-items: stretch;
+    }
+
+    .nav-links li {
+        border-bottom: 1px solid #eee;
+    }
+
+    .nav-links li:last-child {
+        border-bottom: none;
+    }
+
+    .nav-links a {
+        display: block;
+        padding: 15px 20px;
+        color: #333;
+    }
+
+    .dropdown-menu {
+        position: static;
+        box-shadow: none;
+        background: #f8f9fa;
+        display: none;
+    }
+
+    .nav-dropdown:hover .dropdown-menu {
+        display: none;
+    }
+
+    .nav-dropdown > a::after {
+        content: '\f078';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        margin-left: auto;
+    }
+
+    .nav-dropdown.active > a::after {
+        content: '\f077';
+    }
+
+    .nav-dropdown.active .dropdown-menu {
+        display: block;
+    }
+
+    .btn-login,
+    .btn-signup {
+        padding: 10px 15px;
+        font-size: 12px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .btn-login {
+        margin-bottom: 10px;
+        margin-right: 0;
+    }
+
+    /* Main content */
+    .main-content {
+        padding: 20px 0;
+    }
+
+    /* Cards */
+    .card {
+        margin-bottom: 15px;
+    }
+
+    .card-header,
+    .card-body,
+    .card-footer {
+        padding: 15px;
+    }
+
+    .card-title {
+        font-size: 16px;
+    }
+
+    /* Grids */
+    .grid-2,
+    .grid-3,
+    .grid-4 {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    /* Forms */
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+
+    .btn-large {
+        padding: 12px 24px;
+    }
+
+    /* Footer */
+    .footer {
+        padding: 30px 0 15px;
+        margin-top: 50px;
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+
+    .social-links {
+        gap: 10px;
+    }
+
+    .social-links a {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+
+    /* Alerts */
+    .alert {
+        padding: 12px 15px;
+        font-size: 13px;
+    }
+
+    /* Utilities */
+    .mt-20 {
+        margin-top: 15px;
+    }
+
+    .mb-20,
+    .mb-30 {
+        margin-bottom: 15px;
+    }
+}
+
+/* Small Mobile Phones (480px and below) */
+@media (max-width: 480px) {
+    .container {
+        padding: 0 10px;
+    }
+
+    /* Navigation */
+    .navbar .container {
+        padding: 12px 10px;
+    }
+
+    .navbar-brand {
+        flex: 0 1 auto;
+    }
+
+    .logo {
+        font-size: 16px;
+        gap: 5px;
+    }
+
+    .logo span {
+        display: none;
+    }
+
+    /* Cards */
+    .card-header,
+    .card-body,
+    .card-footer {
+        padding: 12px;
+    }
+
+    .card-title {
+        font-size: 14px;
+    }
+
+    .card-text {
+        font-size: 12px;
+    }
+
+    /* Forms */
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        padding: 10px 8px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+
+    .btn-small {
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+
+    /* Footer */
+    .footer-section h3 {
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .footer-section p,
+    .footer-section a {
+        font-size: 12px;
+    }
+
+    .footer-bottom {
+        font-size: 12px;
+    }
+
+    /* Text utilities */
+    .text-small {
+        font-size: 11px;
+    }
+}
+
+/* Touch-friendly adjustments */
+@media (hover: none) and (pointer: coarse) {
+    /* Increase touch targets to 44px minimum */
+    .btn,
+    .nav-links a,
+    .dropdown-menu a,
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    /* Remove hover effects on touch devices */
+    .btn:hover,
+    .card:hover,
+    .nav-links a:hover {
+        transform: none;
+        box-shadow: var(--box-shadow);
+    }
+
+    .nav-dropdown:hover .dropdown-menu {
+        display: none;
+    }
+
+    /* Add active states instead */
+    .btn:active {
+        opacity: 0.8;
+    }
+}
+
+/* High DPI screens (Retina) */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .navbar-toggle span {
+        height: 2px;
+    }
+
+    .progress {
+        height: 6px;
+    }
+}
+
+/* Landscape mode on mobile */
+@media (max-height: 600px) and (orientation: landscape) {
+    .navbar {
+        padding: 8px 0;
+    }
+
+    .navbar .container {
+        padding: 8px 20px;
+    }
+
+    .main-content {
+        padding: 15px 0;
+    }
+
+    .card-header,
+    .card-body,
+    .card-footer {
+        padding: 10px 15px;
+    }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .navbar,
+    .footer,
+    .navbar-toggle,
+    .btn {
+        display: none;
+    }
+
+    body {
+        background: white;
+    }
+
+    .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        page-break-inside: avoid;
+    }
+
+    a {
+        text-decoration: underline;
+    }
+}

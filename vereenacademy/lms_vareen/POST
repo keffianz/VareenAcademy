@@ -1,0 +1,1 @@
+Restart Apache (XAMPP Stop/Start) and re-test Sign In - /lms_vareen/src/api/auth.php?action=login
