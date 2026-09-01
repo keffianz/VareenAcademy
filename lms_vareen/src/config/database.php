@@ -20,7 +20,9 @@ define('SESSION_TIMEOUT', 30 * 60); // 30 minutes
 define('REMEMBER_ME_DAYS', 30);
 
 // Security
-define('JWT_SECRET', 'your_jwt_secret_key_here_change_in_production');
+// IMPORTANT: In production, these secrets should be stored in environment variables or a .env file
+// Never commit real secrets to version control
+define('JWT_SECRET', 'sk_live_' . bin2hex(random_bytes(24))); // Generated secure random key - regenerate per environment
 define('PASSWORD_MIN_LENGTH', 8);
 
 // Pagination

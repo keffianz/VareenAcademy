@@ -82,3 +82,25 @@ function checkSessionTimeout() {
         $_SESSION['login_time'] = time();
     }
 }
+
+
+function checkAuth() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    if (!isLoggedIn()) {
+        http_response_code(401);
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Authentication required. Please log in again.']);
+        exit;
+    }
+    
+    return [
+        'id' => $_SESSION['user_id'],
+        'role' => $_SESSION['role'] ?? null,
+        'first_name' => $_SESSION['first_name'] ?? null,
+        'last_name' => $_SESSION['last_name'] ?? null,
+        'email' => $_SESSION['email'] ?? null,
+    ];
+}
