@@ -6,6 +6,7 @@
 header('Content-Type: application/json');
 
 require_once '../classes/User.php';
+require_once '../middleware/auth.php';
 
 $request_method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
@@ -13,6 +14,11 @@ $action = $_GET['action'] ?? '';
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
+}
+
+// CSRF protection for all state-changing POST requests
+if ($request_method === 'POST') {
+    requireCsrf();
 }
 
 $user = new User();

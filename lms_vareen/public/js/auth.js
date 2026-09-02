@@ -2,6 +2,17 @@
  * VEREEN Academy - Authentication JavaScript
  */
 
+/**
+ * Retrieve the CSRF token for state-changing requests.
+ * Rendered by PHP either into window.CSRF_TOKEN (auth pages) or into
+ * the <meta name="csrf-token"> tag (layout/dashboard pages).
+ */
+function getCsrfToken() {
+    if (window.CSRF_TOKEN) return window.CSRF_TOKEN;
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    return meta ? meta.getAttribute('content') : '';
+}
+
 const Auth = {
     /**
      * Perform login
@@ -11,7 +22,8 @@ const Auth = {
 const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': getCsrfToken()
                 },
                 body: JSON.stringify({ email, password })
             });
@@ -32,7 +44,8 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
             const response = await fetch('/lms_vareen/src/api/auth.php?action=signup', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': getCsrfToken()
                 },
                 body: JSON.stringify({ first_name, last_name, email, password, role })
             });
@@ -51,12 +64,15 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
     logout: async () => {
         try {
             const response = await fetch('/lms_vareen/src/api/auth.php?action=logout', {
-                method: 'POST'
+                method: 'POST',
+                headers: {
+                    'X-CSRF-Token': getCsrfToken()
+                }
             });
 
             const data = await response.json();
             if (data.success) {
-                window.location.href = '/index.php?page=login';
+                window.location.href = '/lms_vareen/index.php?page=login';
             }
             return data;
         } catch (error) {
@@ -73,7 +89,8 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
             const response = await fetch('/lms_vareen/src/api/auth.php?action=check_email', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': getCsrfToken()
                 },
                 body: JSON.stringify({ email })
             });
@@ -94,7 +111,8 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
             const response = await fetch('/lms_vareen/src/api/auth.php?action=request_reset', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': getCsrfToken()
                 },
                 body: JSON.stringify({ email })
             });
@@ -115,7 +133,8 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
             const response = await fetch('/lms_vareen/src/api/auth.php?action=reset_password', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': getCsrfToken()
                 },
                 body: JSON.stringify({ token, new_password })
             });
@@ -136,7 +155,8 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
             const response = await fetch('/lms_vareen/src/api/auth.php?action=change_password', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': getCsrfToken()
                 },
                 body: JSON.stringify({ old_password, new_password })
             });

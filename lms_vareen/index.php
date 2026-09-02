@@ -46,8 +46,8 @@ function render_page($view_path, $page_title = 'Dashboard') {
 // Get requested page
 $page = $_GET['page'] ?? null;
 
-// Allow login and registration pages without authentication (no layout for auth pages)
-if ($page === 'login' || $page === 'register') {
+// Allow login, signup and password reset pages without authentication (no layout for auth pages)
+if ($page === 'login' || $page === 'signup' || $page === 'password-reset') {
     require_once __DIR__ . '/views/auth/' . $page . '.php';
     exit;
 }
@@ -118,7 +118,6 @@ switch ($page) {
         requireRole('teacher');
         render_page('views/teacher/dashboard.php', 'Dashboard');
         break;
-
     case 'teacher-lesson-editor':
         requireRole('teacher');
         render_page('views/teacher/lesson-editor.php', 'Edit Lesson');
@@ -154,6 +153,12 @@ switch ($page) {
         render_page('views/teacher/assignments-editor.php', 'Edit Assignments');
         break;
 
+    // Admin Pages
+    case 'admin-dashboard':
+        requireRole('admin');
+        render_page('views/admin/dashboard.php', 'Admin Dashboard');
+        break;
+
     // Default: redirect to appropriate dashboard
     case null:
         $role = getCurrentUserRole();
@@ -161,6 +166,8 @@ switch ($page) {
             redirectTo('index.php?page=student-dashboard');
         } elseif ($role === 'teacher') {
             redirectTo('index.php?page=teacher-dashboard');
+        } elseif ($role === 'admin') {
+            redirectTo('index.php?page=admin-dashboard');
         } else {
             redirectTo('index.php?page=login');
         }

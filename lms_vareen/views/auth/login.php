@@ -1,6 +1,7 @@
 <?php
 // Login page
 ?>
+<script>window.CSRF_TOKEN = '<?php echo csrfToken(); ?>';</script>
 <div class="auth-container">
     <div class="auth-box">
         <div class="auth-header">
@@ -252,14 +253,13 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    console.log('Login payload:', { email, password });
-
 
     try {
         const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': window.CSRF_TOKEN
             },
             body: JSON.stringify({ email, password })
         });
@@ -272,7 +272,9 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 
             // Redirect based on role
             setTimeout(() => {
-                if (data.user.role === 'teacher' || data.user.role === 'admin') {
+                if (data.user.role === 'admin') {
+                    window.location.href = 'index.php?page=admin-dashboard';
+                } else if (data.user.role === 'teacher') {
                     window.location.href = 'index.php?page=teacher-dashboard';
                 } else {
                     window.location.href = 'index.php?page=student-dashboard';

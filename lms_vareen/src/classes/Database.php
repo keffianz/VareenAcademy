@@ -1,14 +1,26 @@
 <?php
 /**
  * Database Class - PDO Connection Handler
+ *
+ * Reads credentials from src/config/database.php (production constants)
+ * with safe local-development fallbacks if the config is not loaded.
  */
 
+require_once __DIR__ . '/../config/database.php';
+
 class Database {
-    private $host = 'localhost';
-    private $db_name = 'vereen_academy';
-    private $user = 'root';
-    private $pass = '';
+    private $host;
+    private $db_name;
+    private $user;
+    private $pass;
     private $pdo;
+
+    public function __construct() {
+        $this->host    = defined('DB_HOST') ? DB_HOST : 'localhost';
+        $this->db_name = defined('DB_NAME') ? DB_NAME : 'vereen_academy';
+        $this->user    = defined('DB_USER') ? DB_USER : 'root';
+        $this->pass    = defined('DB_PASS') ? DB_PASS : '';
+    }
 
     public function connect() {
         try {

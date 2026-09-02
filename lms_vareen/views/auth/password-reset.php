@@ -1,6 +1,7 @@
 <?php
 // Password reset page
 ?>
+<script>window.CSRF_TOKEN = '<?php echo csrfToken(); ?>';</script>
 <div class="auth-container">
     <div class="auth-box">
         <div class="auth-header">
@@ -272,10 +273,11 @@ async function sendResetLink() {
     }
 
     try {
-        const response = await fetch('/src/api/auth.php?action=request_reset', {
+        const response = await fetch('/lms_vareen/src/api/auth.php?action=request_reset', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': window.CSRF_TOKEN
             },
             body: JSON.stringify({ email })
         });
@@ -283,10 +285,9 @@ async function sendResetLink() {
         const data = await response.json();
 
         if (data.success) {
-            document.getElementById('resetSuccess').textContent = 'Reset link sent! Check your email. (Token: ' + data.token + ')';
+            document.getElementById('resetSuccess').textContent = 'If a matching account exists, a reset code has been sent. Please check your email.';
             document.getElementById('resetSuccess').style.display = 'block';
-            
-            // For demo purposes, show the token
+
             setTimeout(() => {
                 document.getElementById('emailStep').style.display = 'none';
                 document.getElementById('passwordStep').style.display = 'block';
@@ -330,10 +331,11 @@ async function resetPassword() {
     if (!isValid) return;
 
     try {
-        const response = await fetch('/src/api/auth.php?action=reset_password', {
+        const response = await fetch('/lms_vareen/src/api/auth.php?action=reset_password', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': window.CSRF_TOKEN
             },
             body: JSON.stringify({ token, new_password })
         });
@@ -345,7 +347,7 @@ async function resetPassword() {
             document.getElementById('resetSuccess2').style.display = 'block';
             
             setTimeout(() => {
-                window.location.href = '/index.php?page=login';
+                window.location.href = '/lms_vareen/index.php?page=login';
             }, 2000);
         } else {
             document.getElementById('resetError2').textContent = data.message;

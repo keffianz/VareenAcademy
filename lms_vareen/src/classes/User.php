@@ -15,8 +15,18 @@ class User {
 
     /**
      * Register a new user
+     *
+     * SECURITY: Public registration is restricted to the 'student' role.
+     * 'teacher' and 'admin' accounts must be created by an administrator,
+     * never via a client-supplied role parameter.
      */
     public function register($first_name, $last_name, $email, $password, $role = 'student') {
+        // Whitelist roles - prevent privilege escalation via crafted requests
+        $allowedRoles = ['student'];
+        if (!in_array($role, $allowedRoles, true)) {
+            $role = 'student';
+        }
+
         // Validate input
         if (empty($first_name) || empty($last_name) || empty($email) || empty($password)) {
             return ['success' => false, 'message' => 'All fields are required'];
@@ -63,6 +73,19 @@ class User {
             return ['success' => false, 'message' => 'Email and password required'];
         }
 
+        // Brute-force protection: lock after 5 failed attempts per 15 minutes
+        $now = time();
+        $failures = $_SESSION['login_failures'] ?? 0;
+        $lockUntil = $_SESSION['login_lock_until'] ?? 0;
+
+        if ($lockUntil > $now) {
+            $mins = (int)ceil(($lockUntil - $now) / 60);
+            return ['success' => false, 'message' => 'Too many failed attempts. Please try again in ' . $mins . ' minute(s).'];
+        }
+
+        // Generic message used for both unknown email and wrong password to prevent user enumeration
+        $genericError = ['success' => false, 'message' => 'Invalid email or password'];
+
         try {
             $sql = "SELECT id, first_name, last_name, email, password, role, is_active 
                     FROM users WHERE email = :email";
@@ -72,26 +95,26 @@ class User {
             
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if (!$user) {
-                return ['success' => false, 'message' => 'Email not found'];
+            $passwordOk = $user && !empty($user['password']) && password_verify($password, $user['password']);
+
+            if (!$passwordOk) {
+                $failures++;
+                $_SESSION['login_failures'] = $failures;
+                if ($failures >= 5) {
+                    $_SESSION['login_lock_until'] = $now + 900; // 15 minutes
+                }
+                return $genericError;
             }
 
-
-            if (!$user['is_active']) {
+            if (!(int)$user['is_active']) {
                 return ['success' => false, 'message' => 'Your account has been deactivated'];
+
             }
 
-            // Verify password (ensure we compare against the correct bcrypt hash column)
-            $hash = $user['password'] ?? '';
-            if (!is_string($hash) || $hash === '') {
-                return ['success' => false, 'message' => 'Invalid email or password'];
-            }
-            if (!password_verify($password, $hash)) {
-                return ['success' => false, 'message' => 'Invalid email or password'];
-            }
+            // Login successful - clear failure counter and regenerate session id to prevent fixation
+            unset($_SESSION['login_failures'], $_SESSION['login_lock_until']);
+            session_regenerate_id(true);
 
-
-            // Login successful
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['first_name'] = $user['first_name'];
             $_SESSION['last_name'] = $user['last_name'];
@@ -99,9 +122,11 @@ class User {
             $_SESSION['role'] = $user['role'];
             $_SESSION['login_time'] = time();
 
+            // Strip password hash before returning the user object to the client
+            unset($user['password']);
             return ['success' => true, 'message' => 'Login successful', 'user' => $user];
         } catch (PDOException $e) {
-            return ['success' => false, 'message' => 'Login failed: ' . $e->getMessage()];
+            return ['success' => false, 'message' => 'Login failed. Please try again later.'];
         }
     }
 
@@ -215,20 +240,31 @@ class User {
 
     /**
      * Request password reset
+     *
+     * Security: always returns a generic success to prevent user enumeration,
+     * stores a hashed token, invalidates previous tokens, and never exposes
+     * the raw token in the JSON response.
      */
     public function requestPasswordReset($email) {
         try {
-            $sql = "SELECT id FROM users WHERE email = :email";
+            $sql = "SELECT id FROM users WHERE email = :email AND is_active = 1";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':email' => $email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+            $genericMessage = 'If a matching account exists, a password reset link has been generated.';
+
             if (!$user) {
-                return ['success' => false, 'message' => 'Email not found'];
+                return ['success' => true, 'message' => $genericMessage];
             }
 
-            // Generate token
+            // Invalidate previous tokens for this user
+            $del = $this->db->prepare("DELETE FROM password_resets WHERE user_id = :user_id");
+            $del->execute([':user_id' => $user['id']]);
+
+            // Generate token; store only its SHA-256 hash in the database
             $token = bin2hex(random_bytes(32));
+            $tokenHash = hash('sha256', $token);
             $expires = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
             $sql = "INSERT INTO password_resets (user_id, token, expires_at) 
@@ -236,13 +272,35 @@ class User {
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
                 ':user_id' => $user['id'],
-                ':token' => $token,
+                ':token' => $tokenHash,
                 ':expires_at' => $expires
             ]);
 
-            return ['success' => true, 'message' => 'Reset link sent', 'token' => $token];
+            // Attempt to email the reset token to the user
+            $emailSent = false;
+            if (!empty($email)) {
+                $subject = 'VAREEN Academy - Password Reset';
+                $body = "Hello,\n\nUse this token to reset your VAREEN Academy password:\n\n$token\n\nThis token expires in 1 hour.\n\nIf you did not request this, you can safely ignore this email.\n";
+                $headers = 'From: ' . (defined('MAIL_FROM') && MAIL_FROM ? MAIL_FROM : 'noreply@vereenacademy.com') . "\r\n";
+                $emailSent = @mail($email, $subject, $body, $headers);
+            }
+
+            // If email delivery is not configured, write the token to a protected log for support recovery
+            if (!$emailSent) {
+                $logDir = __DIR__ . '/../../storage';
+                if (!is_dir($logDir)) {
+                    @mkdir($logDir, 0755, true);
+                }
+                @file_put_contents(
+                    $logDir . '/password_resets.log',
+                    date('c') . " user={$user['id']} token=$token\n",
+                    FILE_APPEND
+                );
+            }
+
+            return ['success' => true, 'message' => $genericMessage];
         } catch (PDOException $e) {
-            return ['success' => false, 'message' => 'Failed to process reset'];
+            return ['success' => false, 'message' => 'Failed to process reset. Please try again later.'];
         }
     }
 
@@ -255,13 +313,15 @@ class User {
         }
 
         try {
+            $tokenHash = hash('sha256', $token);
+
             $sql = "SELECT user_id, expires_at FROM password_resets WHERE token = :token";
             $stmt = $this->db->prepare($sql);
-            $stmt->execute([':token' => $token]);
+            $stmt->execute([':token' => $tokenHash]);
             $reset = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$reset) {
-                return ['success' => false, 'message' => 'Invalid reset token'];
+                return ['success' => false, 'message' => 'Invalid or already-used reset token'];
             }
 
             if (strtotime($reset['expires_at']) < time()) {
@@ -274,10 +334,10 @@ class User {
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':password' => $hashed_password, ':id' => $reset['user_id']]);
 
-            // Delete token
+            // Delete token (single-use)
             $sql = "DELETE FROM password_resets WHERE token = :token";
             $stmt = $this->db->prepare($sql);
-            $stmt->execute([':token' => $token]);
+            $stmt->execute([':token' => $tokenHash]);
 
             return ['success' => true, 'message' => 'Password reset successful'];
         } catch (PDOException $e) {

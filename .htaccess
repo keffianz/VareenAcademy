@@ -86,6 +86,14 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # Route LMS dashboard navigation to the LMS router.
+    # Dashboard views link with root-absolute /index.php?page=... URLs; there is no
+    # root index.php (the marketing site is index.html), so internally map it to the LMS.
+    RewriteRule ^index\.php$ lms_vareen/index.php [L,QSA]
+
+    # Friendly entry point for the LMS
+    RewriteRule ^lms_vareen/?$ lms_vareen/index.php [L,QSA]
+
     # Deny direct access to API configuration
     RewriteRule ^api/config\.php$ - [F,L]
 

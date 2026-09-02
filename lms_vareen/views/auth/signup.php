@@ -1,6 +1,7 @@
 <?php
 // Signup page
 ?>
+<script>window.CSRF_TOKEN = '<?php echo csrfToken(); ?>';</script>
 <div class="auth-container">
     <div class="auth-box">
         <div class="auth-header">
@@ -69,15 +70,6 @@
                     required
                 >
                 <small class="error-msg" id="confirmPasswordError"></small>
-            </div>
-
-            <div class="form-group">
-                <label for="role">I am a:</label>
-                <select id="role" name="role" required>
-                    <option value="student">Student</option>
-                    <option value="teacher">Teacher</option>
-                </select>
-                <small class="error-msg" id="roleError"></small>
             </div>
 
             <div class="form-group checkbox">
@@ -313,7 +305,6 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const confirm_password = document.getElementById('confirm_password').value;
-    const role = document.getElementById('role').value;
     const terms = document.getElementById('terms').checked;
 
     // Validation
@@ -345,19 +336,21 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
     }
 
     if (!terms) {
-        document.getElementById('roleError').textContent = 'You must agree to terms';
+        document.getElementById('signupError').textContent = 'You must agree to the terms';
+        document.getElementById('signupError').style.display = 'block';
         isValid = false;
     }
 
     if (!isValid) return;
 
     try {
-const response = await fetch('src/api/auth.php?action=signup',
+        const response = await fetch('/lms_vareen/src/api/auth.php?action=signup', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': window.CSRF_TOKEN
             },
-            body: JSON.stringify({ first_name, last_name, email, password, role })
+            body: JSON.stringify({ first_name, last_name, email, password, role: 'student' })
         });
 
         const data = await response.json();

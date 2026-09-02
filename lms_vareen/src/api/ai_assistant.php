@@ -26,6 +26,12 @@ try {
     
     $action = $_GET['action'] ?? '';
     $student_id = $auth['id'];
+
+    // CSRF protection for the state-changing 'ask' action
+    if ($action === 'ask') {
+        requireCsrf();
+    }
+    
     $ai = new AIAssistant();
     
     switch ($action) {

@@ -251,7 +251,8 @@ class AIAssistantWidget {
             const response = await fetch('/lms_vareen/src/api/ai_assistant.php?action=ask', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-Token': (document.querySelector('meta[name="csrf-token"]') || {}).content || ''
                 },
                 body: new URLSearchParams({
                     'lesson_id': this.currentLesson.id,

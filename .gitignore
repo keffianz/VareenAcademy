@@ -1,0 +1,15 @@
+# Scratch/output files from local audit tooling
+tools/_*.txt
+
+# Runtime logs & private data (password-reset token log etc.)
+lms_vareen/storage/*.log
+lms_vareen/storage/password_resets.log
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Dependencies
+node_modules/
+vendor/

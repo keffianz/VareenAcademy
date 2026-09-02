@@ -104,3 +104,33 @@ function checkAuth() {
         'email' => $_SESSION['email'] ?? null,
     ];
 }
+
+/**
+ * Get or create the CSRF token for the current session.
+ */
+function csrfToken(): string {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+/**
+ * Reject state-changing requests that do not carry a valid CSRF token.
+ * The token must be sent in the X-CSRF-Token header.
+ */
+function requireCsrf(): void {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+    if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token)) {
+        http_response_code(403);
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Invalid or missing security token. Please refresh the page and try again.']);
+        exit;
+    }
+}
