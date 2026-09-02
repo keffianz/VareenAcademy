@@ -320,7 +320,7 @@ function timeAgo(dateString) {
 }
 
 function markNotificationRead(notificationId) {
-    fetch('/src/api/dashboard.php?action=mark_notification_read', {
+    fetch('<?php echo appBasePath(); ?>/src/api/dashboard.php?action=mark_notification_read', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -341,7 +341,7 @@ function markNotificationRead(notificationId) {
 }
 
 document.getElementById('markAllRead')?.addEventListener('click', () => {
-    fetch('/src/api/dashboard.php?action=mark_all_notifications_read', {
+    fetch('<?php echo appBasePath(); ?>/src/api/dashboard.php?action=mark_all_notifications_read', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

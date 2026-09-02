@@ -51,6 +51,13 @@ if (!$quiz_id) {
 
 <script>
   const quizId = <?php echo (int)$quiz_id; ?>;
+  // App-relative API base so URLs work both at /lms_vareen/index.php and the mapped /index.php
+  const API_BASE = '<?php echo appBasePath(); ?>/src/api/';
+
+  function getCsrfToken(){
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    return meta ? meta.content : '';
+  }
 
   function showToast(msg,type){
     if(typeof window.showToast === 'function') return window.showToast(msg,type);
@@ -60,7 +67,7 @@ if (!$quiz_id) {
   async function apiPost(url, dataObj){
     const fd = new FormData();
     Object.entries(dataObj).forEach(([k,v])=>fd.append(k,v));
-    const res = await fetch(url,{method:'POST',body:fd});
+    const res = await fetch(url,{method:'POST',body:fd,headers:{'X-CSRF-Token':getCsrfToken()}});
     return res.json();
   }
 
@@ -70,7 +77,7 @@ if (!$quiz_id) {
     let attemptId = parseInt(attemptEl.value || '0',10);
 
     if(!attemptId){
-      const r = await apiPost('src/api/quizzes.php?action=student_start_attempt',{quiz_id:quizId});
+      const r = await apiPost(API_BASE + 'quizzes.php?action=student_start_attempt',{quiz_id:quizId});
 
       if(!r.success) throw new Error(r.message||'Failed to start attempt');
       attemptEl.value = r.data ? r.data.attempt_id : r.attempt_id;
@@ -81,7 +88,7 @@ if (!$quiz_id) {
   }
 
   async function loadQuiz(){
-    const r = await apiPost('src/api/quizzes.php?action=student_get_quiz_with_questions',{quiz_id:quizId});
+    const r = await apiPost(API_BASE + 'quizzes.php?action=student_get_quiz_with_questions',{quiz_id:quizId});
 
     if(!r.success) throw new Error(r.message||'Failed to load quiz');
 
@@ -99,8 +106,17 @@ if (!$quiz_id) {
       const card = document.createElement('div');
       card.className = 'question-card';
 
+      // Built with DOM APIs + textContent so teacher-entered text can never inject markup
       const title = document.createElement('div');
-      title.innerHTML = '<strong>'+(idx+1)+'.</strong> '+q.question_text+'<div class="muted" style="margin-top:4px;">Type: '+q.question_type+' • Points: '+q.points+'</div>';
+      const num = document.createElement('strong');
+      num.textContent = (idx+1) + '. ';
+      title.appendChild(num);
+      title.appendChild(document.createTextNode(q.question_text));
+      const meta = document.createElement('div');
+      meta.className = 'muted';
+      meta.style.marginTop = '4px';
+      meta.textContent = 'Type: ' + q.question_type + ' • Points: ' + q.points;
+      title.appendChild(meta);
       card.appendChild(title);
 
       if(q.question_type === 'short_answer'){
@@ -115,7 +131,14 @@ if (!$quiz_id) {
         opts.forEach(opt=>{
           const row = document.createElement('label');
           row.className='option';
-          row.innerHTML = `<input type="radio" name="q_${q.id}" value="${opt.id}" /> <span>${opt.option_text}</span>`;
+          const input = document.createElement('input');
+          input.type = 'radio';
+          input.name = 'q_'+q.id;
+          input.value = opt.id;
+          const span = document.createElement('span');
+          span.textContent = opt.option_text;
+          row.appendChild(input);
+          row.appendChild(span);
           card.appendChild(row);
         });
       }
@@ -174,10 +197,9 @@ if (!$quiz_id) {
       return {question_id:q.id, selected_option_id: selected?parseInt(selected.value,10):null, answer_text:null};
     });
 
-    const res = await fetch('src/api/quizzes.php?action=student_submit_attempt',{
-
-
+    const res = await fetch(API_BASE + 'quizzes.php?action=student_submit_attempt',{
       method:'POST',
+      headers:{'X-CSRF-Token':getCsrfToken()},
       body:(()=>{
         const fd = new FormData();
         fd.append('attempt_id', attemptId);
@@ -189,8 +211,8 @@ if (!$quiz_id) {
     const data = await res.json();
     if(data.success){
       showToast('Quiz submitted. Score: '+data.data.percentage+'%','success');
-      // last attempt only UI; return to quizzes page
-      setTimeout(()=>{ window.location.href = 'index.php?page=quizzes'; }, 800);
+      // Show the graded result + evaluation
+      setTimeout(()=>{ window.location.href = 'index.php?page=quiz-result&quiz_id='+quizId; }, 800);
 
     }else{
       showToast(data.message||'Submit failed','error');

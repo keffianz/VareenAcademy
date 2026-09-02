@@ -17,10 +17,147 @@ $action = $_GET['action'] ?? '';
 $db = (new Database())->connect();
 $notification = new Notification();
 
+// CSRF: every state-changing (POST) endpoint requires the session token.
+// The frontend attaches X-CSRF-Token globally (public/js/main.js).
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireCsrf();
+}
+
 function fail($message, $code = 400) {
     http_response_code($code);
     echo json_encode(['success' => false, 'message' => $message]);
     exit;
+}
+
+/**
+ * Build a post-assessment evaluation from the real, graded attempt data.
+ * No AI call and no fabricated data: strong/weak areas come from the graded
+ * questions; recommended lessons are this course's lessons the student has
+ * not yet completed. Short-answer questions are flagged for teacher review.
+ */
+function buildAttemptEvaluation(PDO $db, $attempt_id, $quiz_id, $course_id, $student_id, $score, $max_score, $percentage) {
+    // Questions with the student's answers
+    $stmt = $db->prepare('SELECT qq.id, qq.question_text, qq.question_type, qq.points,
+                                 qa.is_correct, qa.selected_option_id, qa.answer_text
+                          FROM quiz_questions qq
+                          LEFT JOIN quiz_answers qa ON qa.question_id = qq.id AND qa.quiz_attempt_id = :aid
+                          WHERE qq.quiz_id = :quiz_id
+                          ORDER BY qq.position, qq.id');
+    $stmt->execute([':aid' => $attempt_id, ':quiz_id' => $quiz_id]);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // All options for this quiz (to resolve selected/correct option text)
+    $stmt = $db->prepare('SELECT qo.question_id, qo.id, qo.option_text, qo.is_correct
+                          FROM quiz_options qo
+                          JOIN quiz_questions qq ON qo.question_id = qq.id
+                          WHERE qq.quiz_id = :quiz_id
+                          ORDER BY qo.position, qo.id');
+    $stmt->execute([':quiz_id' => $quiz_id]);
+    $optionsByQuestion = [];
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $o) {
+        $optionsByQuestion[(int)$o['question_id']][] = $o;
+    }
+
+    $strong = [];
+    $weak = [];
+    $mistakes = [];
+    $correctCount = 0;
+    $incorrectCount = 0;
+    $reviewCount = 0;
+
+    foreach ($rows as $r) {
+        $qid = (int)$r['id'];
+        $text = (string)$r['question_text'];
+        $opts = $optionsByQuestion[$qid] ?? [];
+        $selectedText = null;
+        $correctText = null;
+        foreach ($opts as $o) {
+            if ($r['selected_option_id'] !== null && (int)$o['id'] === (int)$r['selected_option_id']) {
+                $selectedText = $o['option_text'];
+            }
+            if ((int)$o['is_correct'] === 1) {
+                $correctText = $o['option_text'];
+            }
+        }
+
+        if ($r['question_type'] === 'short_answer') {
+            // Auto-scored 0 in MVP; flag for teacher review instead of calling it wrong
+            $reviewCount++;
+            continue;
+        }
+
+        if ((int)$r['is_correct'] === 1) {
+            $correctCount++;
+            $strong[] = ['question' => $text];
+        } else {
+            $incorrectCount++;
+            $weak[] = ['question' => $text];
+            if ($r['selected_option_id'] === null) {
+                $mistakes[] = 'Left unanswered: "' . $text . '"'
+                    . ($correctText !== null ? ' (correct answer: "' . $correctText . '")' : '');
+            } elseif ($selectedText !== null && $correctText !== null) {
+                $mistakes[] = 'You selected "' . $selectedText . '", but the correct answer is "' . $correctText . '".';
+            }
+        }
+    }
+
+    // Recommended lessons: active lessons of this course not yet completed
+    $stmt = $db->prepare('SELECT DISTINCT l.id, l.title,
+                                 (lp.id IS NOT NULL AND lp.is_completed = 1) AS completed
+                          FROM lessons l
+                          LEFT JOIN lesson_progress lp ON lp.lesson_id = l.id AND lp.student_id = :sid
+                          WHERE l.course_id = :cid AND l.is_active = 1
+                          ORDER BY l.position, l.id');
+    $stmt->execute([':sid' => $student_id, ':cid' => $course_id]);
+    $lessonRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $recommended = [];
+    foreach ($lessonRows as $l) {
+        if (!(int)$l['completed']) {
+            $recommended[] = ['id' => (int)$l['id'], 'title' => $l['title']];
+            if (count($recommended) >= 3) break;
+        }
+    }
+    if (!$recommended) { // everything completed -> suggest first lessons for revision
+        foreach (array_slice($lessonRows, 0, 3) as $l) {
+            $recommended[] = ['id' => (int)$l['id'], 'title' => $l['title'] . ' (revision)'];
+        }
+    }
+
+    // Personalized study advice derived from the real result
+    $stmt = $db->prepare('SELECT pass_score FROM quizzes WHERE id = :id');
+    $stmt->execute([':id' => $quiz_id]);
+    $passScoreRaw = $stmt->fetchColumn();
+    $passScore = ($passScoreRaw === false || $passScoreRaw === null) ? null : (float)$passScoreRaw;
+    $passed = ($passScore !== null) ? ((float)$percentage >= $passScore) : null;
+
+    if ($passed === true) {
+        $advice = 'Good work - you passed this quiz. '
+            . ($weak
+                ? 'Review the weak areas below before moving on, and use the recommended lessons to close any gaps.'
+                : 'You answered every auto-graded question correctly.');
+    } elseif ($passed === false) {
+        $advice = 'Not passed yet - that is a normal part of learning. Work through the recommended lessons, '
+            . 'revisit the questions you missed, then try again. The VAREEN AI assistant can explain the '
+            . 'weak topics once you are back on your lessons.';
+    } else {
+        $advice = 'Review the recommended lessons below and try the quiz again.';
+    }
+
+    return [
+        'generated_at'        => date('c'),
+        'score'               => (int)$score,
+        'max_score'           => (int)$max_score,
+        'percentage'          => (float)$percentage,
+        'pass_score'          => $passScore,
+        'passed'              => $passed,
+        'auto_graded'         => ['correct' => $correctCount, 'incorrect' => $incorrectCount, 'needs_review' => $reviewCount],
+        'strong_areas'        => $strong,
+        'weak_areas'          => $weak,
+        'common_mistakes'     => array_slice($mistakes, 0, 10),
+        'recommended_lessons' => $recommended,
+        'study_advice'        => $advice,
+    ];
 }
 
 try {
@@ -393,12 +530,19 @@ try {
 
             $percentage = $max_score > 0 ? round(($score / $max_score) * 100, 2) : 0;
 
-            $stmt = $db->prepare('UPDATE quiz_attempts SET score = :score, max_score = :max_score, percentage = :percentage, status = :status, submitted_at = NOW() WHERE id = :id');
+            // Post-assessment evaluation (generated server-side from real answers)
+            $evaluation = buildAttemptEvaluation(
+                $db, $attempt_id, (int)$attempt['quiz_id'], (int)$attempt['course_id'],
+                (int)$user['id'], (int)$score, (int)$max_score, $percentage
+            );
+
+            $stmt = $db->prepare('UPDATE quiz_attempts SET score = :score, max_score = :max_score, percentage = :percentage, status = :status, evaluation = :evaluation, submitted_at = NOW() WHERE id = :id');
             $stmt->execute([
                 ':score' => $score,
                 ':max_score' => $max_score,
                 ':percentage' => $percentage,
                 ':status' => 'graded',
+                ':evaluation' => json_encode($evaluation),
                 ':id' => $attempt_id
             ]);
 
@@ -427,7 +571,8 @@ try {
                     'score' => (int)$score,
                     'max_score' => (int)$max_score,
                     'percentage' => $percentage,
-                    'graded' => true
+                    'graded' => true,
+                    'evaluation' => $evaluation
                 ]
             ]);
             break;

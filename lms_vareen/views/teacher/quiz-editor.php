@@ -258,7 +258,7 @@ $selectedQuizId = (int)($_GET['quiz_id'] ?? 0);
         const fd = new FormData(e.target);
         fd.append('action','teacher_create_quiz');
 
-        const res = await fetch('/src/api/quizzes.php?action=teacher_create_quiz', {method:'POST', body: fd});
+        const res = await fetch('<?php echo appBasePath(); ?>/src/api/quizzes.php?action=teacher_create_quiz', {method:'POST', body: fd});
         const data = await res.json();
         if(data.success){
             showToast(data.message || 'Quiz created', 'success');
@@ -274,7 +274,7 @@ $selectedQuizId = (int)($_GET['quiz_id'] ?? 0);
         e.preventDefault();
         const fd = new FormData(e.target);
         const quiz_id = fd.get('quiz_id');
-        const res = await fetch('/src/api/quizzes.php?action=teacher_add_question', {method:'POST', body: fd});
+        const res = await fetch('<?php echo appBasePath(); ?>/src/api/quizzes.php?action=teacher_add_question', {method:'POST', body: fd});
         const data = await res.json();
         if(data.success){
             showToast(data.message || 'Question added', 'success');
@@ -295,7 +295,7 @@ $selectedQuizId = (int)($_GET['quiz_id'] ?? 0);
             const is_correct = fd.get('is_correct') ? 1 : 0;
             fd.set('is_correct', is_correct);
 
-            const res = await fetch('/src/api/quizzes.php?action=teacher_add_option', {method:'POST', body: fd});
+            const res = await fetch('<?php echo appBasePath(); ?>/src/api/quizzes.php?action=teacher_add_option', {method:'POST', body: fd});
             const data = await res.json();
             if(data.success){
                 showToast(data.message || 'Option added', 'success');

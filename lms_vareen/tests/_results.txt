@@ -1,0 +1,42 @@
+[PASS] Login page returns 200
+[PASS] Login page embeds CSRF token
+[PASS] POST without CSRF token rejected (403)
+[PASS] Wrong password rejected
+[PASS] Failed login does not leak password hash
+[PASS] Failed login cannot open dashboard (302)
+[PASS] Role mismatch rejected (admin pw + student role)
+[PASS] Role mismatch rejected (teacher pw + admin role)
+[PASS] Role-mismatched login has no dashboard access
+[PASS] Admin login succeeds (role=admin)
+[PASS] Login response contains no password/hash
+[PASS] Session ID regenerated on login (anti-fixation)
+[PASS] Admin can open admin dashboard
+[PASS] Admin denied student dashboard (403)
+[PASS] Admin denied teacher dashboard (403)
+[PASS] Teacher login succeeds (role=teacher)
+[PASS] Teacher can open teacher dashboard
+[PASS] Teacher denied admin dashboard (403)
+[PASS] Teacher denied student dashboard (403)
+[PASS] Student login succeeds (role=student)
+[PASS] Student can open student dashboard
+[PASS] Student can open courses
+[PASS] Student can open assignments
+[PASS] Student can open quizzes
+[PASS] Student can open notifications
+[PASS] Student can open profile
+[PASS] Student denied admin dashboard (403)
+[PASS] Student denied teacher dashboard (403)
+[PASS] Student denied teacher lesson editor (403)
+[PASS] Student re-login after prior checks
+[PASS] Logout succeeds (200 + success)
+[PASS] Dashboard after logout redirects to login (302)
+[PASS] Unauthenticated /admin-dashboard redirects (302)
+[PASS] Unauthenticated /teacher-dashboard redirects (302)
+[PASS] Unauthenticated /student-dashboard redirects (302)
+[PASS] Unauthenticated /profile redirects (302)
+[PASS] Unknown page returns 404
+[PASS] Quizzes API rejects unauthenticated caller
+[PASS] AI API rejects teacher (student-only, 403)
+
+================ RESULTS ================
+PASS: 39  FAIL: 0

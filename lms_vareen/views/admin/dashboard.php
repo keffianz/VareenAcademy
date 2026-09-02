@@ -40,32 +40,8 @@ $aiConfigured = file_exists(__DIR__ . '/../src/config/ai_config.php');
 ?>
 
 <div class="dashboard-wrapper">
-    <!-- Sidebar Navigation -->
-    <aside class="dashboard-sidebar" id="adminSidebar">
-        <div class="sidebar-header">
-            <h3>Admin Panel</h3>
-            <button class="sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
-        </div>
-        <nav class="sidebar-menu">
-            <ul>
-                <li><a href="/index.php?page=admin-dashboard" class="active">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a></li>
-                <li><a href="#" title="Coming soon — Phase 8">
-                    <i class="fas fa-users-cog"></i> Manage Users
-                </a></li>
-                <li><a href="#" title="Coming soon — Phase 8">
-                    <i class="fas fa-book"></i> Manage Courses
-                </a></li>
-                <li><a href="#" title="Coming soon — Phase 8">
-                    <i class="fas fa-chart-bar"></i> Reports
-                </a></li>
-                <li><a href="#" title="Coming soon — Phase 8">
-                    <i class="fas fa-cog"></i> Settings
-                </a></li>
-            </ul>
-        </nav>
-    </aside>
+    <!-- Sidebar Navigation (shared partial) -->
+    <?php $admin_active = 'dashboard'; include __DIR__ . '/_sidebar.php'; ?>
 
     <!-- Main Content -->
     <div class="dashboard-content">

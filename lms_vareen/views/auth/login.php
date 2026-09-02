@@ -1,5 +1,8 @@
 <?php
-// Login page
+// Login page — role-aware (Admin / Teacher / Student).
+// The selected role is only a hint for account selection; the backend verifies
+// email + password + intended role, and the session role always decides
+// authorization and the post-login redirect.
 ?>
 <script>window.CSRF_TOKEN = '<?php echo csrfToken(); ?>';</script>
 <div class="auth-container">
@@ -11,12 +14,23 @@
 
         <form id="loginForm" class="auth-form">
             <div class="form-group">
+                <span class="role-label" id="roleLabel">I am signing in as</span>
+                <div class="role-tabs" role="tablist" aria-label="Select your account type">
+                    <button type="button" class="role-tab" data-role="student" role="tab" aria-selected="true">Student</button>
+                    <button type="button" class="role-tab" data-role="teacher" role="tab" aria-selected="false">Teacher / Staff</button>
+                    <button type="button" class="role-tab" data-role="admin" role="tab" aria-selected="false">Admin</button>
+                </div>
+                <input type="hidden" name="intended_role" id="intendedRole" value="student" autocomplete="off">
+            </div>
+
+            <div class="form-group">
                 <label for="email">Email Address</label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    name="email" 
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
                     placeholder="your@email.com"
+                    autocomplete="username"
                     required
                 >
                 <small class="error-msg" id="emailError"></small>
@@ -24,11 +38,12 @@
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
                     placeholder="••••••••"
+                    autocomplete="current-password"
                     required
                 >
                 <small class="error-msg" id="passwordError"></small>
@@ -40,7 +55,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary btn-block">Sign In</button>
-            
+
             <div class="error-message" id="loginError" style="display: none;"></div>
             <div class="success-message" id="loginSuccess" style="display: none;"></div>
         </form>
@@ -79,7 +94,7 @@
 
     .auth-header {
         text-align: center;
-        margin-bottom: 40px;
+        margin-bottom: 30px;
     }
 
     .auth-header h1 {
@@ -103,7 +118,8 @@
         margin-bottom: 20px;
     }
 
-    .form-group label {
+    .form-group label,
+    .role-label {
         display: block;
         margin-bottom: 8px;
         color: #333;
@@ -150,6 +166,53 @@
         cursor: pointer;
     }
 
+    /* Role selection tabs */
+    .role-tabs {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .role-tab {
+        padding: 10px 6px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: #f8f9ff;
+        color: #555;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        line-height: 1.3;
+    }
+
+    .role-tab:hover {
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+    .role-tab.active {
+        background: #667eea;
+        border-color: #667eea;
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.35);
+    }
+
+    .form-group.checkbox {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-group.checkbox input[type="checkbox"] {
+        width: auto;
+    }
+
+    .form-group.checkbox label {
+        margin-bottom: 0;
+        font-weight: 400;
+    }
+
     .btn {
         padding: 12px 20px;
         border: none;
@@ -169,6 +232,13 @@
         background: #5568d3;
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:disabled {
+        background: #9aa7f2;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
     }
 
     .btn-block {
@@ -236,7 +306,7 @@
     }
 
     /* Mobile Responsive */
-    @media (max-width: 768px) {
+    @media (max-width: 480px) {
         .auth-box {
             padding: 30px 20px;
         }
@@ -244,49 +314,93 @@
         .auth-header h1 {
             font-size: 24px;
         }
+
+        .role-tabs {
+            grid-template-columns: 1fr;
+        }
+
+        .role-tab {
+            padding: 10px 12px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .auth-box {
+            padding: 30px 20px;
+        }
     }
 </style>
 
 <script>
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+(function () {
+    var selectedRole = 'student';
 
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    try {
-        const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': window.CSRF_TOKEN
-            },
-            body: JSON.stringify({ email, password })
+    var tabs = document.querySelectorAll('.role-tab');
+    tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            tabs.forEach(function (t) {
+                t.classList.remove('active');
+                t.setAttribute('aria-selected', 'false');
+            });
+            tab.classList.add('active');
+            tab.setAttribute('aria-selected', 'true');
+            selectedRole = tab.getAttribute('data-role');
+            document.getElementById('intendedRole').value = selectedRole;
         });
+    });
 
-        const data = await response.json();
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-        if (data.success) {
-            document.getElementById('loginSuccess').textContent = 'Login successful! Redirecting...';
-            document.getElementById('loginSuccess').style.display = 'block';
+        var email = document.getElementById('email').value.trim();
+        var password = document.getElementById('password').value;
+        var loginError = document.getElementById('loginError');
+        var loginSuccess = document.getElementById('loginSuccess');
+        var submitBtn = e.target.querySelector('button[type="submit"]');
 
-            // Redirect based on role
-            setTimeout(() => {
-                if (data.user.role === 'admin') {
-                    window.location.href = 'index.php?page=admin-dashboard';
-                } else if (data.user.role === 'teacher') {
-                    window.location.href = 'index.php?page=teacher-dashboard';
-                } else {
-                    window.location.href = 'index.php?page=student-dashboard';
-                }
-            }, 1000);
-        } else {
-            document.getElementById('loginError').textContent = data.message;
-            document.getElementById('loginError').style.display = 'block';
+        loginError.style.display = 'none';
+        loginSuccess.style.display = 'none';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Signing In…';
+
+        try {
+            const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': window.CSRF_TOKEN
+                },
+                body: JSON.stringify({ email: email, password: password, intended_role: selectedRole })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                loginSuccess.textContent = 'Login successful! Redirecting...';
+                loginSuccess.style.display = 'block';
+
+                // Redirect by the SERVER-VERIFIED role, not by the selected tab.
+                setTimeout(() => {
+                    if (data.user.role === 'admin') {
+                        window.location.href = 'index.php?page=admin-dashboard';
+                    } else if (data.user.role === 'teacher') {
+                        window.location.href = 'index.php?page=teacher-dashboard';
+                    } else {
+                        window.location.href = 'index.php?page=student-dashboard';
+                    }
+                }, 1000);
+            } else {
+                loginError.textContent = data.message || 'Login failed. Please try again.';
+                loginError.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Sign In';
+            }
+        } catch (error) {
+            loginError.textContent = 'An error occurred. Please try again.';
+            loginError.style.display = 'block';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Sign In';
         }
-    } catch (error) {
-        document.getElementById('loginError').textContent = 'An error occurred. Please try again.';
-        document.getElementById('loginError').style.display = 'block';
-    }
-});
+    });
+})();
 </script>

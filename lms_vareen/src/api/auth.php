@@ -42,10 +42,19 @@ switch ($action) {
     case 'login':
         if ($request_method === 'POST') {
             $data = json_decode(file_get_contents('php://input'), true);
-            
+
+            // Intended role is used ONLY to select the account (email+password+role
+            // must all match server-side); authorization always comes from the
+            // verified account's role stored in the session, never from this input.
+            $intendedRole = $data['intended_role'] ?? null;
+            if (!in_array($intendedRole, ['admin', 'teacher', 'student'], true)) {
+                $intendedRole = null;
+            }
+
             $response = $user->login(
                 $data['email'] ?? '',
-                $data['password'] ?? ''
+                $data['password'] ?? '',
+                $intendedRole
             );
         }
         break;

@@ -120,14 +120,14 @@ $lessons = $lesson->getLessonsByModule($module_id);
             position: fd.get('position')
         };
 
-        const data = await postForm('/src/api/lessons.php?action=create', payload);
+        const data = await postForm('<?php echo appBasePath(); ?>/src/api/lessons.php?action=create', payload);
         if (data.success) location.reload();
         else showToast(data.message || 'Failed', 'error');
     });
 
     function deleteLesson(lessonId) {
         if (!confirm('Delete this lesson?')) return;
-        fetch('/src/api/lessons.php?action=delete', {
+        fetch('<?php echo appBasePath(); ?>/src/api/lessons.php?action=delete', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: new URLSearchParams({ lesson_id: lessonId })

@@ -16,7 +16,6 @@ $role = getCurrentUserRole();
 
 $courseModel = new Course();
 $moduleModel = new Module();
-$lessonModel = new Lesson();
 $progressModel = new LessonProgress();
 $enrollmentModel = new Enrollment();
 
@@ -38,12 +37,8 @@ foreach ($courseList as $c) {
     $modules = $moduleModel->getModulesByCourse($cid);
     $moduleCount = count($modules);
 
-    // Total lessons count
-    $lessons = $lessonModel->getCourseLessons($cid); // note: Course.php has getCourseLessons, not Lesson
-    // fallback: derive from lessons table via Course model
-    if (!is_array($lessons)) {
-        $lessons = (new Course())->getCourseLessons($cid);
-    }
+    // Lessons are exposed via the Course model (Course::getCourseLessons)
+    $lessons = $courseModel->getCourseLessons($cid);
     $lessonCount = is_array($lessons) ? count($lessons) : 0;
 
     $courseStats[] = [

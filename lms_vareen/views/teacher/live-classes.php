@@ -122,7 +122,7 @@ if (!empty($courseIds)) {
         const form = e.target;
         const payload = formToPayload(form);
 
-        const res = await fetch('/src/api/live_classes.php?action=teacher_create', {
+        const res = await fetch('<?php echo appBasePath(); ?>/src/api/live_classes.php?action=teacher_create', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: new URLSearchParams(payload)
@@ -135,7 +135,7 @@ if (!empty($courseIds)) {
 
     async function deleteLive(id) {
         if (!confirm('Delete this live class?')) return;
-        const res = await fetch('/src/api/live_classes.php?action=teacher_delete', {
+        const res = await fetch('<?php echo appBasePath(); ?>/src/api/live_classes.php?action=teacher_delete', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: new URLSearchParams({ live_class_id: id })

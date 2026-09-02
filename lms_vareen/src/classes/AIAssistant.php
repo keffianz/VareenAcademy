@@ -204,6 +204,31 @@ class AIAssistant {
     }
     
     /**
+     * Server-side AI assessment lock: true while the student has a fresh
+     * in-progress quiz attempt. A stale attempt (older than its time limit
+     * plus a 5-minute grace period) is treated as abandoned and does not
+     * lock the assistant.
+     */
+    public function isAssessmentLocked($student_id) {
+        try {
+            $stmt = $this->db->prepare(
+                "SELECT COUNT(*) AS count
+                 FROM quiz_attempts qa
+                 JOIN quizzes q ON qa.quiz_id = q.id
+                 WHERE qa.student_id = :sid
+                   AND qa.status = 'in_progress'
+                   AND qa.started_at >= NOW() - INTERVAL (COALESCE(q.time_limit_minutes, 60) + 5) MINUTE"
+            );
+            $stmt->execute([':sid' => (int)$student_id]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            return (int)($row['count'] ?? 0) > 0;
+        } catch (PDOException $e) {
+            // Fail closed: if we cannot verify, do not unlock during assessments
+            return true;
+        }
+    }
+
+    /**
      * Log conversation to database
      */
     private function logConversation($student_id, $lesson_id, $question, $answer, $success) {

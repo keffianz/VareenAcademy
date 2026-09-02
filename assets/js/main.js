@@ -31,7 +31,7 @@ const initializeWebsite = () => {
 const initializeTestimonials = () => {
     if (typeof $ !== 'undefined' && $.fn && $.fn.slick && $('.testimonials-slider').length > 0) {
         $('.testimonials-slider').slick({
-            slidesToShow: 1,
+            slidesToShow: 3,
             slidesToScroll: 1,
             autoplay: true,
             autoplaySpeed: 5000,
@@ -39,9 +39,10 @@ const initializeTestimonials = () => {
             arrows: true,
             infinite: true,
             pauseOnHover: true,
+            adaptiveHeight: false,
             responsive: [
                 {
-                    breakpoint: 768,
+                    breakpoint: 992,
                     settings: {
                         slidesToShow: 2,
                         slidesToScroll: 1

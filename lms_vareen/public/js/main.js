@@ -2,6 +2,41 @@
  * VEREEN Academy - Main JavaScript
  */
 
+// Attach the session CSRF token to every same-origin state-changing request,
+// so all API POSTs are protected without each caller remembering the header.
+(function () {
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    if (!meta) return;
+    const token = meta.content;
+    const origFetch = window.fetch.bind(window);
+    window.fetch = function (input, init) {
+        try {
+            init = init || {};
+            const method = (init.method || (typeof input === 'object' && input && input.method) || 'GET').toUpperCase();
+            let url = typeof input === 'string' ? input : (input && input.url) || '';
+            if (url.startsWith('http') && !url.startsWith(window.location.origin)) {
+                return origFetch(input, init); // cross-origin: leave untouched
+            }
+            if (method !== 'GET') {
+                let headers = init.headers;
+                if (!headers) {
+                    headers = { 'X-CSRF-Token': token };
+                } else if (typeof Headers !== 'undefined' && headers instanceof Headers) {
+                    if (!headers.has('X-CSRF-Token')) headers.set('X-CSRF-Token', token);
+                } else if (Array.isArray(headers)) {
+                    if (!headers.some(([k]) => String(k).toLowerCase() === 'x-csrf-token')) {
+                        headers.push(['X-CSRF-Token', token]);
+                    }
+                } else {
+                    if (!headers['X-CSRF-Token']) headers['X-CSRF-Token'] = token;
+                }
+                init.headers = headers;
+            }
+        } catch (e) { /* never break a request because of header patching */ }
+        return origFetch(input, init);
+    };
+})();
+
 // Mobile menu toggle
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 const navbarMenu = document.querySelector('.navbar-menu');
@@ -329,5 +364,5 @@ window.VereenaUtils = {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('VEREEN Academy initialized');
+    // Utilities are exported below; no debug logging in production.
 });

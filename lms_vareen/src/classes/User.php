@@ -67,8 +67,16 @@ class User {
 
     /**
      * Login user
+     *
+     * SECURITY: Email alone does not uniquely identify an account — the
+     * system supports one account per role per email (e.g. demo/test
+     * accounts). When $expectedRole is provided, only a user with that
+     * role can log in (email + password + intended role are all verified
+     * server-side before a session is created).
+     *
+     * @param string|null $expectedRole One of 'admin', 'teacher', 'student' or null for legacy behaviour.
      */
-    public function login($email, $password) {
+    public function login($email, $password, $expectedRole = null) {
         if (empty($email) || empty($password)) {
             return ['success' => false, 'message' => 'Email and password required'];
         }
@@ -87,13 +95,43 @@ class User {
         $genericError = ['success' => false, 'message' => 'Invalid email or password'];
 
         try {
-            $sql = "SELECT id, first_name, last_name, email, password, role, is_active 
+            $sql = "SELECT id, first_name, last_name, email, password, role, is_active
                     FROM users WHERE email = :email";
-            
+            $params = [':email' => $email];
+
+            // Role-scoped login: never trust the client role for authorization,
+            // but require that the verified account actually has that role.
+            if ($expectedRole !== null && $expectedRole !== '') {
+                if (!in_array($expectedRole, ['admin', 'teacher', 'student'], true)) {
+                    return $genericError;
+                }
+                $sql .= " AND role = :role";
+                $params[':role'] = $expectedRole;
+            }
+
             $stmt = $this->db->prepare($sql);
-            $stmt->execute([':email' => $email]);
-            
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->execute($params);
+            $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Normally at most one candidate. If several share the email+role
+            // (legacy data), require exactly one match to avoid ambiguity.
+            $user = null;
+            if (count($users) === 1) {
+                $user = $users[0];
+            } elseif (count($users) > 1) {
+                // Degrade safely: never pick "the first row" at random.
+                foreach ($users as $candidate) {
+                    if (!empty($candidate['password']) && password_verify($password, $candidate['password'])) {
+                        return ['success' => false, 'message' => 'Multiple accounts found for this email. Please contact support.'];
+                    }
+                }
+                $failures++;
+                $_SESSION['login_failures'] = $failures;
+                if ($failures >= 5) {
+                    $_SESSION['login_lock_until'] = $now + 900; // 15 minutes
+                }
+                return $genericError;
+            }
 
             $passwordOk = $user && !empty($user['password']) && password_verify($password, $user['password']);
 
@@ -132,12 +170,24 @@ class User {
 
     /**
      * Check if email exists
+     *
+     * @param string      $email Email address
+     * @param string|null $role  When provided, only that role's account is matched.
+     *                           Used so one email can exist once per role
+     *                           (demo/test accounts) without breaking the
+     *                           unique-email rule for normal registrations.
      */
-    public function emailExists($email) {
+    public function emailExists($email, $role = null) {
         try {
-            $sql = "SELECT id FROM users WHERE email = :email";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([':email' => $email]);
+            if ($role !== null && in_array($role, ['admin', 'teacher', 'student'], true)) {
+                $sql = "SELECT id FROM users WHERE email = :email AND role = :role";
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute([':email' => $email, ':role' => $role]);
+            } else {
+                $sql = "SELECT id FROM users WHERE email = :email";
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute([':email' => $email]);
+            }
             return $stmt->rowCount() > 0;
         } catch (PDOException $e) {
             return false;

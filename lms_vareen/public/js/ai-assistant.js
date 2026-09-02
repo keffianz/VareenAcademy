@@ -26,8 +26,33 @@ class AIAssistantWidget {
         this.createWidget();
         this.attachEventListeners();
         
+        // Server-enforced assessment lock: hide the assistant during quizzes/exams.
+        // The server also rejects 'ask' requests while locked (defense in depth).
+        this.refreshLockState();
+        
         // Load lessons when opened
         document.addEventListener('aiAssistant:opened', () => this.loadLessons());
+    }
+    
+    async refreshLockState() {
+        try {
+            const res = await fetch('/lms_vareen/src/api/ai_assistant.php?action=status');
+            if (!res.ok) return;
+            const data = await res.json();
+            if (data && data.success && data.assessment_locked) {
+                this.applyAssessmentLock();
+            }
+        } catch (e) {
+            // Widget stays visible; the server still enforces the lock on 'ask'
+        }
+    }
+    
+    applyAssessmentLock() {
+        const widget = document.getElementById('ai-assistant-widget');
+        if (widget) {
+            widget.style.display = 'none';
+        }
+        document.body.classList.add('ai-assessment-locked');
     }
     
     createWidget() {

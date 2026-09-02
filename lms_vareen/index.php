@@ -51,6 +51,39 @@ if ($page === 'login' || $page === 'signup' || $page === 'password-reset') {
     require_once __DIR__ . '/views/auth/' . $page . '.php';
     exit;
 }
+// Public pages: no login required, self-contained views (own header/styles)
+if ($page === 'verify' || $page === 'instructors' || $page === 'become-instructor') {
+    require_once __DIR__ . '/views/' . $page . '.php';
+    exit;
+}
+
+
+// Known routed pages — anything else is a 404, even for unauthenticated visitors,
+// so "requires login" never masks "does not exist".
+$knownPages = [
+    // Student pages
+    'student-dashboard', 'assignments', 'courses', 'lessons', 'quizzes', 'quiz-attempt',
+    'quiz-result', 'live-classes', 'course-detail', 'notifications', 'profile', 'certificates',
+    // Teacher pages
+    'teacher-dashboard', 'teacher-lesson-editor', 'teacher-module-editor', 'teacher-quiz-editor',
+    'teacher-quiz-attempts', 'teacher-resource-editor', 'teacher-live-classes', 'teacher-assignments-editor',
+    'teacher-attendance',
+    // Admin pages
+    'admin-dashboard', 'admin-users', 'admin-courses', 'admin-reports', 'admin-settings',
+    'admin-applications', 'admin-certificates',
+];
+if ($page !== null && !in_array($page, $knownPages, true)) {
+    http_response_code(404);
+    $view_content = '<div style="padding:40px;text-align:center;">'
+        . '<h1>404 - Page Not Found</h1>'
+        . '<p>The page you requested does not exist.</p>'
+        . '<a href="index.php">Back to Home</a>'
+        . '</div>';
+    $GLOBALS['view_content'] = $view_content;
+    $GLOBALS['page_title'] = 'Page Not Found';
+    include __DIR__ . '/views/layout.php';
+    exit;
+}
 
 // For all other pages, require login
 requireLogin();
@@ -113,6 +146,11 @@ switch ($page) {
         render_page('views/profile.php', 'Profile');
         break;
 
+    case 'certificates':
+        requireRole('student');
+        render_page('views/student/certificates.php', 'My Certificates');
+        break;
+
     // Teacher Pages
     case 'teacher-dashboard':
         requireRole('teacher');
@@ -153,10 +191,45 @@ switch ($page) {
         render_page('views/teacher/assignments-editor.php', 'Edit Assignments');
         break;
 
+    case 'teacher-attendance':
+        requireRole('teacher');
+        render_page('views/teacher/attendance.php', 'Attendance');
+        break;
+
     // Admin Pages
     case 'admin-dashboard':
         requireRole('admin');
         render_page('views/admin/dashboard.php', 'Admin Dashboard');
+        break;
+
+    case 'admin-users':
+        requireRole('admin');
+        render_page('views/admin/users.php', 'Manage Users');
+        break;
+
+    case 'admin-courses':
+        requireRole('admin');
+        render_page('views/admin/courses.php', 'Manage Courses');
+        break;
+
+    case 'admin-reports':
+        requireRole('admin');
+        render_page('views/admin/reports.php', 'Reports');
+        break;
+
+    case 'admin-settings':
+        requireRole('admin');
+        render_page('views/admin/settings.php', 'Settings');
+        break;
+
+    case 'admin-applications':
+        requireRole('admin');
+        render_page('views/admin/applications.php', 'Instructor Applications');
+        break;
+
+    case 'admin-certificates':
+        requireRole('admin');
+        render_page('views/admin/certificates.php', 'Certificate Management');
         break;
 
     // Default: redirect to appropriate dashboard

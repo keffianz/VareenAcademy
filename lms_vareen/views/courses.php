@@ -126,7 +126,7 @@ foreach ($courses as &$c) {
 
 <script>
 function enrollCourse(courseId) {
-    fetch('/src/api/dashboard.php?action=enroll', {
+    fetch('<?php echo appBasePath(); ?>/src/api/dashboard.php?action=enroll', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

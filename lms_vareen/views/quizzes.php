@@ -58,7 +58,7 @@ requireRole('student');
     }
 
     async function loadQuizzes(){
-        const res = await fetch('/src/api/quizzes.php?action=student_list_quizzes', {method:'POST'});
+        const res = await fetch('<?php echo appBasePath(); ?>/src/api/quizzes.php?action=student_list_quizzes', {method:'POST'});
         const data = await res.json();
         document.getElementById('quizzesLoading').style.display='none';
         document.getElementById('quizzesUI').style.display='block';

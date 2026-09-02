@@ -121,7 +121,7 @@ if ($selectedCourseId) {
         const form = e.target;
         const payload = formToPayload(form);
 
-        const res = await fetch('/src/api/assignments.php?action=teacher_create', {
+        const res = await fetch('<?php echo appBasePath(); ?>/src/api/assignments.php?action=teacher_create', {
             method: 'POST',
             headers: {'Content-Type':'application/x-www-form-urlencoded'},
             body: new URLSearchParams(payload)
@@ -133,7 +133,7 @@ if ($selectedCourseId) {
     });
 
     async function viewSubmissions(assignmentId) {
-        const res = await fetch('/src/api/assignments.php?action=teacher_list_submissions', {
+        const res = await fetch('<?php echo appBasePath(); ?>/src/api/assignments.php?action=teacher_list_submissions', {
             method: 'POST',
             headers: {'Content-Type':'application/x-www-form-urlencoded'},
             body: new URLSearchParams({ assignment_id: assignmentId })
@@ -187,7 +187,7 @@ if ($selectedCourseId) {
         const score = document.getElementById('score_' + submissionId).value;
         const feedback = document.getElementById('feedback_' + submissionId).value;
 
-        const res = await fetch('/src/api/assignments.php?action=teacher_grade', {
+        const res = await fetch('<?php echo appBasePath(); ?>/src/api/assignments.php?action=teacher_grade', {
             method:'POST',
             headers:{'Content-Type':'application/x-www-form-urlencoded'},
             body:new URLSearchParams({ submission_id: submissionId, score, feedback })

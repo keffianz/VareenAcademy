@@ -6,12 +6,20 @@
 require_once '../classes/Lesson.php';
 require_once '../classes/LessonProgress.php';
 require_once '../classes/Resource.php';
+require_once '../classes/Certificate.php';
+require_once '../classes/Notification.php';
+require_once '../classes/Database.php';
 require_once '../middleware/auth.php';
 
 header('Content-Type: application/json');
 
 // Check authentication
 $user = checkAuth();
+
+// CSRF: every POST (including lesson fetches posted with lesson_id) must carry the token
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireCsrf();
+}
 
 $action = $_GET['action'] ?? '';
 
@@ -90,6 +98,28 @@ try {
 
             $progress = new LessonProgress();
             $result = $progress->markCompleted($user['id'], $lesson_id);
+
+            // Auto-issue a certificate when this was the final active lesson of the course
+            $result['certificate_issued'] = false;
+            if (!empty($result['success'])) {
+                $dbConn = (new Database())->connect();
+                $stmtL = $dbConn->prepare('SELECT course_id FROM lessons WHERE id = :id');
+                $stmtL->execute([':id' => (int)$lesson_id]);
+                $certCourseId = (int)$stmtL->fetchColumn();
+                if ($certCourseId) {
+                    $certResult = (new Certificate())->issueIfEligible((int)$user['id'], $certCourseId);
+                    if (!empty($certResult['success']) && !empty($certResult['issued'])) {
+                        $result['certificate_issued'] = true;
+                        $result['certificate_code'] = $certResult['certificate']['certificate_code'];
+                        (new Notification())->create(
+                            (int)$user['id'],
+                            'certificate',
+                            'Certificate earned!',
+                            'Congratulations! You completed a course and earned certificate ' . $result['certificate_code'] . '.'
+                        );
+                    }
+                }
+            }
 
             echo json_encode($result);
             break;

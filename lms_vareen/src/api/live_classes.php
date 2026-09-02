@@ -19,13 +19,17 @@ if (!in_array($role, ['teacher', 'admin', 'student'], true)) {
     exit;
 }
 
-// Helper: normalize status update if provided
+$action = $_GET['action'] ?? '';
+
+// Normalize status update if provided (must run AFTER $action is defined)
 if (!isset($_POST['status']) && isset($_POST['live_class_id']) && ($action === 'teacher_update')) {
     $_POST['status'] = 'scheduled';
 }
 
-
-$action = $_GET['action'] ?? '';
+// CSRF: every POST (state change or authorized listing) must carry the session token
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireCsrf();
+}
 
 // Inline DB usage via Database class patterns
 require_once '../classes/Database.php';
@@ -184,7 +188,78 @@ try {
                 throw new Exception('You are not enrolled in this course');
             }
 
+            // Auto-record attendance the first time the student actually joins
+            if (!empty($lc['meeting_url'])) {
+                $att = $db->prepare(
+                    'INSERT IGNORE INTO live_class_attendance (live_class_id, student_id, joined_at)
+                     VALUES (:lc, :s, NOW())'
+                );
+                $att->execute([':lc' => $live_class_id, ':s' => (int)$user['id']]);
+            }
+
             echo json_encode(['success' => true, 'data' => ['meeting_url' => $lc['meeting_url'], 'recording_url' => $lc['recording_url'], 'title' => $lc['title']]]);
+            break;
+
+        case 'teacher_attendance_list':
+            if ($role !== 'teacher') throw new Exception('Access denied');
+
+            $live_class_id = (int)($_POST['live_class_id'] ?? 0);
+            if (!$live_class_id) throw new Exception('live_class_id required');
+
+            // Ownership check: the teacher may only view attendance for their own class
+            $stmt = $db->prepare('SELECT id, title FROM live_classes WHERE id = :id AND teacher_id = :t');
+            $stmt->execute([':id' => $live_class_id, ':t' => (int)$user['id']]);
+            $lc = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$lc) throw new Exception('Live class not found');
+
+            // All enrolled students with their attendance record (if any)
+            $stmt = $db->prepare(
+                'SELECT u.id AS student_id, u.first_name, u.last_name,
+                        lca.joined_at, lca.duration_minutes
+                 FROM enrollments e
+                 JOIN users u ON e.student_id = u.id AND u.is_active = 1
+                 LEFT JOIN live_class_attendance lca
+                        ON lca.student_id = u.id AND lca.live_class_id = :lc
+                 WHERE e.course_id = (SELECT course_id FROM live_classes WHERE id = :lc)
+                 ORDER BY u.first_name, u.last_name
+                 LIMIT 500'
+            );
+            $stmt->execute([':lc' => $live_class_id]);
+            echo json_encode(['success' => true, 'data' => ['live_class' => $lc, 'students' => $stmt->fetchAll(PDO::FETCH_ASSOC)]]);
+            break;
+
+        case 'teacher_attendance_mark':
+            if ($role !== 'teacher') throw new Exception('Access denied');
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') throw new Exception('Invalid request method');
+
+            $live_class_id = (int)($_POST['live_class_id'] ?? 0);
+            $student_id    = (int)($_POST['student_id'] ?? 0);
+            $present       = (int)!empty($_POST['present']);
+            if (!$live_class_id || !$student_id) throw new Exception('live_class_id and student_id required');
+
+            // Ownership + enrolled-student verification (prevents marking arbitrary users)
+            $stmt = $db->prepare('SELECT course_id FROM live_classes WHERE id = :id AND teacher_id = :t');
+            $stmt->execute([':id' => $live_class_id, ':t' => (int)$user['id']]);
+            $courseId = $stmt->fetchColumn();
+            if (!$courseId) throw new Exception('Live class not found');
+
+            $stmt = $db->prepare('SELECT COUNT(*) FROM enrollments WHERE course_id = :c AND student_id = :s');
+            $stmt->execute([':c' => $courseId, ':s' => $student_id]);
+            if (!(int)$stmt->fetchColumn()) throw new Exception('Student is not enrolled in this course');
+
+            if ($present) {
+                $stmt = $db->prepare(
+                    'INSERT INTO live_class_attendance (live_class_id, student_id, joined_at)
+                     VALUES (:lc, :s, NOW())
+                     ON DUPLICATE KEY UPDATE joined_at = COALESCE(joined_at, NOW())'
+                );
+                $stmt->execute([':lc' => $live_class_id, ':s' => $student_id]);
+                echo json_encode(['success' => true, 'message' => 'Marked present']);
+            } else {
+                $stmt = $db->prepare('DELETE FROM live_class_attendance WHERE live_class_id = :lc AND student_id = :s');
+                $stmt->execute([':lc' => $live_class_id, ':s' => $student_id]);
+                echo json_encode(['success' => true, 'message' => 'Marked absent']);
+            }
             break;
 
         default:

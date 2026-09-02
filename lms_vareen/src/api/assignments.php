@@ -21,6 +21,11 @@ if (!in_array($role, ['teacher', 'admin', 'student'], true)) {
 
 $action = $_GET['action'] ?? '';
 
+// CSRF: every POST (state change or authorized listing) must carry the session token
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireCsrf();
+}
+
 $db = (new Database())->connect();
 
 try {

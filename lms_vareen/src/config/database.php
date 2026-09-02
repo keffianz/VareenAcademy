@@ -1,13 +1,41 @@
 <?php
 /**
  * Database Configuration
+ *
+ * SECURITY: Credentials are loaded from (in order of priority):
+ *   1. Environment variables (DB_HOST, DB_USER, DB_PASS, DB_NAME)
+ *   2. Local untracked config: src/config/local_db.php  (copy local_db.example.php)
+ *   3. Local development defaults (XAMPP-style root user)
+ *
+ * NEVER commit real production credentials to version control.
+ * The credentials previously committed here must be considered exposed:
+ * rotate that database user's password on the production server.
  */
 
-// Database credentials
-define('DB_HOST', 'localhost');
-define('DB_USER', 'u374397808_vereenacademy');
-define('DB_PASS', 'Abubakar11@');
-define('DB_NAME', 'u374397808_vereen_academy');
+$__localDb = [];
+$__localFile = __DIR__ . '/local_db.php';
+if (is_file($__localFile)) {
+    $__localDb = require $__localFile;
+    if (!is_array($__localDb)) {
+        $__localDb = [];
+    }
+}
+
+$__dbCfg = static function (string $key, string $envVar, string $default) use ($__localDb): string {
+    $fromEnv = getenv($envVar);
+    if ($fromEnv !== false && $fromEnv !== '') {
+        return $fromEnv;
+    }
+    if (isset($__localDb[$key]) && $__localDb[$key] !== '') {
+        return (string)$__localDb[$key];
+    }
+    return $default;
+};
+
+define('DB_HOST', $__dbCfg('host', 'DB_HOST', '127.0.0.1'));
+define('DB_USER', $__dbCfg('user', 'DB_USER', 'root'));
+define('DB_PASS', $__dbCfg('pass', 'DB_PASS', ''));
+define('DB_NAME', $__dbCfg('name', 'DB_NAME', 'vereen_academy'));
 
 // Application constants
 define('APP_NAME', 'VEREEN Academy');

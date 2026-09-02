@@ -8,6 +8,7 @@ header('Content-Type: application/json');
 require_once '../classes/Enrollment.php';
 require_once '../classes/Course.php';
 require_once '../classes/Notification.php';
+require_once '../middleware/auth.php';
 
 // Start session
 if (session_status() === PHP_SESSION_NONE) {
@@ -22,6 +23,11 @@ if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
     echo json_encode(['success' => false, 'message' => 'Unauthorized']);
     exit;
+}
+
+// CSRF: every POST (enroll, mark notification, profile updates) must carry the token
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireCsrf();
 }
 
 $user_id = $_SESSION['user_id'];

@@ -97,7 +97,7 @@ $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
             const fd = new FormData(form);
 
             // require either text or file (server validates too)
-            const res = await fetch('/src/api/assignments.php?action=student_submit', {
+            const res = await fetch('<?php echo appBasePath(); ?>/src/api/assignments.php?action=student_submit', {
                 method: 'POST',
                 body: fd
             });

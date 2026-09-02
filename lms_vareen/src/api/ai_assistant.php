@@ -49,7 +49,30 @@ try {
             ]);
             break;
             
+        case 'status':
+            // Frontend uses this to hide the assistant while an assessment is active
+            $daily = $ai->getDailyUsageCount($student_id);
+            echo json_encode([
+                'success' => true,
+                'assessment_locked' => $ai->isAssessmentLocked($student_id),
+                'daily_usage' => $daily,
+                'daily_limit' => AI_DAILY_LIMIT,
+                'remaining' => max(0, AI_DAILY_LIMIT - $daily)
+            ]);
+            break;
+            
         case 'ask':
+            // Server-side assessment lock: the AI is disabled during timed
+            // quizzes/exams. This is enforced here, not just hidden in the UI.
+            if ($ai->isAssessmentLocked($student_id)) {
+                http_response_code(403);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'The AI assistant is locked while an assessment is in progress. It will be available again after you submit.',
+                    'code' => 'assessment_locked'
+                ]);
+                exit;
+            }
             // Ask a question about a lesson
             $lesson_id = $_POST['lesson_id'] ?? 0;
             $question = $_POST['question'] ?? '';
@@ -102,7 +125,7 @@ try {
             http_response_code(400);
             echo json_encode([
                 'success' => false,
-                'message' => 'Invalid action. Use "my_lessons" or "ask"'
+                'message' => 'Invalid action. Use "my_lessons", "ask" or "status"'
             ]);
     }
     

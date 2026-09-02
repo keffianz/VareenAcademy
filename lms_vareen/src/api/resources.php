@@ -21,6 +21,11 @@ if (!in_array($role, ['teacher', 'admin'], true)) {
 
 $action = $_GET['action'] ?? '';
 
+// CSRF: every POST (upload/delete) must carry the session token
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireCsrf();
+}
+
 try {
     $resource = new Resource();
     $lesson = new Lesson();

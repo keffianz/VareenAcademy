@@ -21,6 +21,11 @@ if (!in_array($role, ['teacher', 'admin'], true)) {
 
 $action = $_GET['action'] ?? '';
 
+// CSRF: every POST (state change or authorized listing) must carry the session token
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireCsrf();
+}
+
 try {
     $module = new Module();
     $course = new Course();

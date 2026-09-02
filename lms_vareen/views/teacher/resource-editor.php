@@ -89,7 +89,7 @@ $resources = $resource->getResourcesByLesson($lesson_id);
         const fd = new FormData(form);
 
         try {
-            const res = await fetch('/src/api/resources.php?action=upload', {
+            const res = await fetch('<?php echo appBasePath(); ?>/src/api/resources.php?action=upload', {
                 method: 'POST',
                 body: fd
             });
@@ -103,7 +103,7 @@ $resources = $resource->getResourcesByLesson($lesson_id);
 
     function deleteResource(resourceId) {
         if (!confirm('Delete this resource?')) return;
-        fetch('/src/api/resources.php?action=delete', {
+        fetch('<?php echo appBasePath(); ?>/src/api/resources.php?action=delete', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: new URLSearchParams({ resource_id: resourceId })

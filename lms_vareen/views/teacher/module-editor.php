@@ -103,7 +103,7 @@ $modules = $module->getModulesByCourse($course_id);
             position: formData.get('position')
         };
 
-        const data = await postForm('/src/api/modules.php?action=create', payload);
+        const data = await postForm('<?php echo appBasePath(); ?>/src/api/modules.php?action=create', payload);
         if (data.success) {
             location.reload();
         } else {
@@ -113,7 +113,7 @@ $modules = $module->getModulesByCourse($course_id);
 
     function deleteModule(moduleId) {
         if (!confirm('Delete this module?')) return;
-        fetch('/src/api/modules.php?action=delete', {
+        fetch('<?php echo appBasePath(); ?>/src/api/modules.php?action=delete', {
             method: 'POST',
             body: new URLSearchParams({ module_id: moduleId })
         })
