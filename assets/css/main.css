@@ -326,6 +326,34 @@ a:focus, button:focus, input:focus, textarea:focus, .nav-link:focus, .btn:focus 
   overflow: hidden;
 }
 
+.hero-section.bg-primary {
+  background: var(--gradient-primary) !important;
+}
+
+.hero-section.bg-primary .hero-title {
+  color: var(--white) !important;
+}
+
+.hero-section.bg-primary p {
+  color: #e2e8f0 !important;
+}
+
+.hero-section.bg-primary .hero-buttons .btn-light {
+  color: var(--text-primary) !important;
+}
+
+.hero-section.bg-primary .hero-buttons .btn-outline-light {
+  border-color: var(--white) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: var(--white) !important;
+}
+
+.hero-section.bg-primary .hero-buttons .btn-outline-light:hover {
+  background: var(--white) !important;
+  color: var(--primary-color) !important;
+  border-color: var(--white) !important;
+}
+
 .hero-section::before {
   content: '';
   position: absolute;
@@ -348,9 +376,9 @@ a:focus, button:focus, input:focus, textarea:focus, .nav-link:focus, .btn:focus 
 }
 
 .hero-buttons .btn-outline-light:hover {
-  background-color: #ffffff !important;
-  color: var(--primary-color) !important;
-  border-color: #ffffff !important;
+  background: var(--primary-color) !important;
+  color: #ffffff !important;
+  border-color: var(--primary-color) !important;
 }
 
 @media (max-width: 768px) {
@@ -451,12 +479,13 @@ a:focus, button:focus, input:focus, textarea:focus, .nav-link:focus, .btn:focus 
 
 .service-icon {
   transition: var(--transition-normal);
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
   height: 120px;
-  width: auto;
-  max-width: 100%;
   margin: 0 auto 1.25rem;
-  object-fit: contain;
+  font-size: 3rem;
 }
 
 .service-card:hover .service-icon {
@@ -618,6 +647,51 @@ a:focus, button:focus, input:focus, textarea:focus, .nav-link:focus, .btn:focus 
   opacity: 0.4;
 }
 
+.testimonial-card {
+  background: var(--white);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px var(--shadow-light);
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.testimonial-card .card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.testimonial-card .card-body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px var(--shadow-medium);
+}
+
+.testimonial-card .testimonial-quote {
+  margin-bottom: 1rem;
+}
+
+.testimonial-card .testimonial-author {
+  margin-top: auto;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
 .testimonial-content {
   font-style: italic;
   margin-bottom: 1rem;
@@ -701,19 +775,19 @@ footer h3, footer h4 {
 }
 
 .btn-outline-light {
-  border: 2px solid #ffffff !important;
-  background: rgba(255, 255, 255, 0.15) !important;
+  border: 2px solid var(--primary-color) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
   backdrop-filter: blur(10px);
   border-radius: 0.75rem;
-  color: #ffffff !important;
+  color: var(--primary-color) !important;
 }
 
 .btn-outline-light:hover {
-  background: #ffffff !important;
-  border-color: #ffffff !important;
+  background: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.25);
-  color: var(--primary-color) !important;
+  box-shadow: 0 8px 25px rgba(30, 58, 138, 0.3);
+  color: #ffffff !important;
 }
 
 .btn-outline-primary {
@@ -1330,7 +1404,8 @@ textarea:focus {
 .online-testimonials-swiper {
   width: 100%;
   padding: 1rem 3rem 3rem;
-  overflow: hidden;
+  overflow: visible;
+  position: relative;
 }
 
 .online-testimonials-swiper .swiper-wrapper {
@@ -1349,10 +1424,9 @@ textarea:focus {
   box-shadow: 0 4px 6px var(--shadow-light);
   padding: 1.75rem;
   width: 100%;
-  min-height: 220px;
+  min-height: 120px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -1379,6 +1453,10 @@ textarea:focus {
 
 .online-testimonials-swiper .swiper-button-next,
 .online-testimonials-swiper .swiper-button-prev {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
   color: #ffffff;
   background: var(--primary-color);
   width: 40px;
@@ -1412,8 +1490,10 @@ textarea:focus {
     padding: 1rem 2.5rem 3rem;
   }
 
-  .service-icon {
+    .service-icon {
+    width: 96px;
     height: 96px;
+    font-size: 2.5rem;
   }
 }
 
