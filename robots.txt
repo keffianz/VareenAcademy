@@ -11,7 +11,7 @@ Allow: /assets/css/
 Allow: /assets/js/
 
 # Sitemap
-Sitemap: https://vareenacademy.com/sitemap.xml
+Sitemap: https://vereenacademy.com/sitemap.xml
 
 
 

@@ -1,7 +1,7 @@
 // VAREEN Academy - Service Worker for PWA
-const CACHE_NAME = 'VEREEN-academy-v1.0.0';
-const STATIC_CACHE = 'VEREEN-static-v1.0.0';
-const DYNAMIC_CACHE = 'VEREEN-dynamic-v1.0.0';
+const CACHE_NAME = 'VEREEN-academy-v1.1.0';
+const STATIC_CACHE = 'VEREEN-static-v1.1.0';
+const DYNAMIC_CACHE = 'VEREEN-dynamic-v1.1.0';
 
 // Resources to cache immediately
 const STATIC_ASSETS = [

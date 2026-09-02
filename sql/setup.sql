@@ -1,22 +1,22 @@
 -- VAREEN Academy Database Setup
 -- Fresh MySQL/MariaDB setup script
--- Database: vereen_academy
--- Username: vereenacademy
+-- Database: u374397808_vereenacademy
+-- Username: u374397808_vereenacademy
 -- Password: Abubakar11@
 
 -- Create database if it doesn't exist
-CREATE DATABASE IF NOT EXISTS `vereen_academy`
+CREATE DATABASE IF NOT EXISTS `u374397808_vereen_academy`
 CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
 
 -- Use the database
-USE `vereen_academy`;
+USE `u374397808_vereen_academy`;
 
 -- Create user with specified credentials
-CREATE USER IF NOT EXISTS 'vereenacademy'@'localhost' IDENTIFIED BY 'Abubakar11@';
+CREATE USER IF NOT EXISTS 'u374397808_vereenacademy'@'localhost' IDENTIFIED BY 'Abubakar11@';
 
 -- Grant all privileges on the database to the user
-GRANT ALL PRIVILEGES ON `vereen_academy`.* TO 'vereenacademy'@'localhost';
+GRANT ALL PRIVILEGES ON `u374397808_vereen_academy`.* TO 'u374397808_vereenacademy'@'localhost';
 
 -- Flush privileges to apply changes
 FLUSH PRIVILEGES;
@@ -327,3 +327,22 @@ FLUSH PRIVILEGES;
 -- Display setup completion message
 SELECT 'VAREEN Academy database setup completed successfully!' as status;
 
+
+-- Exam Registrations Table
+CREATE TABLE IF NOT EXISTS `exam_registrations` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `exam_type` VARCHAR(100) NOT NULL,
+  `full_name` VARCHAR(191) NOT NULL,
+  `email` VARCHAR(191) NOT NULL,
+  `phone` VARCHAR(50) NOT NULL,
+  `address` TEXT DEFAULT NULL,
+  `state` VARCHAR(100) DEFAULT NULL,
+  `lga` VARCHAR(100) DEFAULT NULL,
+  `additional_info` TEXT DEFAULT NULL,
+  `status` ENUM('pending', 'contacted', 'completed') DEFAULT 'pending',
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  INDEX `idx_exam_type` (`exam_type`),
+  INDEX `idx_email` (`email`),
+  INDEX `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

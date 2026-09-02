@@ -5,13 +5,13 @@
 
 // Database credentials
 define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'vereen_academy');
+define('DB_USER', 'u374397808_vereenacademy');
+define('DB_PASS', 'Abubakar11@');
+define('DB_NAME', 'u374397808_vereen_academy');
 
 // Application constants
 define('APP_NAME', 'VEREEN Academy');
-define('APP_URL', 'http://localhost:8000');
+define('APP_URL', 'https://vereenacademy.com/lms_vareen/');
 define('UPLOAD_PATH', __DIR__ . '/../assets/uploads/');
 define('MAX_FILE_SIZE', 50 * 1024 * 1024); // 50MB
 
@@ -34,7 +34,7 @@ define('MAIL_HOST', 'smtp.gmail.com');
 define('MAIL_PORT', 587);
 define('MAIL_USER', '');
 define('MAIL_PASS', '');
-define('MAIL_FROM', 'noreply@vereenaacademy.com');
+define('MAIL_FROM', 'noreply@vereenacademy.com');
 
 // File upload allowed types
 define('ALLOWED_VIDEO_TYPES', ['mp4', 'webm', 'mov', 'avi']);
@@ -42,6 +42,7 @@ define('ALLOWED_DOCUMENT_TYPES', ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'p
 define('ALLOWED_IMAGE_TYPES', ['jpg', 'jpeg', 'png', 'gif', 'webp']);
 
 // Error reporting
+if (!defined('ENVIRONMENT')) { define('ENVIRONMENT', 'production'); }
 if (ENVIRONMENT === 'development') {
     error_reporting(E_ALL);
     ini_set('display_errors', 1);

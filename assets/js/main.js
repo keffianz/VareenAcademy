@@ -29,7 +29,7 @@ const initializeWebsite = () => {
 
 // Initialize testimonials slider with Slick
 const initializeTestimonials = () => {
-    if (typeof $ !== 'undefined' && $('.testimonials-slider').length > 0) {
+    if (typeof $ !== 'undefined' && $.fn && $.fn.slick && $('.testimonials-slider').length > 0) {
         $('.testimonials-slider').slick({
             slidesToShow: 1,
             slidesToScroll: 1,

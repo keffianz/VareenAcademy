@@ -29,7 +29,7 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
      */
     signup: async (first_name, last_name, email, password, role = 'student') => {
         try {
-            const response = await fetch('/src/api/auth.php?action=signup', {
+            const response = await fetch('/lms_vareen/src/api/auth.php?action=signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -50,7 +50,7 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
      */
     logout: async () => {
         try {
-            const response = await fetch('/src/api/auth.php?action=logout', {
+            const response = await fetch('/lms_vareen/src/api/auth.php?action=logout', {
                 method: 'POST'
             });
 
@@ -70,7 +70,7 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
      */
     checkEmail: async (email) => {
         try {
-            const response = await fetch('/src/api/auth.php?action=check_email', {
+            const response = await fetch('/lms_vareen/src/api/auth.php?action=check_email', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -91,7 +91,7 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
      */
     requestPasswordReset: async (email) => {
         try {
-            const response = await fetch('/src/api/auth.php?action=request_reset', {
+            const response = await fetch('/lms_vareen/src/api/auth.php?action=request_reset', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -112,7 +112,7 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
      */
     resetPassword: async (token, new_password) => {
         try {
-            const response = await fetch('/src/api/auth.php?action=reset_password', {
+            const response = await fetch('/lms_vareen/src/api/auth.php?action=reset_password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -133,7 +133,7 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
      */
     changePassword: async (old_password, new_password) => {
         try {
-            const response = await fetch('/src/api/auth.php?action=change_password', {
+            const response = await fetch('/lms_vareen/src/api/auth.php?action=change_password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

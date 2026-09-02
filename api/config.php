@@ -7,10 +7,10 @@
 
 // Database configuration
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'vereen_academy');
-define('DB_USER', 'vereenacademy');
+define('DB_NAME', 'u374397808_vereen_academy');
+define('DB_USER', 'u374397808_vereenacademy');
 define('DB_PASS', 'Abubakar11@');
-define('ADMIN_EMAIL', 'admin@vereenacademy.com');
+define('ADMIN_EMAIL', 'VEREENacademy@gmail.com');
 
 function get_pdo() {
     static $pdo = null;
@@ -34,18 +34,3 @@ function get_pdo() {
 }
 
 ?>
-<?php
-// This file has been archived to /archive/api/config.php
-// The server-side backend is not required for the static site.
-
-http_response_code(410);
-header('Content-Type: application/json');
-echo json_encode([
-    'success' => false,
-    'message' => 'API removed for static build. See /archive/api/ for original server code.'
-]);
-exit();
-
-?>
-
-

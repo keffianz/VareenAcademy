@@ -86,14 +86,3 @@ try {
 }
 
 ?>
-<?php
-// Neutralized recruitment API for static hosting
-http_response_code(410);
-header('Content-Type: application/json');
-echo json_encode([
-    'success' => false,
-    'message' => 'API removed for static build. See /archive/api/ for original server code.'
-]);
-exit();
-?>
-
