@@ -32,10 +32,10 @@ $__dbCfg = static function (string $key, string $envVar, string $default) use ($
     return $default;
 };
 
-define('DB_HOST', $__dbCfg('host', 'DB_HOST', '127.0.0.1'));
-define('DB_USER', $__dbCfg('user', 'DB_USER', 'root'));
+define('DB_HOST', $__dbCfg('host', 'DB_HOST', 'localhost'));
+define('DB_USER', $__dbCfg('user', 'DB_USER', ''));
 define('DB_PASS', $__dbCfg('pass', 'DB_PASS', ''));
-define('DB_NAME', $__dbCfg('name', 'DB_NAME', 'vereen_academy'));
+define('DB_NAME', $__dbCfg('name', 'DB_NAME', 'u374397808_vereen_academy'));
 
 // Application constants
 define('APP_NAME', 'VEREEN Academy');

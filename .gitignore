@@ -13,3 +13,6 @@ desktop.ini
 # Dependencies
 node_modules/
 vendor/
+
+# Local production/development database credentials
+lms_vareen/src/config/local_db.php
