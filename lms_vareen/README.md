@@ -11,6 +11,25 @@ A modern, mobile-responsive online academy platform built with HTML5, CSS3, Java
 
 ### Installation
 
+### Hostinger database configuration
+
+After importing the shared-hosting SQL file, create
+`src/config/local_db.php` on the server. Do not commit this file.
+
+```php
+<?php
+return [
+	'host' => 'localhost',
+	'user' => 'YOUR_HOSTINGER_DATABASE_USER',
+	'pass' => 'YOUR_HOSTINGER_DATABASE_PASSWORD',
+	'name' => 'u374397808_vereen_academy',
+];
+```
+
+The application also accepts the `DB_HOST`, `DB_USER`, `DB_PASS`, and
+`DB_NAME` environment variables. The MySQL database and user must be created
+and attached in Hostinger hPanel before testing login.
+
 1. **Clone or download the project**
 ```bash
 cd vereen-academy
