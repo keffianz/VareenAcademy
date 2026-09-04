@@ -5,7 +5,7 @@
 <div class="auth-container">
     <div class="auth-box">
         <div class="auth-header">
-            <h1>VEREEN Academy</h1>
+            <h1>VAREEN Academy</h1>
             <p>Reset Your Password</p>
         </div>
 

@@ -4,7 +4,7 @@
 <div class="hero-section">
     <div class="container">
         <div class="hero-content">
-            <h1>Welcome to VEREEN Academy</h1>
+            <h1>Welcome to VAREEN Academy</h1>
             <p>Learn anything, anytime, anywhere with world-class courses and expert instructors</p>
             
             <?php if (!isLoggedIn()): ?>
@@ -30,7 +30,7 @@
 
 <section class="features-section">
     <div class="container">
-        <h2 class="section-title">Why Choose VEREEN Academy?</h2>
+        <h2 class="section-title">Why Choose VAREEN Academy?</h2>
         
         <div class="features-grid">
             <div class="feature-card">
@@ -113,7 +113,7 @@
 <section class="cta-section">
     <div class="container">
         <h2>Ready to Start Learning?</h2>
-        <p>Join thousands of students already learning on VEREEN Academy</p>
+        <p>Join thousands of students already learning on VAREEN Academy</p>
         <?php if (!isLoggedIn()): ?>
             <a href="/index.php?page=signup" class="btn btn-primary btn-large">
                 Sign Up Now - It's Free!

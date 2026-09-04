@@ -1588,6 +1588,11 @@ textarea:focus {
 @media (max-width: 991.98px) {
   .navbar .container {
     justify-content: space-between;
+    /* Notched phones (viewport-fit=cover): keep logo + hamburger clear of
+       display cutouts and the status-bar inset. */
+    padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+    padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+    padding-top: env(safe-area-inset-top, 0px);
   }
 
   /* The top-bar CTA moves into the drawer as "Start Learning" on mobile. */
@@ -1621,7 +1626,12 @@ textarea:focus {
     width: min(320px, 86vw);
     max-height: none;
     margin: 0;
-    padding: 1rem 1.5rem 2rem;
+    /* Notched phones (viewport-fit=cover): keep content clear of display
+       cutouts and the home indicator. */
+    padding: calc(1rem + env(safe-area-inset-top, 0px))
+             calc(1.5rem + env(safe-area-inset-right, 0px))
+             calc(2rem + env(safe-area-inset-bottom, 0px))
+             calc(1.5rem + env(safe-area-inset-left, 0px));
     flex-direction: column;
     align-items: stretch;
     background: #ffffff;

@@ -38,7 +38,7 @@ define('DB_PASS', $__dbCfg('pass', 'DB_PASS', ''));
 define('DB_NAME', $__dbCfg('name', 'DB_NAME', 'u374397808_vereen_academy'));
 
 // Application constants
-define('APP_NAME', 'VEREEN Academy');
+define('APP_NAME', 'VAREEN Academy');
 define('APP_URL', 'https://vereenacademy.com/lms_vareen/');
 define('UPLOAD_PATH', __DIR__ . '/../assets/uploads/');
 define('MAX_FILE_SIZE', 50 * 1024 * 1024); // 50MB

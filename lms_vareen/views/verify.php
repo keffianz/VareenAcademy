@@ -9,7 +9,7 @@ $apiBase = appBasePath() . '/src/api/public.php';
 ?>
 <div class="verify-page">
     <header class="public-header">
-        <a class="brand" href="index.php?page=login">VEREEN Academy</a>
+        <a class="brand" href="index.php?page=login">VAREEN Academy</a>
         <nav class="public-nav">
             <a href="index.php?page=instructors">Instructors</a>
             <a href="index.php?page=become-instructor">Teach with us</a>

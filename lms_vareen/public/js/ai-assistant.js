@@ -288,7 +288,7 @@ class AIAssistantWidget {
             const data = await response.json();
             
             if (data.success) {
-                this.addMessageToChat('VEREEN AI', data.answer, 'ai');
+                this.addMessageToChat('VAREEN AI', data.answer, 'ai');
                 this.remaining = Math.max(0, this.remaining - 1);
                 this.updateUsageDisplay();
             } else {

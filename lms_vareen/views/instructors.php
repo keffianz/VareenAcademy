@@ -4,7 +4,7 @@ $apiBase = appBasePath() . '/src/api/public.php';
 ?>
 <div class="instructors-page">
     <header class="public-header">
-        <a class="brand" href="index.php?page=login">VEREEN Academy</a>
+        <a class="brand" href="index.php?page=login">VAREEN Academy</a>
         <nav class="public-nav">
             <a href="index.php?page=verify">Verify Certificate</a>
             <a href="index.php?page=become-instructor">Teach with us</a>
@@ -14,7 +14,7 @@ $apiBase = appBasePath() . '/src/api/public.php';
 
     <main class="instructors-main">
         <h1>Meet Our Instructors</h1>
-        <p class="page-intro">Learn from experienced practitioners. Every VEREEN Academy instructor is reviewed by our team before their first course goes live.</p>
+        <p class="page-intro">Learn from experienced practitioners. Every VAREEN Academy instructor is reviewed by our team before their first course goes live.</p>
         <div id="instructorGrid" class="instructor-grid" aria-live="polite">
             <p class="loading">Loading instructors…</p>
         </div>

@@ -497,7 +497,7 @@ if (!$lcLookup->fetchColumn()) {
 }
 
 // Default site settings (used by the admin settings page)
-foreach (['site_name' => 'VEREEN Academy', 'support_email' => 'support@vereenacademy.com'] as $k => $v) {
+foreach (['site_name' => 'VAREEN Academy', 'support_email' => 'support@vereenacademy.com'] as $k => $v) {
     $pdo->prepare('INSERT IGNORE INTO settings (setting_key, setting_value) VALUES (:k, :v)')
         ->execute([':k' => $k, ':v' => $v]);
 }
