@@ -271,19 +271,31 @@ vereen-academy/
 - Authentication functions in `public/js/auth.js`
 - Export to window object for global access
 
-## 📊 Test Accounts
+## 📊 Test / Seed Accounts
 
-Once you've run the database schema, you can create test accounts:
+After importing `sql/setup_shared_hosting.sql` (+ optional `sql/seed_data.sql`),
+these accounts are available on the login page (select the matching tab —
+Student / Teacher / Staff / Admin):
 
-**Teacher Account:**
-- Email: teacher@example.com
+**Admin Account** (password is set by the administrator in
+`sql/setup_shared_hosting.sql`):
+- Email: admin@vereenacademy.com
+- Login tab: Admin
+
+**Teacher / Staff Account:**
+- Email: staff@vereenacademy.com
 - Password: password123
+- Login tab: Teacher / Staff
 
 **Student Account:**
-- Email: student@example.com
+- Email: student@vereenacademy.com
 - Password: password123
+- Login tab: Student
 
-Use signup form to create accounts, or manually insert into database.
+> The other demo students in `sql/seed_data.sql` (maryam, emeka, halima,
+> zainab, ibrahim) also use `password123`. Change these demo passwords in
+> production. You can also use the signup form to create a student account
+> (signup is student-only).
 
 ## ✋ Session Messages
 

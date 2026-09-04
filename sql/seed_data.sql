@@ -14,9 +14,12 @@
 --   * Target schema = sql/setup_shared_hosting.sql (the maintained,
 --     production shared-hosting schema). Import that file first, then
 --     import THIS file once on a fresh database.
---   * LMS demo accounts use placeholder password hashes — treat them
---     as throwaway demo credentials and change real passwords in
---     production.
+--   * LMS demo accounts use bcrypt hashes of the demo password `password123`
+--     so they can be signed into immediately. Change these in production.
+--   * Seed login accounts (email / password):
+--       staff@vereenacademy.com    -> password123   (Teacher / Staff tab, role=teacher)
+--       student@vereenacademy.com  -> password123   (Student tab)
+--       maryam/emeka/halima/zainab/ibrahim students -> password123 (Student tab)
 --   * Foreign keys are resolved with sub-queries so this script is
 --     position-independent (no hard-coded auto-increment IDs).
 -- ============================================================
@@ -29,25 +32,25 @@ INSERT INTO `users`
    `first_name`, `last_name`, `role`, `is_active`, `email_verified`,
    `phone`, `city`, `country`, `address`)
 VALUES
-  ('staff', 'staff@vereenacademy.com', '$2y$10$OzSxBaULfT9mCjxCk6jQqeFG1OYctbhuxjjtJ85Cn62np2PPci.vi', '$2y$10$OzSxBaULfT9mCjxCk6jQqeFG1OYctbhuxjjtJ85Cn62np2PPci.vi',
+  ('staff', 'staff@vereenacademy.com', '$2y$10$ckK3sE4/sCTxIJSVKo4Q3O6VcDaE.i97WspmfL1gdmaYPOTgegUEW', '$2y$10$ckK3sE4/sCTxIJSVKo4Q3O6VcDaE.i97WspmfL1gdmaYPOTgegUEW',
    'VAREEN Staff', 'VAREEN', 'Staff', 'teacher', 1, 1,
    '08130397723', 'Keffi', 'Nigeria', 'Near Total Filling Station, Keffi, Nasarawa State'),
-  ('student', 'student@vereenacademy.com', '$2y$10$3VYfifncJsqfw.BgXwkpfufL6kfPeNkDYkEkgtshfiXKW7ogVmhpu', '$2y$10$3VYfifncJsqfw.BgXwkpfufL6kfPeNkDYkEkgtshfiXKW7ogVmhpu',
+  ('student', 'student@vereenacademy.com', '$2y$10$3jI7baG026l0Qg12L8KrPu1RwVbwAwfpChT5Ijy7rnmTRtpdRx3em', '$2y$10$3jI7baG026l0Qg12L8KrPu1RwVbwAwfpChT5Ijy7rnmTRtpdRx3em',
    'VAREEN Student', 'VAREEN', 'Student', 'student', 1, 1,
    '08130397723', 'Keffi', 'Nigeria', 'Keffi, Nasarawa State'),
-  ('maryam', 'maryam.abubakar@example.com', '$2y$10$3VYfifncJsqfw.BgXwkpfufL6kfPeNkDYkEkgtshfiXKW7ogVmhpu', '$2y$10$3VYfifncJsqfw.BgXwkpfufL6kfPeNkDYkEkgtshfiXKW7ogVmhpu',
+  ('maryam', 'maryam.abubakar@example.com', '$2y$10$3jI7baG026l0Qg12L8KrPu1RwVbwAwfpChT5Ijy7rnmTRtpdRx3em', '$2y$10$3jI7baG026l0Qg12L8KrPu1RwVbwAwfpChT5Ijy7rnmTRtpdRx3em',
    'Maryam Abubakar', 'Maryam', 'Abubakar', 'student', 1, 1,
    '08123456789', 'Keffi', 'Nigeria', 'Keffi, Nasarawa State'),
-  ('emeka', 'emeka.nwosu@example.com', '$2y$10$3VYfifncJsqfw.BgXwkpfufL6kfPeNkDYkEkgtshfiXKW7ogVmhpu', '$2y$10$3VYfifncJsqfw.BgXwkpfufL6kfPeNkDYkEkgtshfiXKW7ogVmhpu',
+  ('emeka', 'emeka.nwosu@example.com', '$2y$10$3jI7baG026l0Qg12L8KrPu1RwVbwAwfpChT5Ijy7rnmTRtpdRx3em', '$2y$10$3jI7baG026l0Qg12L8KrPu1RwVbwAwfpChT5Ijy7rnmTRtpdRx3em',
    'Emeka Nwosu', 'Emeka', 'Nwosu', 'student', 1, 1,
    '08129876543', 'Keffi', 'Nigeria', 'Keffi, Nasarawa State'),
-  ('halima', 'halima.suleiman@example.com', '$2y$10$3VYfifncJsqfw.BgXwkpfufL6kfPeNkDYkEkgtshfiXKW7ogVmhpu', '$2y$10$3VYfifncJsqfw.BgXwkpfufL6kfPeNkDYkEkgtshfiXKW7ogVmhpu',
+  ('halima', 'halima.suleiman@example.com', '$2y$10$3jI7baG026l0Qg12L8KrPu1RwVbwAwfpChT5Ijy7rnmTRtpdRx3em', '$2y$10$3jI7baG026l0Qg12L8KrPu1RwVbwAwfpChT5Ijy7rnmTRtpdRx3em',
    'Halima Suleiman', 'Halima', 'Suleiman', 'student', 1, 1,
    '08134567890', 'Keffi', 'Nigeria', 'Keffi, Nasarawa State'),
-  ('zainab', 'zainab.ahmed@example.com', '$2y$10$3VYfifncJsqfw.BgXwkpfufL6kfPeNkDYkEkgtshfiXKW7ogVmhpu', '$2y$10$3VYfifncJsqfw.BgXwkpfufL6kfPeNkDYkEkgtshfiXKW7ogVmhpu',
+  ('zainab', 'zainab.ahmed@example.com', '$2y$10$3jI7baG026l0Qg12L8KrPu1RwVbwAwfpChT5Ijy7rnmTRtpdRx3em', '$2y$10$3jI7baG026l0Qg12L8KrPu1RwVbwAwfpChT5Ijy7rnmTRtpdRx3em',
    'Zainab Ahmed', 'Zainab', 'Ahmed', 'student', 1, 1,
    '08145678901', 'Keana', 'Nigeria', 'Keffi, Nasarawa State'),
-  ('ibrahim', 'ibrahim.musa@example.com', '$2y$10$3VYfifncJsqfw.BgXwkpfufL6kfPeNkDYkEkgtshfiXKW7ogVmhpu', '$2y$10$3VYfifncJsqfw.BgXwkpfufL6kfPeNkDYkEkgtshfiXKW7ogVmhpu',
+  ('ibrahim', 'ibrahim.musa@example.com', '$2y$10$3jI7baG026l0Qg12L8KrPu1RwVbwAwfpChT5Ijy7rnmTRtpdRx3em', '$2y$10$3jI7baG026l0Qg12L8KrPu1RwVbwAwfpChT5Ijy7rnmTRtpdRx3em',
    'Ibrahim Musa', 'Ibrahim', 'Musa', 'student', 1, 1,
    '08156789012', 'Keffi', 'Nigeria', 'Keffi, Nasarawa State')
 ON DUPLICATE KEY UPDATE

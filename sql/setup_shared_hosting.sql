@@ -575,14 +575,17 @@ CREATE TABLE IF NOT EXISTS `exam_registrations` (
 -- INITIAL LMS LOGIN ACCOUNTS
 -- ===========================================
 -- Temporary passwords: change them after the first successful login.
+-- Demo password for the seeded staff/student accounts below is: password123
+-- (staff logs in via the "Teacher / Staff" tab; role = teacher).
+-- The admin account above uses a separate password set by the administrator.
 -- The staff account uses the LMS teacher role because that is the
 -- staff-level role currently supported by the application login code.
 INSERT INTO `users`
   (`username`, `email`, `password_hash`, `password`, `full_name`, `first_name`, `last_name`, `role`, `is_active`, `email_verified`)
 VALUES
   ('admin', 'admin@vereenacademy.com', '$2y$10$0bsxhuKDU5zvFlFABfd21uw6pwEOTQTZb5K0fJWDtzUeL/BAr2TVq', '$2y$10$0bsxhuKDU5zvFlFABfd21uw6pwEOTQTZb5K0fJWDtzUeL/BAr2TVq', 'VAREEN Administrator', 'VAREEN', 'Administrator', 'admin', 1, 1),
-  ('staff', 'staff@vereenacademy.com', '$2y$10$OzSxBaULfT9mCjxCk6jQqeFG1OYctbhuxjjtJ85Cn62np2PPci.vi', '$2y$10$OzSxBaULfT9mCjxCk6jQqeFG1OYctbhuxjjtJ85Cn62np2PPci.vi', 'VAREEN Staff', 'VAREEN', 'Staff', 'teacher', 1, 1),
-  ('student', 'student@vereenacademy.com', '$2y$10$3VYfifncJsqfw.BgXwkpfufL6kfPeNkDYkEkgtshfiXKW7ogVmhpu', '$2y$10$3VYfifncJsqfw.BgXwkpfufL6kfPeNkDYkEkgtshfiXKW7ogVmhpu', 'VAREEN Student', 'VAREEN', 'Student', 'student', 1, 1)
+  ('staff', 'staff@vereenacademy.com', '$2y$10$ckK3sE4/sCTxIJSVKo4Q3O6VcDaE.i97WspmfL1gdmaYPOTgegUEW', '$2y$10$ckK3sE4/sCTxIJSVKo4Q3O6VcDaE.i97WspmfL1gdmaYPOTgegUEW', 'VAREEN Staff', 'VAREEN', 'Staff', 'teacher', 1, 1),
+  ('student', 'student@vereenacademy.com', '$2y$10$3jI7baG026l0Qg12L8KrPu1RwVbwAwfpChT5Ijy7rnmTRtpdRx3em', '$2y$10$3jI7baG026l0Qg12L8KrPu1RwVbwAwfpChT5Ijy7rnmTRtpdRx3em', 'VAREEN Student', 'VAREEN', 'Student', 'student', 1, 1)
 ON DUPLICATE KEY UPDATE
   `email` = VALUES(`email`),
   `password_hash` = VALUES(`password_hash`),
