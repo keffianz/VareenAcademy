@@ -16,6 +16,11 @@ A modern, mobile-responsive online academy platform built with HTML5, CSS3, Java
 After importing the shared-hosting SQL file, create
 `src/config/local_db.php` on the server. Do not commit this file.
 
+For demo/seed data (real site content: programmes, news, testimonials,
+exam registrations and LMS courses), optionally import:
+`sql/seed_data.sql` **after** `sql/setup_shared_hosting.sql`. See the
+header comments in that file for details.
+
 ```php
 <?php
 return [
