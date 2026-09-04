@@ -61,13 +61,21 @@
     <!-- Header & Navigation -->
     <nav class="navbar navbar-expand-lg fixed-top" role="navigation" aria-label="Main navigation">
         <div class="container">
-            <!-- navbar brand removed for consistent top bar -->
+            <a class="navbar-brand" href="index.html" aria-label="VAREEN Academy home">
+                <img src="images/main-logo.png" alt="VAREEN Academy logo" height="40">
+            </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" aria-controls="navbarNav" aria-expanded="false" aria-label="Open navigation menu">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <div class="drawer-header">
+                    <a class="navbar-brand drawer-brand" href="index.html" aria-label="VAREEN Academy home">
+                        <img src="images/main-logo.png" alt="VAREEN Academy logo" height="40">
+                    </a>
+                    <button class="navbar-close" type="button" aria-label="Close navigation menu">&#10005;</button>
+                </div>
+                <ul class="navbar-nav drawer-nav">
                     <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
                     <li class="nav-item"><a class="nav-link" href="programs.html">Programs</a></li>
@@ -77,10 +85,12 @@
                     <li class="nav-item"><a class="nav-link" href="achievements.html">Achievements</a></li>
                     <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
                     <li class="nav-item"><a class="nav-link" href="lms_vareen/index.php?page=login">LMS Portal</a></li>
-                    </ul>
+                </ul>
+                <a class="drawer-cta" href="apply.html">Start Learning</a>
             </div>
             <a class="apply-now-btn btn btn-primary text-contrast" href="apply.html" aria-label="Apply for a course at VAREEN Academy">Apply Now</a>
         </div>
+        <div class="nav-backdrop" aria-hidden="true"></div>
     </nav>
 
     <!-- Main Content -->

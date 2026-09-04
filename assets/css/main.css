@@ -12,6 +12,9 @@
   --text-secondary: #4b5563; /* Medium text (WCAG AA on white) */
   --text-light: #6b7280; /* Light text (WCAG AA on white) */
   --white: #ffffff; /* Pure white */
+  --brand-green: #0d9d58; /* Brand green (hover/active accents) */
+  --brand-green-dark: #0b7f47; /* Darker brand green for gradients/hover */
+  --nav-text: #1f2937; /* Fixed dark nav text — never theme-flipped */
   --shadow-light: rgba(0, 0, 0, 0.05);
   --shadow-medium: rgba(0, 0, 0, 0.1);
   --shadow-strong: rgba(0, 0, 0, 0.15);
@@ -155,10 +158,13 @@ p {
   }
 }
 
-/* Navigation */
+/* Navigation
+   NOTE: no backdrop-filter here — it (like transform/filter) would make the
+   fixed navbar the containing block for the fixed off-canvas mobile drawer,
+   breaking its full-viewport positioning. The 0.95 background is near-opaque,
+   so the blur is visually negligible. */
 .navbar {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.97);
   box-shadow: 0 2px 10px var(--shadow-light);
   position: fixed;
   top: 0;
@@ -205,15 +211,12 @@ nav.navbar.navbar-expand-lg.fixed-top button.navbar-toggler > span.navbar-toggle
   background-position: center !important;
   background-repeat: no-repeat !important;
 }
-.navbar-collapse {
-  background: var(--white);
-  backdrop-filter: blur(10px);
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 20px var(--shadow-medium);
-  margin-top: 0.5rem;
-  padding: 1rem;
-  border: 1px solid rgba(59, 130, 246, 0.1);
-}
+/* NOTE: the old floating-panel styles for .navbar-collapse (white card,
+   margin-top, border, shadow) were removed — they fought the responsive
+   rules further down and produced the misaligned mobile dropdown. The
+   desktop menu is reset in the min-width: 992px block below; the mobile
+   menu is now a full off-canvas drawer styled in the responsive
+   navigation section near the end of this file. */
 
 @media (min-width: 992px) {
   .navbar-collapse {
@@ -1019,20 +1022,10 @@ footer h3, footer h4 {
     margin-bottom: 1.5rem;
   }
 
-  /* Mobile navigation improvements */
-  .navbar-collapse {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(10px);
-    border-radius: 0 0 0.5rem 0.5rem;
-    box-shadow: 0 4px 20px var(--shadow-medium);
-    padding: 1rem;
-    max-height: calc(100vh - 68px);
-    overflow-y: auto;
-  }
+  /* Mobile navigation: the off-canvas drawer (styled in the responsive
+     navigation section near the end of this file) handles the menu panel.
+     The old absolute full-width dropdown was removed — it conflicted with
+     the newer right-anchored rules and misaligned the menu. */
 
   .navbar-toggler {
     border: 2px solid var(--primary-color);
@@ -1590,12 +1583,16 @@ textarea:focus {
   }
 }
 
-/* --- Mobile/tablet: hamburger (left), CTA (right); the menu drops on the
-   OPPOSITE side of the hamburger (right-aligned under the Apply Now
-   button) with proper spacing --- */
+/* --- Mobile/tablet: logo (left), hamburger (right); full-height off-canvas
+   drawer slides in from the RIGHT over a dimmed backdrop --- */
 @media (max-width: 991.98px) {
   .navbar .container {
     justify-content: space-between;
+  }
+
+  /* The top-bar CTA moves into the drawer as "Start Learning" on mobile. */
+  .navbar .container > .apply-now-btn {
+    display: none;
   }
 
   .navbar-toggler {
@@ -1605,25 +1602,57 @@ textarea:focus {
     flex-shrink: 0;
     min-width: 48px;
     min-height: 48px;
-    border: 2px solid var(--primary-color);
+    border: 2px solid var(--neutral-dark);
+    border-radius: 0.5rem;
   }
 
+  /* Full-height right-side drawer. Solid white + fixed dark text — these
+     colors deliberately do NOT use theme variables, so the menu can never
+     end up white-on-white in prefers-color-scheme: dark. */
   .navbar-collapse {
-    position: absolute;
-    top: calc(100% + 0.5rem);
-    right: 1rem;
+    display: flex !important; /* override Bootstrap's .collapse:not(.show) { display: none } so the slide transition can run */
+    position: fixed;
+    top: 0;
+    right: 0;
     left: auto;
-    width: min(320px, calc(100% - 2rem));
-    max-width: 100%;
+    bottom: 0;
+    height: 100vh;
+    height: 100dvh;
+    width: min(320px, 86vw);
+    max-height: none;
     margin: 0;
-    padding: 0.75rem 0.25rem;
-    background: var(--white);
-    border: 1px solid var(--neutral-medium);
-    border-radius: 0.75rem;
-    box-shadow: 0 12px 32px var(--shadow-strong);
-    max-height: calc(100vh - 84px);
+    padding: 1rem 1.5rem 2rem;
+    flex-direction: column;
+    align-items: stretch;
+    background: #ffffff;
+    border: none;
+    border-radius: 1.25rem 0 0 1.25rem;
+    box-shadow: -12px 0 40px rgba(15, 23, 42, 0.3);
+    transform: translateX(100%);
+    visibility: hidden;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s;
+    z-index: 1050;
     overflow-y: auto;
     overscroll-behavior: contain;
+  }
+
+  .navbar-collapse.show {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .drawer-brand img {
+    height: 40px;
+    width: auto;
   }
 
   .navbar-nav {
@@ -1632,19 +1661,70 @@ textarea:focus {
   }
 
   .navbar-nav .nav-item {
-    margin: 0.25rem 0;
+    margin: 0;
   }
 
+  /* Dark text (#1f2937) on the white panel, 48px+ touch targets,
+     consistent vertical rhythm. */
   .navbar-nav .nav-link {
-    display: block;
-    padding: 0.625rem 0.75rem;
-    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    padding: 0.75rem 0.875rem;
+    font-size: 1rem;
+    color: var(--nav-text) !important;
     border-radius: 0.5rem;
   }
 
-  .apply-now-btn {
-    flex-shrink: 0;
-    margin-left: 0;
+  .navbar-nav .nav-link:hover,
+  .navbar-nav .nav-link:focus-visible {
+    color: var(--brand-green-dark) !important;
+    background-color: rgba(13, 157, 88, 0.08);
+  }
+
+  .navbar-nav .nav-link.active {
+    color: var(--brand-green-dark) !important;
+    background-color: rgba(13, 157, 88, 0.12);
+    font-weight: 600;
+  }
+
+  /* In-drawer CTA: brand green with a WCAG-AA white label (5.1:1). */
+  .drawer-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    margin-top: 1.25rem;
+    padding: 0.75rem 1.25rem;
+    background: linear-gradient(135deg, #0b7f47 0%, #09663a 100%);
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 15px rgba(11, 127, 71, 0.35);
+    text-decoration: none;
+  }
+
+  .drawer-cta:hover,
+  .drawer-cta:focus-visible {
+    filter: brightness(1.08);
+    color: #ffffff !important;
+    text-decoration: none;
+  }
+
+  .navbar-close:focus-visible,
+  .drawer-cta:focus-visible {
+    outline: 3px solid var(--brand-green-dark);
+    outline-offset: 2px;
+  }
+}
+
+/* Respect reduced-motion preferences. */
+@media (prefers-reduced-motion: reduce) {
+  .navbar-collapse,
+  .nav-backdrop {
+    transition: none;
   }
 }
 
@@ -1664,9 +1744,72 @@ textarea:focus {
 }
 
 /* ==========================================================================
+ * Premium off-canvas mobile navigation (slide-in from the right)
+ * ========================================================================== */
+
+/* Backdrop overlay behind the drawer */
+.nav-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 1040;
+  pointer-events: none;
+}
+
+.nav-backdrop.show {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Lock page scrolling while the drawer is open (mobile only) */
+@media (max-width: 991.98px) {
+  body.nav-open {
+    overflow: hidden;
+  }
+}
+
+@media (min-width: 992px) {
+  .nav-backdrop {
+    display: none;
+  }
+}
+
+/* Close (X) button inside the drawer */
+.navbar-close {
+  align-self: flex-end;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: 0.5rem;
+  color: var(--nav-text);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.navbar-close:hover,
+.navbar-close:focus-visible {
+  background-color: rgba(13, 157, 88, 0.12);
+  color: var(--brand-green);
+}
+
+
+
+/* ==========================================================================
  * Consistent section colours & guaranteed text contrast
  * (dark text on light panels, light text on dark panels)
  * ========================================================================== */
+
 
 /* Dark / primary panels always render readable light text. */
 .bg-primary,

@@ -67,15 +67,16 @@ const initializeNavigation = () => {
     const navbarToggler = document.querySelector('.navbar-toggler');
     const navbarCollapse = document.querySelector('.navbar-collapse');
 
-    // Navbar scroll effect with enhanced animation
+    // Navbar scroll effect. NOTE: no inline transform is set here — a transform
+    // on .navbar would make it the containing block for the fixed off-canvas
+    // drawer and backdrop, breaking their full-viewport positioning. The
+    // previous code set translateY(0) in both branches (a no-op) anyway.
     const handleScroll = debounce(() => {
         const scrolled = window.scrollY;
         if (scrolled > 50) {
             navbar.classList.add('navbar-scrolled');
-            navbar.style.transform = 'translateY(0)';
         } else {
             navbar.classList.remove('navbar-scrolled');
-            navbar.style.transform = 'translateY(0)';
         }
     }, 10);
 
@@ -517,25 +518,91 @@ const initializeBackToTop = () => {
     });
 };
 
-// Enhanced Mobile Menu with animations
+// Premium off-canvas mobile menu (right-side drawer).
+// This function fully owns the open/close state (the data-bs-toggle attributes
+// were removed from the markup so Bootstrap Collapse no longer races us).
+// It handles: slide-in/out via the .show class (CSS transform transition),
+// backdrop overlay, body scroll lock, Escape key, close button/backdrop taps,
+// link-tap close and a focus trap. The old implementation manually fought
+// Bootstrap's Collapse animation with keyframes that did not exist.
 const initializeMobileMenu = () => {
-    const navbarToggler = document.querySelector('.navbar-toggler');
-    const navbarCollapse = document.querySelector('.navbar-collapse');
+    const collapseEl = document.getElementById('navbarNav');
+    const toggler = document.querySelector('.navbar-toggler');
+    if (!collapseEl || !toggler) return;
 
-    if (navbarToggler && navbarCollapse) {
-        navbarToggler.addEventListener('click', () => {
-            const isExpanded = navbarToggler.getAttribute('aria-expanded') === 'true';
-            navbarToggler.setAttribute('aria-expanded', String(!isExpanded));
+    const navbar = collapseEl.closest('.navbar');
+    const backdrop = navbar ? navbar.querySelector('.nav-backdrop') : null;
+    const closeBtn = collapseEl.querySelector('.navbar-close');
+    const isMobile = () => window.matchMedia('(max-width: 991.98px)').matches;
 
-            if (!isExpanded) {
-                navbarCollapse.style.animation = 'slideDown 0.3s ease-out forwards';
-                navbarCollapse.classList.add('show');
-            } else {
-                navbarCollapse.style.animation = 'slideUp 0.3s ease-out forwards';
-                setTimeout(() => navbarCollapse.classList.remove('show'), 300);
-            }
+    const openMenu = () => {
+        collapseEl.classList.add('show');
+        toggler.setAttribute('aria-expanded', 'true');
+        toggler.setAttribute('aria-label', 'Close navigation menu');
+        if (backdrop) backdrop.classList.add('show');
+        document.body.classList.add('nav-open');
+        window.setTimeout(() => { if (closeBtn) closeBtn.focus(); }, 300);
+    };
+
+    const closeMenu = () => {
+        collapseEl.classList.remove('show');
+        toggler.setAttribute('aria-expanded', 'false');
+        toggler.setAttribute('aria-label', 'Open navigation menu');
+        if (backdrop) backdrop.classList.remove('show');
+        document.body.classList.remove('nav-open');
+    };
+
+    toggler.addEventListener('click', () => {
+        if (collapseEl.classList.contains('show')) {
+            closeMenu();
+            toggler.focus();
+        } else {
+            openMenu();
+        }
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', () => { closeMenu(); toggler.focus(); });
+    if (backdrop) backdrop.addEventListener('click', closeMenu);
+
+    // Escape-key support.
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isMobile() && collapseEl.classList.contains('show')) {
+            closeMenu();
+            toggler.focus();
+        }
+    });
+
+    // Selecting a link (or the CTA) closes the drawer, then lets the link navigate.
+    collapseEl.querySelectorAll('.nav-link, .drawer-cta').forEach((link) => {
+        link.addEventListener('click', () => {
+            if (isMobile() && collapseEl.classList.contains('show')) closeMenu();
         });
-    }
+    });
+
+    // Simple focus trap while the drawer is open on mobile.
+    collapseEl.addEventListener('keydown', (e) => {
+        if (e.key !== 'Tab' || !isMobile() || !collapseEl.classList.contains('show')) return;
+        const focusables = collapseEl.querySelectorAll('a[href], button:not([disabled])');
+        if (!focusables.length) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+        }
+    });
+
+    // Leaving the mobile breakpoint: force-clean any open state.
+    window.matchMedia('(min-width: 992px)').addEventListener('change', (e) => {
+        if (e.matches) {
+            collapseEl.classList.remove('show');
+            if (backdrop) backdrop.classList.remove('show');
+            document.body.classList.remove('nav-open');
+        }
+    });
 };
 
 // Enhanced Lazy Loading with blur effect
