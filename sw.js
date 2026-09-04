@@ -1,7 +1,7 @@
 // VAREEN Academy - Service Worker for PWA
-const CACHE_NAME = 'VEREEN-academy-v1.1.0';
-const STATIC_CACHE = 'VEREEN-static-v1.1.0';
-const DYNAMIC_CACHE = 'VEREEN-dynamic-v1.1.0';
+const CACHE_NAME = 'VEREEN-academy-v1.1.1';
+const STATIC_CACHE = 'VEREEN-static-v1.1.1';
+const DYNAMIC_CACHE = 'VEREEN-dynamic-v1.1.1';
 
 // Resources to cache immediately
 const STATIC_ASSETS = [
@@ -59,6 +59,11 @@ self.addEventListener('activate', (event) => {
 // Fetch event - serve cached content when offline
 self.addEventListener('fetch', (event) => {
   const { request } = event;
+
+  // Cache storage only supports GET requests. Let form submissions and API
+  // mutations pass directly to the network.
+  if (request.method !== 'GET') return;
+
   const url = new URL(request.url);
 
   // Skip cross-origin requests
