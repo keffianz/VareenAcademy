@@ -9,8 +9,8 @@
   --neutral-medium: #e2e8f0; /* Light gray */
   --neutral-dark: #475569; /* Dark slate */
   --text-primary: #1e293b; /* Dark text */
-  --text-secondary: #64748b; /* Medium text */
-  --text-light: #94a3b8; /* Light text */
+  --text-secondary: #4b5563; /* Medium text (WCAG AA on white) */
+  --text-light: #6b7280; /* Light text (WCAG AA on white) */
   --white: #ffffff; /* Pure white */
   --shadow-light: rgba(0, 0, 0, 0.05);
   --shadow-medium: rgba(0, 0, 0, 0.1);
@@ -1495,5 +1495,135 @@ textarea:focus {
     height: 96px;
     font-size: 2.5rem;
   }
+}
+/* ==========================================================================
+ * Responsive navigation bar (top bar) + consistent section colour/contrast
+ * ========================================================================== */
+
+/* Keep the top bar one row: no wrapping, items vertically centred. */
+.navbar .container {
+  gap: 0.75rem;
+  flex-wrap: nowrap;
+}
+
+/* --- Persistent "Apply Now" call to action in the navbar top bar --- */
+.apply-now-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border-radius: 0.75rem;
+  text-decoration: none;
+}
+
+.apply-now-btn.btn-primary,
+.apply-now-btn.btn.btn-primary {
+  background: var(--gradient-primary) !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding: 0.5rem 1.15rem !important;
+  box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+}
+
+.apply-now-btn:hover,
+.apply-now-btn:focus {
+  background: var(--gradient-primary) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(30, 58, 138, 0.45);
+}
+
+/* --- Desktop: let the menu fill the bar, Apply Now pinned to the right --- */
+@media (min-width: 992px) {
+  .navbar-collapse {
+    flex: 1 1 auto;
+  }
+
+  .apply-now-btn {
+    flex-shrink: 0;
+    margin: 0 0 0 0.5rem;
+  }
+}
+
+/* --- Mobile: align hamburger (left) and Apply Now (right) on one row --- */
+@media (max-width: 991.98px) {
+  .navbar .container {
+    justify-content: space-between;
+  }
+
+  .navbar-toggler {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .apply-now-btn {
+    flex-shrink: 0;
+    margin-left: 0;
+    min-height: 44px;
+  }
+}
+
+/* ==========================================================================
+ * Consistent section colours & guaranteed text contrast
+ * (dark text on light panels, light text on dark panels)
+ * ========================================================================== */
+
+/* Dark / primary panels always render readable light text. */
+.bg-primary,
+.cta-section,
+.stats-section,
+.hero-section.bg-primary {
+  color: #ffffff;
+}
+
+.bg-primary h1,
+.bg-primary h2,
+.bg-primary h3,
+.bg-primary h4,
+.bg-primary h5,
+.bg-primary h6,
+.cta-section h1,
+.cta-section h2,
+.cta-section h3,
+.cta-section h4,
+.cta-section h5,
+.cta-section h6,
+.stats-section h1,
+.stats-section h2,
+.stats-section h3,
+.stats-section h4,
+.stats-section h5,
+.stats-section h6 {
+  color: #ffffff;
+}
+
+.bg-primary p,
+.cta-section p,
+.stats-section p {
+  color: #e2e8f0;
+}
+
+/* Light panels always render readable dark text. */
+.bg-light,
+.bg-white,
+.why-choose-section,
+.testimonials-section,
+.gallery-preview-section,
+.news-section,
+.services-section,
+.feature-item,
+.service-card,
+.news-card,
+.testimonial-card,
+.testimonial-card-small,
+.card {
+  color: var(--text-primary);
 }
 
