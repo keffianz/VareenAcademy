@@ -1501,39 +1501,81 @@ textarea:focus {
  * ========================================================================== */
 
 /* Keep the top bar one row: no wrapping, items vertically centred. */
+.navbar {
+  background: var(--white);
+  color: var(--text-primary);
+}
+
 .navbar .container {
   gap: 0.75rem;
   flex-wrap: nowrap;
+  position: relative;
 }
 
-/* --- Persistent "Apply Now" call to action in the navbar top bar --- */
-.apply-now-btn {
+/* --- Navbar links: strong contrast on the (white/light) top bar --- */
+.navbar-nav .nav-link {
+  color: var(--text-primary) !important;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+  color: #1d4ed8 !important; /* WCAG AA (~6.5:1) on white */
+}
+
+@media (prefers-color-scheme: dark) {
+  .navbar-nav .nav-link:hover,
+  .navbar-nav .nav-link.active {
+    color: var(--secondary-color) !important;
+  }
+}
+
+/* --- Persistent "Apply Now" CTA: white label on deep blue, always visible.
+   Solid background colour + background-image + explicit white text colour/
+   fill so the label can never disappear on white or dark backgrounds. --- */
+.apply-now-btn,
+.apply-now-btn.btn,
+.apply-now-btn.btn.btn-primary {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  white-space: nowrap;
+  justify-content: center;
   flex-shrink: 0;
+  white-space: nowrap;
+  min-height: 44px;
+  padding: 0.5rem 1.25rem !important;
+  font-size: 0.95rem;
   font-weight: 600;
   letter-spacing: 0.5px;
-  border-radius: 0.75rem;
-  text-decoration: none;
+  line-height: 1.2;
+  background-color: #1e3a8a !important; /* solid fallback */
+  background-image: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  border: none !important;
+  border-radius: 0.75rem !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.3),
+    0 4px 15px rgba(30, 58, 138, 0.35) !important;
+  text-decoration: none !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
-.apply-now-btn.btn-primary,
-.apply-now-btn.btn.btn-primary {
-  background: var(--gradient-primary) !important;
-  color: #ffffff !important;
-  border: none !important;
-  padding: 0.5rem 1.15rem !important;
-  box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+/* Remove the shine overlay so nothing can sit on top of the label. */
+.apply-now-btn::before,
+.apply-now-btn:hover::before,
+.apply-now-btn:focus::before {
+  display: none !important;
 }
 
 .apply-now-btn:hover,
-.apply-now-btn:focus {
-  background: var(--gradient-primary) !important;
+.apply-now-btn:focus-visible {
+  background-color: #1e40af !important;
+  background-image: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%) !important;
   color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(30, 58, 138, 0.45);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.3),
+    0 6px 20px rgba(30, 58, 138, 0.45) !important;
 }
 
 /* --- Desktop: let the menu fill the bar, Apply Now pinned to the right --- */
@@ -1548,7 +1590,9 @@ textarea:focus {
   }
 }
 
-/* --- Mobile: align hamburger (left) and Apply Now (right) on one row --- */
+/* --- Mobile/tablet: hamburger (left), CTA (right); the menu drops on the
+   OPPOSITE side of the hamburger (right-aligned under the Apply Now
+   button) with proper spacing --- */
 @media (max-width: 991.98px) {
   .navbar .container {
     justify-content: space-between;
@@ -1559,14 +1603,63 @@ textarea:focus {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 48px;
+    min-height: 48px;
+    border: 2px solid var(--primary-color);
+  }
+
+  .navbar-collapse {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 1rem;
+    left: auto;
+    width: min(320px, calc(100% - 2rem));
+    max-width: 100%;
+    margin: 0;
+    padding: 0.75rem 0.25rem;
+    background: var(--white);
+    border: 1px solid var(--neutral-medium);
+    border-radius: 0.75rem;
+    box-shadow: 0 12px 32px var(--shadow-strong);
+    max-height: calc(100vh - 84px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .navbar-nav {
+    width: 100%;
+    margin: 0;
+  }
+
+  .navbar-nav .nav-item {
+    margin: 0.25rem 0;
+  }
+
+  .navbar-nav .nav-link {
+    display: block;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.95rem;
+    border-radius: 0.5rem;
   }
 
   .apply-now-btn {
     flex-shrink: 0;
     margin-left: 0;
-    min-height: 44px;
+  }
+}
+
+/* Very small phones: keep the CTA compact so it never clips or crowds
+   the hamburger. */
+@media (max-width: 379.98px) {
+  .apply-now-btn,
+  .apply-now-btn.btn,
+  .apply-now-btn.btn.btn-primary {
+    padding: 0.5rem 0.9rem !important;
+    font-size: 0.85rem;
+  }
+
+  .navbar .container {
+    gap: 0.5rem;
   }
 }
 
