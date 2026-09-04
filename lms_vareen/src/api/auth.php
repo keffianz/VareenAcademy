@@ -21,7 +21,18 @@ if ($request_method === 'POST') {
     requireCsrf();
 }
 
-$user = new User();
+try {
+    $user = new User();
+} catch (Throwable $e) {
+    error_log('Authentication database initialization failed: ' . $e->getMessage());
+    http_response_code(503);
+    echo json_encode([
+        'success' => false,
+        'message' => 'The authentication service is temporarily unavailable.'
+    ]);
+    exit();
+}
+
 $response = ['success' => false, 'message' => ''];
 
 switch ($action) {

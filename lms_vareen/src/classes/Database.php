@@ -32,7 +32,8 @@ class Database {
             );
             return $this->pdo;
         } catch (PDOException $e) {
-            die('Connection Error: ' . $e->getMessage());
+            error_log('LMS database connection failed: ' . $e->getMessage());
+            throw new RuntimeException('Database connection failed.', 0, $e);
         }
     }
 

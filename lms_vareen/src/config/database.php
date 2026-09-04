@@ -5,7 +5,7 @@
  * SECURITY: Credentials are loaded from (in order of priority):
  *   1. Environment variables (DB_HOST, DB_USER, DB_PASS, DB_NAME)
  *   2. Local untracked config: src/config/local_db.php  (copy local_db.example.php)
- *   3. Local development defaults (XAMPP-style root user)
+ *   3. Safe defaults that deliberately do not contain credentials
  *
  * NEVER commit real production credentials to version control.
  * The credentials previously committed here must be considered exposed:
