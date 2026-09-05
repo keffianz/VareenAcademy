@@ -7,8 +7,8 @@
 
 CREATE TABLE IF NOT EXISTS payments (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    course_id INT NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
+    course_id INT UNSIGNED NOT NULL,
     amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     original_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     discount_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS coupons (
     code VARCHAR(50) NOT NULL,
     type ENUM('percentage','fixed','full_scholarship') NOT NULL DEFAULT 'percentage',
     value DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-    course_id INT NULL COMMENT 'NULL = applies to all courses',
+    course_id INT UNSIGNED NULL COMMENT 'NULL = applies to all courses',
     max_uses INT UNSIGNED NULL COMMENT 'NULL = unlimited',
     used_count INT UNSIGNED NOT NULL DEFAULT 0,
     expires_at DATETIME NULL,
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS coupons (
 CREATE TABLE IF NOT EXISTS coupon_redemptions (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     coupon_id INT UNSIGNED NOT NULL,
-    user_id INT NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
     payment_id INT UNSIGNED NOT NULL,
     redeemed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     KEY idx_redemptions_coupon (coupon_id),
@@ -91,11 +91,11 @@ CREATE TABLE IF NOT EXISTS coupon_redemptions (
 CREATE TABLE IF NOT EXISTS refund_requests (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     payment_id INT UNSIGNED NOT NULL,
-    user_id INT NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
     reason TEXT NOT NULL,
     status ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
     admin_notes TEXT NULL,
-    processed_by INT NULL,
+    processed_by INT UNSIGNED NULL,
     processed_at DATETIME NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     KEY idx_refunds_payment (payment_id),
