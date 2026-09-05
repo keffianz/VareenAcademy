@@ -72,7 +72,7 @@ $resources = $resource->getResourcesByLesson($lesson_id);
                             <div class="muted">Type: <?php echo htmlspecialchars($r['file_type']); ?></div>
                         </div>
                         <div class="resource-actions">
-                            <a class="btn btn-outline" href="<?php echo htmlspecialchars($r['file_path']); ?>" target="_blank">Open</a>
+                            <a class="btn btn-outline" href="<?php echo appBasePath(); ?>/src/api/download.php?type=resource&id=<?php echo (int)$r['id']; ?>" target="_blank">Open</a>
                             <button class="btn btn-danger" onclick="deleteResource(<?php echo (int)$r['id']; ?>)">Delete</button>
                         </div>
                     </div>

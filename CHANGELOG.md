@@ -3,6 +3,38 @@
 All notable changes to this project are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased] — Phase B/D: 10/10 MVP Push
+
+### Added — Payment System (fully wired)
+- `src/classes/Payment.php` — orchestration layer: `initialize()`, `verify()` (server-side, idempotent, `FOR UPDATE` race guard), `approveBankTransfer()` / `rejectBankTransfer()`, refund request/processing, receipts, admin queries.
+- `src/api/payments.php` — student API: method list, checkout init, verify, coupon validation, payment history (CSRF-enforced).
+- `src/api/webhooks.php` — webhook receiver with Paystack `x-paystack-signature` (HMAC-SHA512) and Flutterwave `verif-hash` verification before any state change.
+- `src/classes/PaymentGateway.php` (interface), `PaystackGateway.php`, `FlutterwaveGateway.php`, `Coupon.php`.
+- Student pages: `checkout.php`, `payments.php` (My Payments), `payment-callback.php`.
+- Admin pages: `admin/payments.php` (approve/reject bank transfers, revenue stats, refunds).
+- `database/migration_payments.sql` — payments, receipts, webhooks, coupons, redemptions, refund tables.
+
+### Added — Certificates & Legal
+- `views/certificate-print.php` — standalone print-optimized certificate document (student-gated).
+- `views/student/certificates.php` — student certificate gallery with print links.
+- Legal pages: `legal-privacy.php`, `legal-terms.php`, `legal-refund.php` (public routes).
+
+### Added — Security
+- `database/migration_lockout.sql` + `User::login()` DB-backed per-account lockout (survives cookie clearing, unlike the previous session-only counter).
+- Root + LMS `.htaccess`: web access denied to `storage/`, `uploads/payment_proofs/`, `*.sql`, seed/backup files; reset-token fallback log no longer web-reachable.
+- Removed committed production credentials from `api/config.php` (now environment-driven with safe defaults); removed seed/backup files from repo (`admin_seed.php`, `user_seed.php`, `index_backup.php`, `database/demo_passwords.php`).
+
+### Added — Database & Docs
+- `database/vareen_full_schema.sql` — consolidated canonical schema (base + payments + certificates + AI + attendance + lockout).
+- `Database` class: `update()`, `fetchAll()`, `fetch()`, `insert()`, parameterized `query()`, `getInstance()` singleton — required by the payment layer.
+- `docs/` — `ARCHITECTURE.md`, `ERD.md`, `USER_MANUAL.md`, `DEFENSE_PREP.md` (20 Q&A + demo script), `DEPLOYMENT.md`.
+
+### Fixed
+- `Payment.php`: repaired 5 truncated methods (`initialize`, `verify`, `rejectBankTransfer`, `processRefund`, `getUserPayments`, `adminPendingBankTransfers`) — file previously had fatal parse errors.
+- Router: all new pages registered in the whitelist with correct role gates; `certificates` moved to `views/student/certificates.php`.
+- `checkout` uses `c.thumbnail` (correct column) instead of non-existent `c.image`.
+
+## [Unreleased] — Security Hardening Batch 1
 ## [Unreleased] — Security Hardening Batch 1
 
 ### Added

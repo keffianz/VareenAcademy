@@ -2,7 +2,9 @@
 -- Fresh MySQL/MariaDB setup script
 -- Database: u374397808_vereenacademy
 -- Username: u374397808_vereenacademy
--- Password: Abubakar11@
+-- SECURITY: Never hardcode real passwords in this file.
+-- Replace CHANGE_ME with the rotated password when running this script.
+-- (The password previously committed here was exposed in git history.)
 
 -- Create database if it doesn't exist
 CREATE DATABASE IF NOT EXISTS `u374397808_vereen_academy`
@@ -13,7 +15,7 @@ COLLATE utf8mb4_unicode_ci;
 USE `u374397808_vereen_academy`;
 
 -- Create user with specified credentials
-CREATE USER IF NOT EXISTS 'u374397808_vereenacademy'@'localhost' IDENTIFIED BY 'Abubakar11@';
+CREATE USER IF NOT EXISTS 'u374397808_vereenacademy'@'localhost' IDENTIFIED BY 'CHANGE_ME_ROTATED_PASSWORD';
 
 -- Grant all privileges on the database to the user
 GRANT ALL PRIVILEGES ON `u374397808_vereen_academy`.* TO 'u374397808_vereenacademy'@'localhost';

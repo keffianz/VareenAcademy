@@ -9,9 +9,10 @@
     RewriteRule ^(.+)/$ $1 [L,R=301]
     
     # Prevent access to sensitive directories, BUT allow API under /src/api/
-    # (so login/logout/etc can work)
+    # (so login/logout/etc can work). Also block storage/ (logs) and uploads/
+    # (payment proofs) which must never be served directly.
     RewriteCond %{REQUEST_URI} !^/lms_vareen/src/api/ [NC]
-    RewriteRule ^(src|assets/uploads|database)(/|$) - [F,L]
+    RewriteRule ^(src|assets/uploads|database|storage|uploads)(/|$) - [F,L]
 
     
     # 2. FIXED: Allow access to public assets inside subfolder
@@ -69,6 +70,12 @@
 
 # Prevent access to internal files but allow index.php
 <FilesMatch "\.env$|\.htaccess$|\.gitignore$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Deny direct access to any .log files (e.g. password_resets.log)
+<FilesMatch "\.log$">
     Order allow,deny
     Deny from all
 </FilesMatch>

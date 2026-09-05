@@ -151,7 +151,7 @@ if ($selectedCourseId) {
             container.innerHTML = '<p>No submissions yet.</p>';
         } else {
             data.data.forEach(s => {
-                const fileLink = s.file_path ? `<a href="${s.file_path}" target="_blank" class="btn btn-small">View File</a>` : '';
+                const fileLink = s.file_path ? `<a href="<?php echo appBasePath(); ?>/src/api/download.php?type=submission&id=${s.id}" target="_blank" class="btn btn-small">View File</a>` : '';
 
                 const html = `
                     <div class="submission-item" style="border:1px solid #eee; border-radius:10px; padding:14px; margin-bottom:12px;">

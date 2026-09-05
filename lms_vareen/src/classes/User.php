@@ -95,7 +95,8 @@ class User {
         $genericError = ['success' => false, 'message' => 'Invalid email or password'];
 
         try {
-            $sql = "SELECT id, first_name, last_name, email, password, role, is_active
+            $sql = "SELECT id, first_name, last_name, email, password, role, is_active,
+                    failed_login_attempts, locked_until
                     FROM users WHERE email = :email";
             $params = [':email' => $email];
 
@@ -135,11 +136,35 @@ class User {
 
             $passwordOk = $user && !empty($user['password']) && password_verify($password, $user['password']);
 
+            // DB-backed lockout: survives cookie clearing (server-side truth).
+            if ($user && !empty($user['locked_until']) && strtotime($user['locked_until']) > $now) {
+                $mins = (int)ceil((strtotime($user['locked_until']) - $now) / 60);
+                return ['success' => false, 'message' => 'Too many failed attempts. Please try again in ' . $mins . ' minute(s).'];
+            }
+
             if (!$passwordOk) {
                 $failures++;
                 $_SESSION['login_failures'] = $failures;
                 if ($failures >= 5) {
                     $_SESSION['login_lock_until'] = $now + 900; // 15 minutes
+                }
+                // Persist the attempt + lock server-side.
+                try {
+                    if ($user) {
+                        $newCount = (int)($user['failed_login_attempts'] ?? 0) + 1;
+                        if ($newCount >= 5) {
+                            $upd = $this->db->prepare(
+                                "UPDATE users SET failed_login_attempts = :c, locked_until = DATE_ADD(NOW(), INTERVAL 15 MINUTE)
+                                 WHERE id = :id"
+                            );
+                            $upd->execute([':c' => $newCount, ':id' => $user['id']]);
+                        } else {
+                            $upd = $this->db->prepare("UPDATE users SET failed_login_attempts = :c WHERE id = :id");
+                            $upd->execute([':c' => $newCount, ':id' => $user['id']]);
+                        }
+                    }
+                } catch (PDOException $e) {
+                    // Non-fatal: session lockout still applies if DB update fails.
                 }
                 return $genericError;
             }
@@ -151,6 +176,14 @@ class User {
 
             // Login successful - clear failure counter and regenerate session id to prevent fixation
             unset($_SESSION['login_failures'], $_SESSION['login_lock_until']);
+            try {
+                $reset = $this->db->prepare(
+                    "UPDATE users SET failed_login_attempts = 0, locked_until = NULL WHERE id = :id"
+                );
+                $reset->execute([':id' => $user['id']]);
+            } catch (PDOException $e) {
+                // Non-fatal: session state is already cleared.
+            }
             session_regenerate_id(true);
 
             $_SESSION['user_id'] = $user['id'];
@@ -327,27 +360,18 @@ class User {
             ]);
 
             // Attempt to email the reset token to the user
-            $emailSent = false;
             if (!empty($email)) {
                 $subject = 'VAREEN Academy - Password Reset';
                 $body = "Hello,\n\nUse this token to reset your VAREEN Academy password:\n\n$token\n\nThis token expires in 1 hour.\n\nIf you did not request this, you can safely ignore this email.\n";
                 $headers = 'From: ' . (defined('MAIL_FROM') && MAIL_FROM ? MAIL_FROM : 'noreply@vereenacademy.com') . "\r\n";
-                $emailSent = @mail($email, $subject, $body, $headers);
+                @mail($email, $subject, $body, $headers);
             }
 
-            // If email delivery is not configured, write the token to a protected log for support recovery
-            if (!$emailSent) {
-                $logDir = __DIR__ . '/../../storage';
-                if (!is_dir($logDir)) {
-                    @mkdir($logDir, 0755, true);
-                }
-                @file_put_contents(
-                    $logDir . '/password_resets.log',
-                    date('c') . " user={$user['id']} token=$token\n",
-                    FILE_APPEND
-                );
-            }
-
+            // SECURITY: the plaintext reset token is never written to disk or
+            // logs — only its SHA-256 hash is stored in password_resets. If the
+            // server has no mail transport configured the token simply cannot
+            // reach the inbox, but the generic success message is still
+            // returned so the response never reveals whether the email exists.
             return ['success' => true, 'message' => $genericMessage];
         } catch (PDOException $e) {
             return ['success' => false, 'message' => 'Failed to process reset. Please try again later.'];

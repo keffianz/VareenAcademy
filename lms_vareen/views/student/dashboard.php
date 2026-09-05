@@ -59,6 +59,12 @@ $pending_assignments = $dashboard['pending_assignments'] ?? [];
                 <li><a href="/index.php?page=quizzes">
                     <i class="fas fa-list-check"></i> Quizzes
                 </a></li>
+                <li><a href="/index.php?page=my-payments">
+                    <i class="fas fa-credit-card"></i> My Payments
+                </a></li>
+                <li><a href="/index.php?page=certificates">
+                    <i class="fas fa-certificate"></i> My Certificates
+                </a></li>
                 <li><a href="/index.php?page=profile">
                     <i class="fas fa-user"></i> Profile
                 </a></li>

@@ -46,8 +46,50 @@ class Database {
         }
     }
 
-    public function query($sql) {
-        return $this->pdo->prepare($sql);
+        public function query($sql, $params = []) {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt;
+    }
+
+    public function fetch(string $sql, array $params = []): ?array {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+        public function insert(string $table, array $data): int {
+        $columns = array_keys($data);
+        $placeholders = array_map(fn($c) => ':' . $c, $columns);
+        $sql = 'INSERT INTO `' . $table . '` (`' . implode('`,`', $columns) . '`) VALUES (' . implode(',', $placeholders) . ')';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($data);
+        return (int) $this->pdo->lastInsertId();
+    }
+
+    /**
+     * UPDATE a table by primary-key / custom WHERE builder.
+     * $where is a string like 'id = ?' and $params are the bound values
+     * that follow the column-value array.
+     */
+    public function update(string $table, array $data, string $where, array $params = []): int {
+        $sets = [];
+        foreach (array_keys($data) as $col) {
+            $sets[] = '`' . $col . '` = :' . $col;
+        }
+        $sql = 'UPDATE `' . $table . '` SET ' . implode(', ', $sets);
+        $sql .= $where !== '' ? ' WHERE ' . $where : '';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(array_merge($data, $params));
+        return (int) $stmt->rowCount();
+    }
+
+    /** Fetch multiple rows. */
+    public function fetchAll(string $sql, array $params = []): array {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function execute($stmt, $params = []) {
@@ -68,5 +110,18 @@ class Database {
 
     public function rollBack() {
         return $this->pdo->rollBack();
+    }
+
+    /**
+     * Singleton accessor so orchestration classes (e.g. Payment) share a
+     * single connected Database instance. Returns a connected self.
+     */
+        public static function getInstance(): self {
+        static $instance = null;
+        if ($instance === null) {
+            $instance = new self();
+            $instance->connect();
+        }
+        return $instance;
     }
 }

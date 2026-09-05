@@ -57,9 +57,15 @@ foreach ($courses as &$c) {
                                     <i class="fas fa-play-circle"></i> Continue Learning
                                 </a>
                             <?php elseif (isLoggedIn() && getCurrentUserRole() === 'student'): ?>
-                                <button class="btn btn-primary btn-small btn-block" onclick="enrollCourse(<?php echo $c['id']; ?>)">
-                                    <i class="fas fa-check-circle"></i> Enroll Now
-                                </button>
+                                <?php if ((float)($c['price'] ?? 0) > 0): ?>
+                                    <a href="/index.php?page=checkout&id=<?php echo $c['id']; ?>" class="btn btn-primary btn-small btn-block">
+                                        <i class="fas fa-shopping-cart"></i> Enroll — ₦<?php echo number_format((float)$c['price'], 2); ?>
+                                    </a>
+                                <?php else: ?>
+                                    <button class="btn btn-primary btn-small btn-block" onclick="enrollCourse(<?php echo $c['id']; ?>)">
+                                        <i class="fas fa-check-circle"></i> Enroll Now (Free)
+                                    </button>
+                                <?php endif; ?>
                             <?php else: ?>
                                 <a href="/index.php?page=login" class="btn btn-primary btn-small btn-block">
                                     Sign in to Enroll

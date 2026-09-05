@@ -52,7 +52,8 @@ if ($page === 'login' || $page === 'signup' || $page === 'password-reset') {
     exit;
 }
 // Public pages: no login required, self-contained views (own header/styles)
-if ($page === 'verify' || $page === 'instructors' || $page === 'become-instructor') {
+if ($page === 'verify' || $page === 'instructors' || $page === 'become-instructor'
+    || $page === 'legal-privacy' || $page === 'legal-terms' || $page === 'legal-refund') {
     require_once __DIR__ . '/views/' . $page . '.php';
     exit;
 }
@@ -64,13 +65,14 @@ $knownPages = [
     // Student pages
     'student-dashboard', 'assignments', 'courses', 'lessons', 'quizzes', 'quiz-attempt',
     'quiz-result', 'live-classes', 'course-detail', 'notifications', 'profile', 'certificates',
+    'checkout', 'my-payments', 'payment-callback', 'certificate-print',
     // Teacher pages
     'teacher-dashboard', 'teacher-lesson-editor', 'teacher-module-editor', 'teacher-quiz-editor',
     'teacher-quiz-attempts', 'teacher-resource-editor', 'teacher-live-classes', 'teacher-assignments-editor',
     'teacher-attendance',
     // Admin pages
     'admin-dashboard', 'admin-users', 'admin-courses', 'admin-reports', 'admin-settings',
-    'admin-applications', 'admin-certificates',
+    'admin-applications', 'admin-certificates', 'admin-payments',
 ];
 if ($page !== null && !in_array($page, $knownPages, true)) {
     http_response_code(404);
@@ -151,6 +153,27 @@ switch ($page) {
         render_page('views/student/certificates.php', 'My Certificates');
         break;
 
+    case 'checkout':
+        requireRole('student');
+        render_page('views/checkout.php', 'Checkout');
+        break;
+
+    case 'my-payments':
+        requireRole('student');
+        render_page('views/payments.php', 'My Payments');
+        break;
+
+    case 'payment-callback':
+        requireRole('student');
+        render_page('views/payment-callback.php', 'Payment Confirmation');
+        break;
+
+    case 'certificate-print':
+        requireRole('student');
+        // Standalone full HTML document (own <!DOCTYPE>) — do not wrap in layout.
+        require_once __DIR__ . '/views/certificate-print.php';
+        exit;
+
     // Teacher Pages
     case 'teacher-dashboard':
         requireRole('teacher');
@@ -230,6 +253,11 @@ switch ($page) {
     case 'admin-certificates':
         requireRole('admin');
         render_page('views/admin/certificates.php', 'Certificate Management');
+        break;
+
+    case 'admin-payments':
+        requireRole('admin');
+        render_page('views/admin/payments.php', 'Payments');
         break;
 
     // Default: redirect to appropriate dashboard

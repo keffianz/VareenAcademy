@@ -50,7 +50,9 @@ define('REMEMBER_ME_DAYS', 30);
 // Security
 // IMPORTANT: In production, these secrets should be stored in environment variables or a .env file
 // Never commit real secrets to version control
-define('JWT_SECRET', 'sk_live_' . bin2hex(random_bytes(24))); // Generated secure random key - regenerate per environment
+// NOTE: JWT auth is not currently used (session-based auth is in place). If JWT is adopted,
+// generate a static per-environment secret (e.g. via env var) — not a per-request value.
+define('JWT_SECRET', getenv('JWT_SECRET') !== false ? getenv('JWT_SECRET') : '');
 define('PASSWORD_MIN_LENGTH', 8);
 
 // Pagination
