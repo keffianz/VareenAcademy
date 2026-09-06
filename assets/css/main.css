@@ -1583,6 +1583,11 @@ textarea:focus {
     margin: 0 auto;
   }
 
+  /* The in-drawer "Apply Now" is mobile-only; desktop uses the top-bar button. */
+  .nav-item-cta {
+    display: none;
+  }
+
   .apply-now-btn {
     flex-shrink: 0;
     margin: 0 0 0 0.5rem;
@@ -1601,7 +1606,43 @@ textarea:focus {
     padding-top: env(safe-area-inset-top, 0px);
   }
 
-  /* Apply Now stays visible at every breakpoint. */
+  /* On mobile the top-bar CTA is hidden; "Apply Now" is the last item of the drawer. */
+  .navbar .container > .apply-now-btn {
+    display: none;
+  }
+
+  /* In-drawer "Apply Now": visually distinct but aligned with other items. */
+  .nav-item-cta {
+    margin-top: 0.75rem;
+  }
+
+  .nav-item-cta .nav-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0.75rem 0.875rem;
+    background: linear-gradient(135deg, #0b7f47 0%, #09663a 100%);
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 15px rgba(11, 127, 71, 0.35);
+    text-decoration: none;
+  }
+
+  .nav-item-cta .nav-cta:hover,
+  .nav-item-cta .nav-cta:focus-visible {
+    filter: brightness(1.08);
+    color: #ffffff !important;
+    text-decoration: none;
+  }
+
+  .nav-item-cta .nav-cta:focus-visible {
+    outline: 3px solid var(--brand-green-dark);
+    outline-offset: 2px;
+  }
 
   .navbar-toggler {
     display: inline-flex;
