@@ -573,7 +573,7 @@ const initializeMobileMenu = () => {
     });
 
     // Selecting a link (or the CTA) closes the drawer, then lets the link navigate.
-    collapseEl.querySelectorAll('.nav-link, .drawer-cta').forEach((link) => {
+    collapseEl.querySelectorAll('.nav-link').forEach((link) => {
         link.addEventListener('click', () => {
             if (isMobile() && collapseEl.classList.contains('show')) closeMenu();
         });
