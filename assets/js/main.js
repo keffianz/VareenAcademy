@@ -848,39 +848,18 @@ const debounce = (func, wait) => {
 
 // Enhanced PWA features with animations
 const initializePWA = () => {
-    // Register service worker
+    // Register service worker (offline support)
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/sw.js')
                 .then((registration) => {
                     console.log('SW registered: ', registration);
-                    registration.addEventListener('updatefound', () => {
-                        const newWorker = registration.installing;
-                        newWorker.addEventListener('statechange', () => {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                showUpdatePrompt();
-                            }
-                        });
-                    });
                 })
                 .catch((registrationError) => {
                     console.log('SW registration failed: ', registrationError);
                 });
         });
     }
-
-    // Handle install prompt with animation
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        showInstallPrompt();
-    });
-
-    window.addEventListener('appinstalled', (evt) => {
-        console.log('PWA was installed successfully');
-        hideInstallPrompt();
-    });
 
     // Enhanced online/offline status with animations
     window.addEventListener('online', () => {
@@ -890,29 +869,6 @@ const initializePWA = () => {
     window.addEventListener('offline', () => {
         showOfflineStatus();
     });
-};
-
-// Enhanced install prompt with animation
-const showInstallPrompt = () => {
-    const installBanner = document.createElement('div');
-    installBanner.id = 'install-banner';
-    installBanner.className = 'install-banner bg-primary text-contrast text-center py-2 px-3 position-fixed top-0 w-100 animate-slide-in-down';
-    installBanner.style.cssText = `
-        z-index: 9999;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        font-size: 0.9rem;
-    `;
-    installBanner.innerHTML = `
-        <div class="d-flex justify-content-between align-items-center">
-            <span class="visually-hidden">VAREEN Academy install prompt</span>
-            <div>
-                <button class="btn btn-light btn-sm me-2 animate-bounce-in" onclick="installPWA()">Install</button>
-                <button class="btn btn-outline-light btn-sm" onclick="hideInstallPrompt()">Later</button>
-            </div>
-        </div>
-    `;
-
-    document.body.insertBefore(installBanner, document.body.firstChild);
 };
 
 // Enhanced status messages with animations
