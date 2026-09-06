@@ -1,11 +1,9 @@
 -- =====================================================================
 -- VAREEN Academy - Batch 2 Migration (reference DDL)
 -- =====================================================================
--- NOTE: This file documents the Batch 2 schema changes. The canonical,
--- idempotent migration runner is database/seed_demo.php (CLI), which
--- checks information_schema before altering anything. Run:
---     php lms_vareen/database/seed_demo.php
--- Running this raw file twice may error; the PHP seeder never will.
+-- NOTE: This file documents the Batch 2 schema changes. The schema is also
+-- consolidated in sql/setup_shared_hosting.sql (fresh installs); apply this
+-- file's statements manually ONLY when upgrading an older existing database.
 -- =====================================================================
 
 -- 1. Allow the same email to exist once PER ROLE (demo accounts).

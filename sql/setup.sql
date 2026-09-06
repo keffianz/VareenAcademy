@@ -315,10 +315,11 @@ DELIMITER ;
 -- FINAL SETUP
 -- ===========================================
 
--- Create admin user (password: admin123 - CHANGE THIS!)
--- Password hash for 'admin123' - you should change this
-INSERT INTO `users` (`username`, `email`, `password_hash`, `full_name`, `role`) VALUES
-('admin', 'admin@vereenacademy.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'System Administrator', 'admin');
+-- Create admin user
+-- SECURITY: no demo accounts are seeded anymore. Insert your admin account
+-- manually with a bcrypt hash:
+--   INSERT INTO `users` (`username`, `email`, `password_hash`, `full_name`, `role`)
+--   VALUES ('admin', 'you@example.com', '<bcrypt-hash>', 'System Administrator', 'admin');
 
 -- Set proper permissions for the user
 GRANT SELECT, INSERT, UPDATE, DELETE ON `vereen_academy`.* TO 'vereenacademy'@'localhost';

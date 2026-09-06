@@ -97,12 +97,12 @@ body {
     position: relative; z-index: 1;
     min-height: 100vh;
     display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 520px);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 460px);
     align-items: center;
-    gap: clamp(24px, 4vw, 72px);
+    gap: clamp(32px, 5vw, 80px);
     max-width: 1440px;
     margin: 0 auto;
-    padding: clamp(20px, 4vw, 56px) clamp(20px, 5vw, 72px);
+    padding: clamp(24px, 4vw, 56px) clamp(24px, 5vw, 72px);
 }
 
 /* ============================================================
@@ -367,16 +367,21 @@ body {
     flex-wrap: wrap;
 }
 .remember {
-    display: inline-flex; align-items: center; gap: 9px;
+    display: inline-flex; align-items: center; gap: 8px;
     font-size: 13.5px; color: var(--text-mid);
     cursor: pointer; min-height: 44px;
+    line-height: 1;
 }
-.remember input {
+.remember input[type="checkbox"] {
     width: 18px; height: 18px;
+    margin: 0;
     accent-color: var(--accent-strong);
     cursor: pointer;
+    vertical-align: middle;
+    position: relative;
+    top: -1px;
 }
-.remember input:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; }
+.remember input[type="checkbox"]:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; }
 .forgot { font-size: 13.5px; font-weight: 600; color: var(--accent-strong); text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
 .forgot:hover { text-decoration: underline; }
 .forgot:focus-visible { outline: 3px solid var(--ring); outline-offset: 3px; border-radius: 6px; }
@@ -445,63 +450,6 @@ body {
 .alert svg { width: 17px; height: 17px; flex: none; margin-top: 1px; }
 .alert--error { display: flex; background: var(--danger-soft); color: #991b1b; border: 1px solid #fecaca; animation: shake .4s var(--ease-out); }
 .alert--success { display: flex; background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
-
-/* ---- Demo accounts panel ---- */
-.demo { margin-top: 18px; border: 1px dashed #cbd5d0; border-radius: var(--radius-md); overflow: hidden; }
-.demo summary {
-    list-style: none;
-    display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    min-height: 48px;
-    padding: 0 14px;
-    font-size: 13.5px; font-weight: 600;
-    color: var(--text-mid);
-    cursor: pointer;
-    user-select: none;
-    transition: background .25s, color .25s;
-}
-.demo summary::-webkit-details-marker { display: none; }
-.demo summary:hover { background: #f4f8f5; color: #0f172a; }
-.demo summary:focus-visible { outline: 3px solid var(--ring); outline-offset: -3px; }
-.demo summary .chev { width: 16px; height: 16px; transition: transform .3s var(--ease-out); }
-.demo[open] summary .chev { transform: rotate(180deg); }
-.demo__body { padding: 6px 12px 12px; }
-.demo__row {
-    display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    padding: 9px 4px;
-    border-top: 1px solid #eef2f0;
-    font-size: 12.5px;
-}
-.demo__meta { min-width: 0; }
-.demo__role { font-weight: 700; font-size: 12px; color: #15803d; }
-.demo__cred { color: var(--text-soft); word-break: break-all; }
-.copy-btn {
-    flex: none;
-    width: 48px; height: 36px;
-    display: inline-flex; align-items: center; justify-content: center;
-    border: 1px solid #dbe3de; border-radius: 9px;
-    background: #fff;
-    color: var(--text-mid);
-    cursor: pointer;
-    transition: color .2s, border-color .2s, background .2s, transform .15s;
-}
-.copy-btn:hover { color: #15803d; border-color: #16a34a; background: #f4fdf7; }
-.copy-btn:active { transform: scale(.94); }
-.copy-btn:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; }
-.copy-btn svg { width: 15px; height: 15px; }
-.copy-btn.is-copied { color: #15803d; border-color: #86efac; background: #f0fdf4; }
-
-/* ---- Trust elements ---- */
-.trust {
-    margin-top: 20px;
-    display: flex; align-items: center; justify-content: center;
-    flex-wrap: wrap; gap: 8px 18px;
-}
-.trust__item {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 12px; font-weight: 600;
-    color: var(--text-soft);
-}
-.trust__item svg { width: 14px; height: 14px; color: #15803d; }
 
 .card__footer { margin-top: 18px; text-align: center; font-size: 13.5px; color: var(--text-soft); }
 .card__footer a { color: #15803d; font-weight: 600; text-decoration: none; }
@@ -736,63 +684,6 @@ body {
                     <span id="loginSuccessText"></span>
                 </div>
             </form>
-
-            <!-- Demo accounts (collapsed by default) -->
-            <details class="demo" id="demoPanel">
-                <summary>
-                    <span>Demo Accounts</span>
-                    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-                </summary>
-                <div class="demo__body">
-                    <div class="demo__row">
-                        <div class="demo__meta">
-                            <div class="demo__role">Admin</div>
-                            <div class="demo__cred">abubakarabdulrahim663+admin@gmail.com · VareenAdmin@2026!</div>
-                        </div>
-                        <button type="button" class="copy-btn" data-copy="abubakarabdulrahim663+admin@gmail.com|VareenAdmin@2026!" aria-label="Copy admin demo credentials">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                        </button>
-                    </div>
-                    <div class="demo__row">
-                        <div class="demo__meta">
-                            <div class="demo__role">Teacher</div>
-                            <div class="demo__cred">abubakarabdulrahim663+teacher@gmail.com · VareenTeacher@2026!</div>
-                        </div>
-                        <button type="button" class="copy-btn" data-copy="abubakarabdulrahim663+teacher@gmail.com|VareenTeacher@2026!" aria-label="Copy teacher demo credentials">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                        </button>
-                    </div>
-                    <div class="demo__row">
-                        <div class="demo__meta">
-                            <div class="demo__role">Student</div>
-                            <div class="demo__cred">abubakarabdulrahim663+student@gmail.com · VareenStudent@2026!</div>
-                        </div>
-                        <button type="button" class="copy-btn" data-copy="abubakarabdulrahim663+student@gmail.com|VareenStudent@2026!" aria-label="Copy student demo credentials">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                        </button>
-                    </div>
-                </div>
-            </details>
-
-            <!-- Trust indicators -->
-            <div class="trust" aria-label="Security and trust">
-                <span class="trust__item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-                    Secure Login
-                </span>
-                <span class="trust__item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-                    CSRF Protected
-                </span>
-                <span class="trust__item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    SSL Encrypted
-                </span>
-                <span class="trust__item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    Trusted Learning Platform
-                </span>
-            </div>
 
             <p class="card__footer">New to VAREEN Academy? <a href="index.php?page=signup">Create an account</a></p>
         </div>

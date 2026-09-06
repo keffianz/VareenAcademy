@@ -574,27 +574,13 @@ CREATE TABLE IF NOT EXISTS `exam_registrations` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ===========================================
--- INITIAL LMS LOGIN ACCOUNTS
+-- SECURITY NOTE — NO SEEDED LOGIN ACCOUNTS
 -- ===========================================
--- Temporary passwords: change them after the first successful login.
--- Demo password for the seeded staff/student accounts below is: password123
--- (staff logs in via the "Teacher / Staff" tab; role = teacher).
--- The admin account above uses a separate password set by the administrator.
--- The staff account uses the LMS teacher role because that is the
--- staff-level role currently supported by the application login code.
-INSERT INTO `users`
-  (`username`, `email`, `password_hash`, `password`, `full_name`, `first_name`, `last_name`, `role`, `is_active`, `email_verified`)
-VALUES
-  ('admin', 'admin@vereenacademy.com', '$2y$10$0bsxhuKDU5zvFlFABfd21uw6pwEOTQTZb5K0fJWDtzUeL/BAr2TVq', '$2y$10$0bsxhuKDU5zvFlFABfd21uw6pwEOTQTZb5K0fJWDtzUeL/BAr2TVq', 'VAREEN Administrator', 'VAREEN', 'Administrator', 'admin', 1, 1),
-  ('staff', 'staff@vereenacademy.com', '$2y$10$ckK3sE4/sCTxIJSVKo4Q3O6VcDaE.i97WspmfL1gdmaYPOTgegUEW', '$2y$10$ckK3sE4/sCTxIJSVKo4Q3O6VcDaE.i97WspmfL1gdmaYPOTgegUEW', 'VAREEN Staff', 'VAREEN', 'Staff', 'teacher', 1, 1),
-  ('student', 'student@vereenacademy.com', '$2y$10$3jI7baG026l0Qg12L8KrPu1RwVbwAwfpChT5Ijy7rnmTRtpdRx3em', '$2y$10$3jI7baG026l0Qg12L8KrPu1RwVbwAwfpChT5Ijy7rnmTRtpdRx3em', 'VAREEN Student', 'VAREEN', 'Student', 'student', 1, 1)
-ON DUPLICATE KEY UPDATE
-  `email` = VALUES(`email`),
-  `password_hash` = VALUES(`password_hash`),
-  `password` = VALUES(`password`),
-  `full_name` = VALUES(`full_name`),
-  `first_name` = VALUES(`first_name`),
-  `last_name` = VALUES(`last_name`),
-  `role` = VALUES(`role`),
-  `is_active` = 1,
-  `email_verified` = 1;
+-- No default/demo login accounts are inserted by this file.
+-- All demo/test accounts have been REMOVED (security hardening).
+-- Create your own accounts:
+--   - Students: register via the public signup form (student-only).
+--   - Admin/Teacher: insert directly via phpMyAdmin (password_hash
+--     must be a bcrypt hash generated with PHP password_hash()).
+-- Cleanup SQL for previously-seeded demo accounts (if any) is in
+--   lms_vareen/database/cleanup_demo_accounts.sql

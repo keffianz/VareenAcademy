@@ -20,8 +20,10 @@ Run **in this order** from phpMyAdmin:
 1. `lms_vareen/database/vareen_full_schema.sql` — canonical full schema
    (base tables + payments + certificates + AI + instructor applications +
    attendance + lockout, consolidated).
-2. Optionally `database/seed_demo.php` via CLI for demo data — **never in
-   production**, and delete the file after use.
+2. No demo-data seed scripts are shipped. Demo/test login accounts have been
+   removed from the codebase (`demo_passwords.*`, `seed_demo.php`,
+   `sql/seed_data.sql` were deleted for security). Create your own accounts
+   instead — see `lms_vareen/README.md` → Login Accounts.
 
 ## 3. Configuration (environment variables)
 
@@ -68,7 +70,7 @@ The endpoint verifies each provider's signature header before processing.
 
 - [ ] Login as admin → change the default admin password immediately.
 - [ ] Settings → verify support email, phone, bank details.
-- [ ] Delete any seed scripts (`seed_demo.php`, `admin_seed.php`) from server.
+- [ ] No seed scripts remain (all `*_seed.php` / `seed_data.sql` were removed from this repo for security).
 - [ ] Submit a real test payment (Paystack test key) end-to-end.
 - [ ] Trigger a password reset; confirm no token appears in `storage/` logs
       (mail configured) and `storage/password_resets.log` is **not** reachable

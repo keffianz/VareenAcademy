@@ -6,7 +6,7 @@
 --
 -- Run once, e.g.:
 --   mysql -u root vareen_lms < lms_vareen/database/migration_fix_seed_passwords.sql
--- or re-import the corrected sql/setup_shared_hosting.sql / sql/seed_data.sql.
+-- or re-import the corrected sql/setup_shared_hosting.sql.
 --
 -- The specific intended login column is `users`.`password`.
 -- (Old) placeholder hashes are matched so real accounts are never touched.

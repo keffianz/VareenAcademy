@@ -16,10 +16,9 @@ A modern, mobile-responsive online academy platform built with HTML5, CSS3, Java
 After importing the shared-hosting SQL file, create
 `src/config/local_db.php` on the server. Do not commit this file.
 
-For demo/seed data (real site content: programmes, news, testimonials,
-exam registrations and LMS courses), optionally import:
-`sql/seed_data.sql` **after** `sql/setup_shared_hosting.sql`. See the
-header comments in that file for details.
+No demo/seed login-data files are shipped (removed for security). The schema
+in `sql/setup_shared_hosting.sql` creates empty tables; content is added by
+real users and administrators.
 
 ```php
 <?php
@@ -273,29 +272,28 @@ vereen-academy/
 
 ## 📊 Test / Seed Accounts
 
-After importing `sql/setup_shared_hosting.sql` (+ optional `sql/seed_data.sql`),
-these accounts are available on the login page (select the matching tab —
-Student / Teacher / Staff / Admin):
+## 🔐 Login Accounts
 
-**Admin Account** (password is set by the administrator in
-`sql/setup_shared_hosting.sql`):
-- Email: admin@vereenacademy.com
-- Login tab: Admin
+This project ships with **no default/demo login accounts**. All demo/test
+accounts have been removed for security. Accounts are created only via
+real registration (students) or manually by an administrator.
 
-**Teacher / Staff Account:**
-- Email: staff@vereenacademy.com
-- Password: password123
-- Login tab: Teacher / Staff
+**To create your own admin account** (after importing the schema):
 
-**Student Account:**
-- Email: student@vereenacademy.com
-- Password: password123
-- Login tab: Student
+1. Generate a bcrypt hash for the password you want:
 
-> The other demo students in `sql/seed_data.sql` (maryam, emeka, halima,
-> zainab, ibrahim) also use `password123`. Change these demo passwords in
-> production. You can also use the signup form to create a student account
-> (signup is student-only).
+   ```bash
+   php -r "echo password_hash('YourPassword!', PASSWORD_BCRYPT);"
+   ```
+
+2. Insert the account in phpMyAdmin under `users`:
+
+   ```sql
+   INSERT INTO users (username, email, password_hash, password, full_name, role, is_active, email_verified)
+   VALUES ('your_admin', 'you@example.com', '<hash>', '<hash>', 'Your Name', 'admin', 1, 1);
+   ```
+
+Students can register through the public signup form (signup is student-only).
 
 ## ✋ Session Messages
 

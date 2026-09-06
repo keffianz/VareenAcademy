@@ -5,7 +5,14 @@
  *
  * CLI ONLY:   php lms_vareen/tests/run_tests.php
  * Server:     php -S 127.0.0.1:8080 -t <repo root>   (or set env VAREEN_TEST_BASE)
- * Requires:   database/demo_passwords.php (untracked; copy demo_passwords.example.php)
+ *
+ * REQUIREMENTS (no credentials are stored in this repo):
+ *   Create ONE real account per role in the app database, then export
+ *   the credentials via environment variables before running:
+ *     VAREEN_TEST_ADMIN_EMAIL    / VAREEN_TEST_ADMIN_PASS
+ *     VAREEN_TEST_TEACHER_EMAIL  / VAREEN_TEST_TEACHER_PASS
+ *     VAREEN_TEST_STUDENT_EMAIL  / VAREEN_TEST_STUDENT_PASS
+ *   Any missing variable causes the suite to exit with an error.
  *
  * This suite never prints passwords or password hashes.
  */
@@ -13,12 +20,24 @@
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit("CLI only\n"); }
 
 $base = rtrim(getenv('VAREEN_TEST_BASE') ?: 'http://127.0.0.1:8080', '/');
-$pwFile = __DIR__ . '/../database/demo_passwords.php';
-if (!is_file($pwFile)) {
-    fwrite(STDERR, "ERROR: database/demo_passwords.php not found (copy demo_passwords.example.php)\n");
-    exit(1);
+
+// Credentials come from the environment — never from the repository.
+$PW = [
+    'admin'   => getenv('VAREEN_TEST_ADMIN_PASS'),
+    'teacher' => getenv('VAREEN_TEST_TEACHER_PASS'),
+    'student' => getenv('VAREEN_TEST_STUDENT_PASS'),
+];
+$EMAIL = [
+    'admin'   => getenv('VAREEN_TEST_ADMIN_EMAIL'),
+    'teacher' => getenv('VAREEN_TEST_TEACHER_EMAIL'),
+    'student' => getenv('VAREEN_TEST_STUDENT_EMAIL'),
+];
+foreach (['admin', 'teacher', 'student'] as $role) {
+    if ($PW[$role] === false || $EMAIL[$role] === false) {
+        fwrite(STDERR, "ERROR: set VAREEN_TEST_{$role}_EMAIL and VAREEN_TEST_{$role}_PASS before running.\n");
+        exit(1);
+    }
 }
-$PW = require $pwFile;
 
 $pass = 0; $fail = 0; $failures = [];
 function check(string $name, bool $ok, string $info = ''): void {
@@ -59,13 +78,13 @@ function getCsrf(string $jar): string {
     return '';
 }
 
-function apiLogin(string $jar, string $password, string $intendedRole, ?string $csrf = null): array {
+function apiLogin(string $jar, string $role, string $password, string $intendedRole, ?string $csrf = null): array {
     $csrf = $csrf ?? getCsrf($jar);
     [$code, $body] = http('POST', $GLOBALS['base'] . '/lms_vareen/src/api/auth.php?action=login', [
         'jar'     => $jar,
         'headers' => ['Content-Type: application/json', 'X-CSRF-Token: ' . $csrf],
         'body'    => json_encode([
-            'email'         => 'abubakarabdulrahim663@gmail.com',
+            'email'         => $GLOBALS['EMAIL'][$role],
             'password'      => $password,
             'intended_role' => $intendedRole,
         ]),
@@ -97,13 +116,13 @@ check('Login page embeds CSRF token', (bool)preg_match("/window\.CSRF_TOKEN\s*=\
 [$code, $body] = http('POST', $base . '/lms_vareen/src/api/auth.php?action=login', [
     'jar'     => $jar,
     'headers' => ['Content-Type: application/json'],
-    'body'    => json_encode(['email' => 'abubakarabdulrahim663@gmail.com', 'password' => 'x']),
+    'body'    => json_encode(['email' => $GLOBALS['EMAIL']['student'], 'password' => 'x']),
 ]);
 check('POST without CSRF token rejected (403)', $code === 403, "got {$code}: " . substr($body, 0, 80));
 
 /* ================= 3. Wrong password ================= */
 $jar = newJar();
-[$code, $data, $raw] = apiLogin($jar, strrev($PW['student']), 'student');
+[$code, $data, $raw] = apiLogin($jar, 'student', strrev($PW['student']), 'student');
 check('Wrong password rejected', empty($data['success']), 'code=' . $code);
 check('Failed login does not leak password hash', strpos($raw, '$2y$') === false);
 [$code] = page('student-dashboard', $jar);
@@ -111,9 +130,9 @@ check('Failed login cannot open dashboard (302)', $code === 302, "got {$code}");
 
 /* ================= 4. Role mismatch (email+pw+role must match) ================= */
 $jar = newJar();
-[, $data, ] = apiLogin($jar, $PW['admin'], 'student');   // admin credentials, student role
+[, $data, ] = apiLogin($jar, 'admin', $PW['admin'], 'student');   // admin credentials, student role
 check('Role mismatch rejected (admin pw + student role)', empty($data['success']) || empty($data['user']['role']), substr(json_encode($data), 0, 100));
-[, $data, ] = apiLogin($jar, $PW['teacher'], 'admin');   // teacher credentials, admin role
+[, $data, ] = apiLogin($jar, 'teacher', $PW['teacher'], 'admin');   // teacher credentials, admin role
 check('Role mismatch rejected (teacher pw + admin role)', empty($data['success']) || empty($data['user']['role']));
 [$code] = page('student-dashboard', $jar);
 check('Role-mismatched login has no dashboard access', $code === 302, "got {$code}");
@@ -122,7 +141,7 @@ check('Role-mismatched login has no dashboard access', $code === 302, "got {$cod
 $jarAdmin = newJar();
 $csrf = getCsrf($jarAdmin);
 $preSess = sessId($jarAdmin);
-[, $data, $raw] = apiLogin($jarAdmin, $PW['admin'], 'admin', $csrf);
+[, $data, $raw] = apiLogin($jarAdmin, 'admin', $PW['admin'], 'admin', $csrf);
 check('Admin login succeeds (role=admin)', !empty($data['success']) && ($data['user']['role'] ?? '') === 'admin', substr(json_encode($data), 0, 120));
 check('Login response contains no password/hash', strpos($raw, '$2y$') === false && !isset($data['user']['password']));
 $postSess = sessId($jarAdmin);
@@ -136,7 +155,7 @@ check('Admin denied teacher dashboard (403)', $code === 403, "got {$code}");
 
 /* ================= 6. Teacher session + access matrix ================= */
 $jarTeacher = newJar();
-[, $data, ] = apiLogin($jarTeacher, $PW['teacher'], 'teacher');
+[, $data, ] = apiLogin($jarTeacher, 'teacher', $PW['teacher'], 'teacher');
 check('Teacher login succeeds (role=teacher)', !empty($data['success']) && ($data['user']['role'] ?? '') === 'teacher', substr(json_encode($data), 0, 120));
 [$code] = page('teacher-dashboard', $jarTeacher);
 check('Teacher can open teacher dashboard', $code === 200, "got {$code}");
@@ -147,7 +166,7 @@ check('Teacher denied student dashboard (403)', $code === 403, "got {$code}");
 
 /* ================= 7. Student session + access matrix ================= */
 $jarStudent = newJar();
-[, $data, ] = apiLogin($jarStudent, $PW['student'], 'student');
+[, $data, ] = apiLogin($jarStudent, 'student', $PW['student'], 'student');
 check('Student login succeeds (role=student)', !empty($data['success']) && ($data['user']['role'] ?? '') === 'student', substr(json_encode($data), 0, 120));
 [$code] = page('student-dashboard', $jarStudent);
 check('Student can open student dashboard', $code === 200, "got {$code}");
@@ -163,7 +182,7 @@ check('Student denied teacher dashboard (403)', $code === 403, "got {$code}");
 check('Student denied teacher lesson editor (403)', $code === 403, "got {$code}");
 
 /* ================= 8. Logout & session behavior ================= */
-[$code, $data] = apiLogin($jarStudent, $PW['student'], 'student');
+[$code, $data] = apiLogin($jarStudent, 'student', $PW['student'], 'student');
 check('Student re-login after prior checks', !empty($data['success']));
 [$code, $body] = http('POST', $base . '/lms_vareen/src/api/auth.php?action=logout', [
     'jar'     => $jarStudent,
@@ -190,7 +209,7 @@ $unauth = $code === 401 || $code === 403;
 check('Quizzes API rejects unauthenticated caller', $unauth, "got {$code}: " . substr($body, 0, 80));
 
 $jarT = newJar();
-[$code, $data] = apiLogin($jarT, $PW['teacher'], 'teacher');
+[$code, $data] = apiLogin($jarT, 'teacher', $PW['teacher'], 'teacher');
 [$code, $body] = http('GET', $base . '/lms_vareen/src/api/ai_assistant.php?action=my_lessons', ['jar' => $jarT]);
 check('AI API rejects teacher (student-only, 403)', $code === 403, "got {$code}");
 
