@@ -532,7 +532,6 @@ const initializeMobileMenu = () => {
 
     const navbar = collapseEl.closest('.navbar');
     const backdrop = navbar ? navbar.querySelector('.nav-backdrop') : null;
-    const closeBtn = collapseEl.querySelector('.navbar-close');
     const isMobile = () => window.matchMedia('(max-width: 991.98px)').matches;
 
     const openMenu = () => {
@@ -541,7 +540,6 @@ const initializeMobileMenu = () => {
         toggler.setAttribute('aria-label', 'Close navigation menu');
         if (backdrop) backdrop.classList.add('show');
         document.body.classList.add('nav-open');
-        window.setTimeout(() => { if (closeBtn) closeBtn.focus(); }, 300);
     };
 
     const closeMenu = () => {
@@ -561,7 +559,6 @@ const initializeMobileMenu = () => {
         }
     });
 
-    if (closeBtn) closeBtn.addEventListener('click', () => { closeMenu(); toggler.focus(); });
     if (backdrop) backdrop.addEventListener('click', closeMenu);
 
     // Escape-key support.

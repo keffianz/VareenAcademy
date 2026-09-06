@@ -1577,10 +1577,6 @@ textarea:focus {
     flex: 1 1 auto;
   }
 
-  /* Drawer header (mobile close button) must never render on desktop. */
-  .drawer-header {
-    display: none;
-  }
 
   /* Centre the menu between the logo and the Apply Now button. */
   .navbar-nav {
@@ -1658,19 +1654,7 @@ textarea:focus {
     visibility: visible;
   }
 
-  .drawer-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-bottom: 0.75rem;
-    margin-bottom: 0.5rem;
-    border-bottom: 1px solid #e5e7eb;
-  }
 
-  .drawer-brand img {
-    height: 40px;
-    width: auto;
-  }
 
   .navbar-nav {
     width: 100%;
@@ -1705,10 +1689,6 @@ textarea:focus {
     font-weight: 600;
   }
 
-  .navbar-close:focus-visible {
-    outline: 3px solid var(--brand-green-dark);
-    outline-offset: 2px;
-  }
 }
 
 /* Respect reduced-motion preferences. */
@@ -1771,28 +1751,7 @@ textarea:focus {
 }
 
 /* Close (X) button inside the drawer */
-.navbar-close {
-  align-self: flex-end;
-  width: 48px;
-  height: 48px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  border-radius: 0.5rem;
-  color: var(--nav-text);
-  font-size: 1.25rem;
-  line-height: 1;
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
 
-.navbar-close:hover,
-.navbar-close:focus-visible {
-  background-color: rgba(13, 157, 88, 0.12);
-  color: var(--brand-green);
-}
 
 
 
