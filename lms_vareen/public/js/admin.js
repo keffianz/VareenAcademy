@@ -66,8 +66,13 @@
             entries.forEach(function (entry) {
                 if (entry.isIntersecting) {
                     var el = entry.target;
-                    var target = parseFloat(el.getAttribute("data-target") || el.textContent);
+                    // Robust parse: server renders values like "₦25,000" or "1,204".
+                    // parseFloat("₦25,000") is NaN and parseFloat("25,000") is 25 —
+                    // strip everything except digits and the decimal point first.
+                    var raw = el.getAttribute("data-target") || el.textContent;
+                    var target = parseFloat(String(raw).replace(/[^0-9.]/g, ""));
                     var isCurrency = el.textContent.indexOf("₦") !== -1 || el.getAttribute("data-currency");
+                    if (isNaN(target)) { observer.unobserve(el); return; }
                     var isDecimal = target % 1 !== 0;
                     var start = 0;
                     var duration = 1500;

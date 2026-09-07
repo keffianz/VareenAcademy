@@ -41,7 +41,10 @@ function admin_rows($db, string $sql, array $params = []) {
 $totalStudents = (int)admin_scalar($db, "SELECT COUNT(*) FROM users WHERE role='student'");
 $totalTeachers = (int)admin_scalar($db, "SELECT COUNT(*) FROM users WHERE role='teacher'");
 $totalCourses = (int)admin_scalar($db, "SELECT COUNT(*) FROM courses");
-$publishedCourses = (int)admin_scalar($db, "SELECT COUNT(*) FROM courses WHERE status='published'");
+// NOTE: the courses table has NO `status` column (schema: setup_shared_hosting.sql:241) —
+// only `is_active` TINYINT. Querying status='published' throws "Unknown column",
+// which admin_scalar swallows and reports 0 forever. Use is_active=1 (= live course).
+$publishedCourses = (int)admin_scalar($db, "SELECT COUNT(*) FROM courses WHERE is_active=1");
 $totalEnrollments = (int)admin_scalar($db, "SELECT COUNT(*) FROM enrollments");
 $totalCertificates = (int)admin_scalar($db, "SELECT COUNT(*) FROM certificates");
 $totalCommunityPosts = (int)admin_scalar($db, "SELECT COUNT(*) FROM community_posts WHERE is_deleted = 0");
@@ -93,7 +96,7 @@ $gatewayOk = $paystackStatus || $flutterwaveStatus || $bankTransferStatus;
         <div class="kpi-grid">
             <div class="kpi-card"><div class="kpi-icon" style="background:#e8f4fd"><i class="fas fa-user-graduate" style="color:#4facfe"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $totalStudents; ?></span><span class="kpi-label">Students <small style="color:#28a745">+<?php echo $studentsThisWeek; ?></small></span></div></div>
             <div class="kpi-card"><div class="kpi-icon" style="background:#fdecea"><i class="fas fa-chalkboard-teacher" style="color:#f5576c"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $totalTeachers; ?></span><span class="kpi-label">Teachers</span></div></div>
-            <div class="kpi-card"><div class="kpi-icon" style="background:#e9f9ef"><i class="fas fa-book" style="color:#28a745"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $publishedCourses; ?></span><span class="kpi-label">Published Courses</span></div></div>
+            <div class="kpi-card"><div class="kpi-icon" style="background:#e9f9ef"><i class="fas fa-book" style="color:#28a745"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $publishedCourses; ?></span><span class="kpi-label">Active Courses</span></div></div>
             <div class="kpi-card"><div class="kpi-icon" style="background:#fff7e6"><i class="fas fa-user-plus" style="color:#b9770e"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $totalEnrollments; ?></span><span class="kpi-label">Enrollments <small style="color:#28a745">+<?php echo $enrollmentsThisWeek; ?></small></span></div></div>
             <div class="kpi-card"><div class="kpi-icon" style="background:#f3e8fd"><i class="fas fa-naira-sign" style="color:#764ba2"></i></div><div class="kpi-info"><span class="kpi-count">₦<?php echo number_format($totalRevenue, 0); ?></span><span class="kpi-label">Revenue <small style="color:#28a745">+₦<?php echo number_format($revenueThisWeek, 0); ?></small></span></div></div>
             <div class="kpi-card"><div class="kpi-icon" style="background:#e8f4fd"><i class="fas fa-certificate" style="color:#4facfe"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $totalCertificates; ?></span><span class="kpi-label">Certificates</span></div></div>

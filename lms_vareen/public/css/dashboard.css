@@ -80,9 +80,10 @@
 .kpi-card{display:flex;align-items:center;gap:14px;background:#fff;border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.05);transition:all .3s}
 .kpi-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.1)}
 .kpi-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0}
-.kpi-info{display:flex;flex-direction:column}
-.kpi-count{font-size:24px;font-weight:700;color:#222;line-height:1.2}
-.kpi-label{font-size:12px;color:#888}
+.kpi-info{display:flex;flex-direction:column;min-width:0}
+.kpi-count{font-size:24px;font-weight:700;color:#222;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi-label{font-size:12px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi-label small{margin-left:4px;font-weight:700}
 /* Health Banner */
 .health-banner{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px}
 .health-item{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;background:#fff}
