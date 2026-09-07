@@ -34,8 +34,8 @@ DROP PROCEDURE IF EXISTS vareen_add_column;
 -- Teacher announcements (course-specific)
 CREATE TABLE IF NOT EXISTS teacher_announcements (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    teacher_id INT NOT NULL,
-    course_id INT NULL,
+    teacher_id INT UNSIGNED NOT NULL,
+    course_id INT UNSIGNED NULL,
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     is_pinned TINYINT(1) DEFAULT 0,
@@ -50,8 +50,8 @@ CREATE TABLE IF NOT EXISTS teacher_announcements (
 -- Extended schema: student uses lesson_id+question+answer, teacher uses prompt+response+context
 CREATE TABLE IF NOT EXISTS ai_conversations (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    student_id INT NULL,
+    user_id INT UNSIGNED NOT NULL,
+    student_id INT UNSIGNED NULL,
     lesson_id INT NULL,
     role ENUM('teacher','student','admin') NOT NULL,
     question TEXT NULL,
