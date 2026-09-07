@@ -33,6 +33,20 @@ $courses = $dashboard['courses'] ?? [];
 $upcoming_classes = $dashboard['upcoming_classes'] ?? [];
 $recent_recordings = $dashboard['recent_recordings'] ?? [];
 $pending_assignments = $dashboard['pending_assignments'] ?? [];
+// Relative-time helper used by the notifications list (line ~278).
+// Previously this only existed in JS and never ran — PHP fatalled.
+if (!function_exists('timeAgo')) {
+    function timeAgo($datetime) {
+        $ts = strtotime((string)$datetime);
+        if ($ts === false) { return ''; }
+        $diff = time() - $ts;
+        if ($diff < 60)     return 'just now';
+        if ($diff < 3600)   return floor($diff / 60) . 'm ago';
+        if ($diff < 86400)  return floor($diff / 3600) . 'h ago';
+        if ($diff < 604800) return floor($diff / 86400) . 'd ago';
+        return date('M j, Y', $ts);
+    }
+}
 ?>
 
 <div class="dashboard-wrapper">
@@ -288,113 +302,9 @@ $pending_assignments = $dashboard['pending_assignments'] ?? [];
 </div>
 
 <style>
-    .dashboard-wrapper {
-        display: flex;
-        min-height: calc(100vh - 100px);
-        background: #f8f9fa;
-    }
-
-    /* Sidebar */
-    .dashboard-sidebar {
-        width: 250px;
-        background: white;
-        border-right: 1px solid #eee;
-        padding: 20px 0;
-        position: fixed;
-        height: calc(100vh - 100px);
-        overflow-y: auto;
-        z-index: 99;
-    }
-
-    .sidebar-header {
-        padding: 0 20px 20px;
-        border-bottom: 1px solid #eee;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .sidebar-header h3 {
-        margin: 0;
-        font-size: 16px;
-        color: #333;
-    }
-
-    .sidebar-close {
-        display: none;
-        background: none;
-        border: none;
-        font-size: 18px;
-        cursor: pointer;
-        color: #666;
-    }
-
-    .sidebar-menu ul {
-        list-style: none;
-        padding: 10px 0;
-    }
-
-    .sidebar-menu li {
-        margin: 0;
-    }
-
-    .sidebar-menu a {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 20px;
-        color: #666;
-        text-decoration: none;
-        transition: all 0.3s;
-    }
-
-    .sidebar-menu a:hover,
-    .sidebar-menu a.active {
-        color: var(--primary-color);
-        background: rgba(102, 126, 234, 0.05);
-        border-left: 3px solid var(--primary-color);
-        padding-left: 17px;
-    }
-
-    .sidebar-menu i {
-        width: 20px;
-        text-align: center;
-    }
-
-    /* Main Content */
-    .dashboard-content {
-        flex: 1;
-        margin-left: 250px;
-        padding: 30px;
-    }
-
-    .dashboard-topbar {
-        margin-bottom: 30px;
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
-
-    .sidebar-toggle {
-        display: none;
-        background: none;
-        border: none;
-        font-size: 20px;
-        cursor: pointer;
-        color: #333;
-    }
-
-    .topbar-title h1 {
-        margin: 0;
-        font-size: 28px;
-        color: #333;
-    }
-
-    .topbar-title p {
-        margin: 5px 0 0;
-        color: #666;
-        font-size: 14px;
-    }
+    /* Shell (wrapper, sidebar, topbar) now comes from the shared
+       public/css/dashboard.css — dark premium sidebar, 260px fixed,
+       matching Admin & Teacher. Only content styles remain below. */
 
     /* Statistics Cards */
     .stats-cards {
@@ -702,33 +612,7 @@ $pending_assignments = $dashboard['pending_assignments'] ?? [];
     }
 
     @media (max-width: 768px) {
-        .dashboard-sidebar {
-            position: fixed;
-            left: -250px;
-            transition: left 0.3s;
-            height: 100vh;
-            z-index: 1000;
-            border-right: none;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .dashboard-sidebar.active {
-            left: 0;
-        }
-
-        .sidebar-close {
-            display: block;
-        }
-
-        .dashboard-content {
-            margin-left: 0;
-            padding: 20px;
-        }
-
-        .sidebar-toggle {
-            display: block;
-            order: -1;
-        }
+        /* Sidebar drawer handled by shared dashboard.css */
 
         .topbar-title h1 {
             font-size: 20px;
@@ -831,54 +715,3 @@ $pending_assignments = $dashboard['pending_assignments'] ?? [];
     }
 </style>
 
-<script>
-// Sidebar toggle
-const sidebarToggle = document.getElementById('sidebarToggle');
-const sidebarClose = document.getElementById('sidebarClose');
-const sidebar = document.querySelector('.dashboard-sidebar');
-
-if (sidebarToggle) {
-    sidebarToggle.addEventListener('click', () => {
-        sidebar.classList.add('active');
-    });
-}
-
-if (sidebarClose) {
-    sidebarClose.addEventListener('click', () => {
-        sidebar.classList.remove('active');
-    });
-}
-
-// Close sidebar when clicking on a link
-const sidebarLinks = document.querySelectorAll('.sidebar-menu a');
-sidebarLinks.forEach(link => {
-    link.addEventListener('click', () => {
-        sidebar.classList.remove('active');
-    });
-});
-
-// Close sidebar when clicking outside
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.dashboard-sidebar') && !e.target.closest('.sidebar-toggle')) {
-        sidebar.classList.remove('active');
-    }
-});
-
-// Helper function - timeAgo
-function timeAgo(date) {
-    const now = new Date();
-    const diff = now - new Date(date);
-    
-    const seconds = Math.floor(diff / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-
-    if (seconds < 60) return 'just now';
-    if (minutes < 60) return minutes + 'm ago';
-    if (hours < 24) return hours + 'h ago';
-    if (days < 7) return days + 'd ago';
-    
-    return new Date(date).toLocaleDateString();
-}
-</script>

@@ -173,3 +173,42 @@
         scroll-behavior:auto !important;
     }
 }
+
+/* ============================================================
+   TEACHER DASHBOARD COMPONENTS (previously unstyled)
+   ============================================================ */
+/* Default gradient behind KPI icons — admin dashboard overrides
+   per-icon via inline styles; teacher icons were invisible (white
+   icon on transparent bg over a white card). */
+.kpi-icon{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)}
+/* AI button + container in the topbar */
+.topbar-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+.btn-ai{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:10px;
+    background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;font-size:13px;
+    font-weight:600;text-decoration:none;transition:opacity .2s,transform .2s}
+.btn-ai:hover{opacity:.9;transform:translateY(-1px)}
+.btn-ai i{font-size:14px}
+/* Quick actions grid (teacher dashboard) */
+.quick-action-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+.quick-action-card{display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:10px;min-height:48px;padding:20px 14px;background:#fff;border:1px solid #eee;
+    border-radius:12px;font-size:13px;font-weight:600;color:#555;text-decoration:none;
+    text-align:center;transition:all .2s}
+.quick-action-card:hover{border-color:#667eea;color:#667eea;
+    box-shadow:0 4px 12px rgba(102,126,234,.18);transform:translateY(-2px)}
+.quick-action-card i{font-size:20px;color:#667eea}
+/* Recent student activity list */
+.activity-list{display:flex;flex-direction:column;gap:12px}
+.activity-item{display:flex;align-items:center;gap:12px;padding:12px 14px;
+    border:1px solid #f0f0f0;border-radius:10px;transition:background .2s}
+.activity-item:hover{background:#fafafa}
+.activity-avatar{width:38px;height:38px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}
+.activity-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.activity-info strong{font-size:13px;color:#333}
+.activity-info span{font-size:12px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.activity-time{font-size:12px;color:#aaa;flex-shrink:0}
+/* Mobile: quick-action cards stay 2-up, then 1-up on very small screens */
+@media(max-width:768px){.quick-action-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:420px){.quick-action-grid{grid-template-columns:1fr}}

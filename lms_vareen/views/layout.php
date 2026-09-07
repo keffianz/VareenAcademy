@@ -58,8 +58,8 @@
         <script src="<?php echo appBasePath() . '/public/js/ai-assistant.js'; ?>"></script>
     <?php endif; ?>
     
-            <!-- Admin shared JS (sidebar toggle, logout, KPIs) -->
-    <?php if (isset($_SESSION['role']) && in_array($_SESSION['role'], ['admin','teacher'], true)): ?>
+    <!-- Admin shared JS (sidebar toggle + scrim, logout, KPIs) — all dashboard roles -->
+    <?php if (isset($_SESSION['role']) && in_array($_SESSION['role'], ['admin','teacher','student'], true)): ?>
         <script src="<?php echo appBasePath() . '/public/js/admin.js'; ?>"></script>
     <?php endif; ?>
     
