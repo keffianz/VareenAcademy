@@ -14,7 +14,17 @@
     
     <!-- CSS Files -->
     <link rel="stylesheet" href="<?php echo appBasePath() . '/public/css/styles.css'; ?>">
+    <?php if (isset($_SESSION['role'])): ?>
+    <!-- Dashboard shell (sidebar, topbar, KPI cards) — logged-in roles only.
+         Loaded AFTER styles.css so dashboard rules win the cascade for shared
+         class names (.btn, .alert), and BEFORE responsive.css so media-query
+         overrides always take precedence. -->
+    <link rel="stylesheet" href="<?php echo appBasePath() . '/public/css/dashboard.css'; ?>">
+    <?php endif; ?>
     <link rel="stylesheet" href="<?php echo appBasePath() . '/public/css/responsive.css'; ?>">
+
+    <!-- Font Awesome (sidebar/KPI/button icons across all dashboards) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     
     <!-- AI Assistant Widget CSS (only for students) -->
     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'student'): ?>

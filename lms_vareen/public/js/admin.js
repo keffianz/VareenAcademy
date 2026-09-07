@@ -17,13 +17,25 @@
     if (sidebar && toggleBtn) {
         toggleBtn.addEventListener("click", function () {
             sidebar.classList.add("active");
+            document.body.classList.add("drawer-open");
         });
     }
     if (sidebar && closeBtn) {
         closeBtn.addEventListener("click", function () {
             sidebar.classList.remove("active");
+            document.body.classList.remove("drawer-open");
         });
     }
+
+    // Tap the scrim (mobile) to close the drawer
+    var scrim = document.createElement("div");
+    scrim.className = "drawer-scrim";
+    scrim.setAttribute("aria-hidden", "true");
+    document.body.appendChild(scrim);
+    scrim.addEventListener("click", function () {
+        sidebar && sidebar.classList.remove("active");
+        document.body.classList.remove("drawer-open");
+    });
 
     // --- Logout button handler ---
     var logoutBtn = document.getElementById("adminLogoutBtn");

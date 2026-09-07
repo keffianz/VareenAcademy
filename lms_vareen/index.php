@@ -15,11 +15,11 @@ require_once __DIR__ . '/src/middleware/auth.php';
 
 // Helper function to render a view wrapped in layout
 function render_page($view_path, $page_title = 'Dashboard') {
-    // Set the page title for the layout
-    $GLOBALS['page_title'] = $page_title;
-    $GLOBALS['additional_css'] = [];
-    $GLOBALS['additional_js'] = [];
-    
+    // Per-page CSS/JS queues. These are plain locals (NOT $GLOBALS) because
+    // layout.php is included inside this function and sees the function scope.
+    $additional_css = [];
+    $additional_js = [];
+
     // Start output buffering to capture the view output
     ob_start();
     
@@ -36,10 +36,7 @@ function render_page($view_path, $page_title = 'Dashboard') {
     // Capture the view output
     $view_content = ob_get_clean();
     
-    // Set the view content for the layout
-    $GLOBALS['view_content'] = $view_content;
-    
-    // Include the main layout
+    // Include the main layout (locals above + $view_content are in scope)
     include __DIR__ . '/views/layout.php';
 }
 
