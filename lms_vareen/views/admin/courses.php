@@ -4,7 +4,7 @@
  * Activate/deactivate courses, assign teachers, enroll students.
  */
 requireRole('admin');
-$active = 'courses';
+$admin_active = 'courses';
 $page_title = 'Manage Courses';
 $additional_css = [appBasePath() . '/public/css/dashboard.css'];
 ?>

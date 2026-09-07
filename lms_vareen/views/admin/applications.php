@@ -4,7 +4,7 @@
  * Review queue for "Become an Instructor" submissions.
  */
 requireRole('admin');
-$active = 'applications';
+$admin_active = 'applications';
 $page_title = 'Instructor Applications';
 $additional_css = [appBasePath() . '/public/css/dashboard.css'];
 ?>

@@ -31,8 +31,10 @@ $verifyBase = 'index.php?page=verify';
 $printBase  = appBasePath() . '/index.php?page=certificate-print';
 ?>
 <div class="dashboard-wrapper">
-    <div class="dashboard-content" style="margin-left:0;max-width:900px;">
+    <?php $student_active = 'certificates'; include __DIR__ . '/_sidebar.php'; ?>
+    <div class="dashboard-content">
         <div class="dashboard-topbar">
+            <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
             <div class="topbar-title">
                 <h1>My Certificates</h1>
                 <p>Certificates you have earned by completing courses. Download a PDF copy or verify a code publicly.</p>
@@ -40,8 +42,10 @@ $printBase  = appBasePath() . '/index.php?page=certificate-print';
         </div>
 
         <section class="dashboard-section">
+            <div class="section-header"><h2>Earned Certificates</h2></div>
             <?php if (empty($certificates)): ?>
                 <div class="empty-state">
+                    <i class="fas fa-certificate"></i>
                     <p>You have not earned any certificate yet.</p>
                     <p style="font-size:13px;color:#999;">Complete all the lessons in a course to earn a certificate.</p>
                 </div>
@@ -63,29 +67,24 @@ $printBase  = appBasePath() . '/index.php?page=certificate-print';
                                 <td>
                                     <?php echo htmlspecialchars($cert['course_title'], ENT_QUOTES, 'UTF-8'); ?>
                                     <?php if (!empty($cert['course_category'])): ?>
-                                        <span class="tag" style="background:#eef1ff;color:#667eea;border-radius:12px;padding:2px 10px;font-size:12px;">
-                                            <?php echo htmlspecialchars($cert['course_category'], ENT_QUOTES, 'UTF-8'); ?>
-                                        </span>
+                                        <span class="role-badge role-teacher"><?php echo htmlspecialchars($cert['course_category'], ENT_QUOTES, 'UTF-8'); ?></span>
                                     <?php endif; ?>
                                 </td>
                                 <td><?php echo htmlspecialchars(date('M j, Y', strtotime($cert['issued_at'])), ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td>
                                     <?php if (!empty($cert['revoked'])): ?>
-                                        <span class="role-badge" style="background:#fdecea;color:#d9534f;">Revoked</span>
+                                        <span class="status-pill pill-revoked">Revoked</span>
                                     <?php else: ?>
-                                        <span class="role-badge" style="background:#e6f6ec;color:#2e9e5b;">Valid</span>
+                                        <span class="status-pill pill-valid">Valid</span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
                                     <?php if (empty($cert['revoked'])): ?>
-                                        <a class="btn btn-small" style="padding:4px 12px;font-size:12px;margin-right:4px;"
-                                           href="<?php echo $printBase; ?>&code=<?php echo urlencode($cert['certificate_code']); ?>"
-                                           target="_blank">
+                                        <a class="btn btn-sm btn-primary" href="<?php echo $printBase; ?>&code=<?php echo urlencode($cert['certificate_code']); ?>" target="_blank">
                                             <i class="fas fa-download"></i> PDF
                                         </a>
                                     <?php endif; ?>
-                                    <a class="btn btn-small" style="padding:4px 12px;font-size:12px;"
-                                       href="<?php echo $verifyBase; ?>&code=<?php echo urlencode($cert['certificate_code']); ?>">Verify</a>
+                                    <a class="btn btn-sm btn-ghost" href="<?php echo $verifyBase; ?>&code=<?php echo urlencode($cert['certificate_code']); ?>">Verify</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -95,14 +94,4 @@ $printBase  = appBasePath() . '/index.php?page=certificate-print';
         </section>
     </div>
 </div>
-<style>
-    .dashboard-content{margin-left:0!important;max-width:900px;padding:24px}
-    .dashboard-topbar{display:flex;align-items:center;margin-bottom:24px}
-    .topbar-title h1{margin:0;font-size:22px;color:#222}
-    .topbar-title p{margin:2px 0 0;color:#777;font-size:13px}
-    .dashboard-section{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-    .admin-table{width:100%;border-collapse:collapse;font-size:13px}
-    .admin-table th{text-align:left;padding:10px;color:#888;font-weight:600;border-bottom:2px solid #eee}
-    .admin-table td{padding:10px;border-bottom:1px solid #f0f0f0;color:#444}
-    .empty-state{text-align:center;padding:30px;color:#999}
-</style>
+<script src="/lms_vareen/public/js/auth.js"></script>

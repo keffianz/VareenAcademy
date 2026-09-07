@@ -4,7 +4,7 @@
  * Site name and support email (stored in the settings table).
  */
 requireRole('admin');
-$active = 'settings';
+$admin_active = 'settings';
 $page_title = 'Settings';
 $additional_css = [appBasePath() . '/public/css/dashboard.css'];
 ?>

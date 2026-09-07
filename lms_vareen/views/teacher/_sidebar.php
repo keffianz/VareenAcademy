@@ -14,10 +14,10 @@ $teacher_groups = [
         'label' => 'TEACHING',
         'items' => [
             'courses'     => ['fa-book',       'My Courses',    '/index.php?page=teacher-courses'],
-            'lessons'     => ['fa-list-ul',    'Lessons',       '/index.php?page=teacher-lessons'],
-            'resources'   => ['fa-folder-open','Resources',     '/index.php?page=teacher-resources'],
-            'assignments' => ['fa-tasks',      'Assignments',   '/index.php?page=teacher-assignments'],
-            'quizzes'     => ['fa-question-circle', 'Quizzes',  '/index.php?page=teacher-quizzes'],
+            'lessons'     => ['fa-list-ul',    'Lessons',       '/index.php?page=teacher-lesson-editor'],
+            'resources'   => ['fa-folder-open','Resources',     '/index.php?page=teacher-resource-editor'],
+            'assignments' => ['fa-tasks',      'Assignments',   '/index.php?page=teacher-assignments-editor'],
+            'quizzes'     => ['fa-question-circle', 'Quizzes',  '/index.php?page=teacher-quiz-editor'],
         ],
     ],
     'live' => [

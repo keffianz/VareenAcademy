@@ -36,41 +36,7 @@ $pending_assignments = $dashboard['pending_assignments'] ?? [];
 ?>
 
 <div class="dashboard-wrapper">
-    <!-- Sidebar Navigation -->
-    <aside class="dashboard-sidebar">
-        <div class="sidebar-header">
-            <h3>Navigation</h3>
-            <button class="sidebar-close" id="sidebarClose">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-
-        <nav class="sidebar-menu">
-            <ul>
-                <li><a href="/index.php?page=student-dashboard" class="active">
-                    <i class="fas fa-home"></i> Dashboard
-                </a></li>
-                <li><a href="/index.php?page=courses">
-                    <i class="fas fa-book"></i> Browse Courses
-                </a></li>
-                <li><a href="/index.php?page=assignments">
-                    <i class="fas fa-tasks"></i> Assignments
-                </a></li>
-                <li><a href="/index.php?page=quizzes">
-                    <i class="fas fa-list-check"></i> Quizzes
-                </a></li>
-                <li><a href="/index.php?page=my-payments">
-                    <i class="fas fa-credit-card"></i> My Payments
-                </a></li>
-                <li><a href="/index.php?page=certificates">
-                    <i class="fas fa-certificate"></i> My Certificates
-                </a></li>
-                <li><a href="/index.php?page=profile">
-                    <i class="fas fa-user"></i> Profile
-                </a></li>
-            </ul>
-        </nav>
-    </aside>
+    <?php $student_active = 'student-dashboard'; include __DIR__ . '/_sidebar.php'; ?>
 
     <!-- Main Content -->
     <div class="dashboard-content">

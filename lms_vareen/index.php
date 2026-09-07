@@ -66,6 +66,7 @@ $knownPages = [
     'student-dashboard', 'assignments', 'courses', 'lessons', 'quizzes', 'quiz-attempt',
     'quiz-result', 'live-classes', 'course-detail', 'notifications', 'profile', 'certificates',
     'checkout', 'my-payments', 'payment-callback', 'certificate-print',
+    'student-community', 'student-showcase', 'student-ai', 'post-detail',
     // Teacher pages
     'teacher-dashboard', 'teacher-lesson-editor', 'teacher-module-editor', 'teacher-quiz-editor',
     'teacher-quiz-attempts', 'teacher-resource-editor', 'teacher-live-classes', 'teacher-assignments-editor',
@@ -110,17 +111,17 @@ switch ($page) {
 
     case 'courses':
         requireRole('student');
-        render_page('views/courses.php', 'Courses');
+        render_page('views/student/courses.php', 'Browse Courses');
         break;
 
     case 'lessons':
         requireRole('student');
-        render_page('views/lesson.php', 'Lessons');
+        render_page('views/student/lessons.php', 'My Lessons');
         break;
 
     case 'quizzes':
         requireRole('student');
-        render_page('views/quizzes.php', 'Quizzes');
+        render_page('views/student/quizzes.php', 'Quizzes');
         break;
 
     case 'quiz-attempt':
@@ -135,7 +136,7 @@ switch ($page) {
 
     case 'live-classes':
         requireRole('student');
-        render_page('views/live-classes.php', 'Live Classes');
+        render_page('views/student/live-classes.php', 'Live Classes');
         break;
 
     case 'course-detail':
@@ -165,7 +166,7 @@ switch ($page) {
 
     case 'my-payments':
         requireRole('student');
-        render_page('views/payments.php', 'My Payments');
+        render_page('views/student/my-payments.php', 'My Payments');
         break;
 
     case 'payment-callback':
@@ -178,6 +179,26 @@ switch ($page) {
         // Standalone full HTML document (own <!DOCTYPE>) — do not wrap in layout.
         require_once __DIR__ . '/views/certificate-print.php';
         exit;
+
+    case 'student-community':
+        requireRole('student');
+        render_page('views/student/student-community.php', 'Community Hub');
+        break;
+
+    case 'student-showcase':
+        requireRole('student');
+        render_page('views/student/student-showcase.php', 'Student Showcase');
+        break;
+
+    case 'student-ai':
+        requireRole('student');
+        render_page('views/student/student-ai.php', 'AI Assistant');
+        break;
+
+    case 'post-detail':
+        requireRole('student');
+        render_page('views/student/post-detail.php', 'Discussion');
+        break;
 
     // Teacher Pages
     case 'teacher-dashboard':

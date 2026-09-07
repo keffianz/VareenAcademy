@@ -4,7 +4,7 @@
  * List issued certificates, open public verification, revoke.
  */
 requireRole('admin');
-$active = 'certificates';
+$admin_active = 'certificates';
 $page_title = 'Certificates';
 $additional_css = [appBasePath() . '/public/css/dashboard.css'];
 ?>

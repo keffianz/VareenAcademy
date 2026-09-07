@@ -25,16 +25,24 @@ $recentPayments = $db->query("SELECT p.amount, p.status, CONCAT(u.first_name, ' 
 $sslActive = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
 $phpVersion = phpversion();
 $serverSoftware = $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown';
+
+// Payment gateway status
+$payConfig = require __DIR__ . '/../src/config/payments.php';
+$paystackStatus = !empty($payConfig['paystack']['enabled']) && !empty($payConfig['paystack']['secret_key']);
+$flutterwaveStatus = !empty($payConfig['flutterwave']['enabled']) && !empty($payConfig['flutterwave']['secret_key']);
+$bankTransferStatus = !empty($payConfig['bank_transfer']['enabled']);
+$gatewayOk = $paystackStatus || $flutterwaveStatus || $bankTransferStatus;
 ?>
 <div class="dashboard-wrapper">
     <?php $admin_active='dashboard'; include __DIR__.'/_sidebar.php'; ?>
-    <div class="dashboard-content">
+        <div class="dashboard-content">
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
             <div class="topbar-title">
                 <h1>Welcome, Admin</h1>
                 <p><?php echo date('l, F j, Y'); ?> &bull; <span id="liveTime"><?php echo date('g:i A'); ?></span></p>
             </div>
+            <button class="btn btn-logout" id="adminLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
         <div class="health-banner">
             <div class="health-item ok"><i class="fas fa-database"></i> Database Connected</div>
@@ -42,6 +50,7 @@ $serverSoftware = $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown';
             <div class="health-item ok"><i class="fas fa-server"></i> Server: <?php echo htmlspecialchars($serverSoftware); ?></div>
             <div class="health-item ok"><i class="fab fa-php"></i> PHP <?php echo $phpVersion; ?></div>
             <div class="health-item ok"><i class="fas fa-robot"></i> AI Online</div>
+            <div class="health-item <?php echo $gatewayOk?'ok':'warn'; ?>"><i class="fas fa-credit-card"></i> Payment Gateway <?php echo $gatewayOk?'Active':'Inactive'; ?></div>
         </div>
         <div class="kpi-grid">
             <div class="kpi-card"><div class="kpi-icon" style="background:#e8f4fd"><i class="fas fa-user-graduate" style="color:#4facfe"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $totalStudents; ?></span><span class="kpi-label">Students <small style="color:#28a745">+<?php echo $studentsThisWeek; ?></small></span></div></div>
@@ -93,10 +102,8 @@ $serverSoftware = $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown';
 <script src="/lms_vareen/public/js/auth.js"></script>
 <script>
 (function(){
-    var s=document.getElementById('adminSidebar'),t=document.getElementById('sidebarToggle'),c=document.getElementById('sidebarClose');
-    if(t&&s)t.addEventListener('click',function(){s.classList.add('active')});
-    if(c&&s)c.addEventListener('click',function(){s.classList.remove('active')});
     var timeEl=document.getElementById('liveTime');
-    if(timeEl){setInterval(function(){var d=new Date();var h=d.getHours(),m=d.getMinutes(),ampm=h>=12?'PM':'AM';h=h%12||12;timeEl.textContent=h+':'+(m<10?'0':'')+m+' '+ampm;},30000);}
+    if(timeEl){setInterval(function(){var d=new Date();var h=d.getHours(),m=d.getMinutes(),ampm=h>=12?'PM':'AM';h=h%12||12;timeEl.textContent=h+':'+(m<10?'0':'')+m+' '+ampm;},30000);
+    }
 })();
 </script>
