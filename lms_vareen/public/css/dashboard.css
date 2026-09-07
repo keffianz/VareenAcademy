@@ -212,3 +212,38 @@
 /* Mobile: quick-action cards stay 2-up, then 1-up on very small screens */
 @media(max-width:768px){.quick-action-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:420px){.quick-action-grid{grid-template-columns:1fr}}
+
+/* ============================================================
+   COURSE CARDS & PROGRESS BARS (shared: student courses/lessons,
+   teacher courses/community/showcase — previously unstyled)
+   ============================================================ */
+.courses-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px}
+.course-card{background:#fff;border:1px solid #eceef1;border-radius:12px;padding:18px;
+    display:flex;flex-direction:column;gap:10px;transition:box-shadow .25s,transform .25s,border-color .25s}
+.course-card:hover{border-color:#d8dee6;box-shadow:0 6px 18px rgba(15,23,42,.08);transform:translateY(-3px)}
+.course-card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.course-card-header h3{margin:0;font-size:15px;color:#1f2937;line-height:1.35;flex:1}
+.course-card-body h3{margin:0 0 6px;font-size:15px;color:#1f2937}
+.course-card-body p{margin:0;font-size:13px;color:#6b7280}
+.course-info h3{margin:0 0 8px;font-size:15px;color:#1f2937}
+.course-meta{margin:0;font-size:12px;color:#8a929e}
+.course-thumb{margin:-18px -18px 0;border-radius:12px 12px 0 0;overflow:hidden;
+    aspect-ratio:16/9;background:#f1f3f6}
+.course-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.course-thumb-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+    font-size:30px;color:#b9c2cf;background:linear-gradient(135deg,#eef2f7 0%,#e3e9f2 100%)}
+.course-stats{display:flex;gap:16px;font-size:12.5px;color:#6b7280;flex-wrap:wrap}
+.course-stats i{color:#667eea;width:14px;text-align:center}
+.course-progress{display:flex;align-items:center;gap:10px}
+.course-progress>span{font-size:12px;color:#6b7280;white-space:nowrap}
+.course-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.progress-bar{flex:1;height:8px;min-width:60px;background:#e9edf2;border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;border-radius:99px;
+    background:linear-gradient(90deg,#16a34a 0%,#22c55e 100%);transition:width .4s ease}
+.progress-text{font-size:12px;font-weight:600;color:#374151;white-space:nowrap}
+/* Very small phones: full-width single-column cards, tighter padding */
+@media(max-width:480px){
+    .courses-grid{grid-template-columns:1fr;gap:14px}
+    .course-card{padding:14px}
+    .course-thumb{margin:-14px -14px 0;border-radius:12px 12px 0 0}
+}
