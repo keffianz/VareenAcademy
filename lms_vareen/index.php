@@ -69,10 +69,15 @@ $knownPages = [
     // Teacher pages
     'teacher-dashboard', 'teacher-lesson-editor', 'teacher-module-editor', 'teacher-quiz-editor',
     'teacher-quiz-attempts', 'teacher-resource-editor', 'teacher-live-classes', 'teacher-assignments-editor',
-    'teacher-attendance',
+    'teacher-attendance', 'teacher-courses', 'teacher-students', 'teacher-community',
+    'teacher-discussions', 'teacher-showcase', 'teacher-ai', 'teacher-analytics',
+    'teacher-calendar', 'teacher-profile', 'teacher-settings', 'teacher-grades', 'teacher-progress',
     // Admin pages
-    'admin-dashboard', 'admin-users', 'admin-courses', 'admin-reports', 'admin-settings',
-    'admin-applications', 'admin-certificates', 'admin-payments',
+    'admin-dashboard', 'admin-users', 'admin-teachers', 'admin-courses', 'admin-lessons',
+    'admin-quizzes', 'admin-live', 'admin-reports', 'admin-settings', 'admin-applications',
+    'admin-certificates', 'admin-verify', 'admin-payments', 'admin-coupons',
+    'admin-community', 'admin-discussions', 'admin-moderation', 'admin-analytics',
+    'admin-activity', 'admin-ai', 'admin-notifications',
 ];
 if ($page !== null && !in_array($page, $knownPages, true)) {
     http_response_code(404);
@@ -218,6 +223,54 @@ switch ($page) {
         requireRole('teacher');
         render_page('views/teacher/attendance.php', 'Attendance');
         break;
+    case 'teacher-courses':
+        requireRole('teacher');
+        render_page('views/teacher/courses.php', 'My Courses');
+        break;
+    case 'teacher-students':
+        requireRole('teacher');
+        render_page('views/teacher/students.php', 'My Students');
+        break;
+    case 'teacher-community':
+        requireRole('teacher');
+        render_page('views/teacher/community.php', 'Community Hub');
+        break;
+    case 'teacher-discussions':
+        requireRole('teacher');
+        render_page('views/teacher/discussions.php', 'Discussions');
+        break;
+    case 'teacher-showcase':
+        requireRole('teacher');
+        render_page('views/teacher/showcase.php', 'Student Showcase');
+        break;
+    case 'teacher-ai':
+        requireRole('teacher');
+        render_page('views/teacher/ai.php', 'AI Teaching Assistant');
+        break;
+    case 'teacher-analytics':
+        requireRole('teacher');
+        render_page('views/teacher/analytics.php', 'Analytics');
+        break;
+    case 'teacher-calendar':
+        requireRole('teacher');
+        render_page('views/teacher/calendar.php', 'Calendar');
+        break;
+    case 'teacher-profile':
+        requireRole('teacher');
+        render_page('views/teacher/profile.php', 'Profile');
+        break;
+    case 'teacher-settings':
+        requireRole('teacher');
+        render_page('views/teacher/settings.php', 'Settings');
+        break;
+    case 'teacher-grades':
+        requireRole('teacher');
+        render_page('views/teacher/grades.php', 'Grades');
+        break;
+    case 'teacher-progress':
+        requireRole('teacher');
+        render_page('views/teacher/progress.php', 'Student Progress');
+        break;
 
     // Admin Pages
     case 'admin-dashboard':
@@ -258,6 +311,71 @@ switch ($page) {
     case 'admin-payments':
         requireRole('admin');
         render_page('views/admin/payments.php', 'Payments');
+        break;
+
+    case 'admin-teachers':
+        requireRole('admin');
+        render_page('views/admin/teachers.php', 'Teachers');
+        break;
+
+    case 'admin-lessons':
+        requireRole('admin');
+        render_page('views/admin/lessons.php', 'Lessons');
+        break;
+
+    case 'admin-quizzes':
+        requireRole('admin');
+        render_page('views/admin/quizzes.php', 'Quizzes');
+        break;
+
+    case 'admin-live':
+        requireRole('admin');
+        render_page('views/admin/live.php', 'Live Classes');
+        break;
+
+    case 'admin-coupons':
+        requireRole('admin');
+        render_page('views/admin/coupons.php', 'Coupons');
+        break;
+
+    case 'admin-community':
+        requireRole('admin');
+        render_page('views/admin/community.php', 'Community Hub');
+        break;
+
+    case 'admin-discussions':
+        requireRole('admin');
+        render_page('views/admin/discussions.php', 'Discussions');
+        break;
+
+    case 'admin-moderation':
+        requireRole('admin');
+        render_page('views/admin/moderation.php', 'AI Moderation');
+        break;
+
+    case 'admin-analytics':
+        requireRole('admin');
+        render_page('views/admin/analytics.php', 'Analytics');
+        break;
+
+    case 'admin-activity':
+        requireRole('admin');
+        render_page('views/admin/activity.php', 'Activity Log');
+        break;
+
+    case 'admin-ai':
+        requireRole('admin');
+        render_page('views/admin/ai.php', 'AI Control Center');
+        break;
+
+    case 'admin-notifications':
+        requireRole('admin');
+        render_page('views/admin/notifications.php', 'Notifications');
+        break;
+
+    case 'admin-verify':
+        requireRole('admin');
+        render_page('views/admin/verify.php', 'Certificate Verification');
         break;
 
     // Default: redirect to appropriate dashboard

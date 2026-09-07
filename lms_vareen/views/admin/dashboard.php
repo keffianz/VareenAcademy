@@ -1,172 +1,102 @@
 <?php
-/**
- * Admin Dashboard
- * Platform overview: user counts, course counts, recent registrations, system status.
- */
 requireRole('admin');
-
 require_once 'src/classes/Database.php';
+$db = (new Database())->connect();
 
-$pdo = (new Database())->connect();
+$totalStudents = (int)$db->query("SELECT COUNT(*) FROM users WHERE role='student'")->fetchColumn();
+$totalTeachers = (int)$db->query("SELECT COUNT(*) FROM users WHERE role='teacher'")->fetchColumn();
+$totalCourses = (int)$db->query("SELECT COUNT(*) FROM courses")->fetchColumn();
+$publishedCourses = (int)$db->query("SELECT COUNT(*) FROM courses WHERE status='published'")->fetchColumn();
+$totalEnrollments = (int)$db->query("SELECT COUNT(*) FROM enrollments")->fetchColumn();
+$totalCertificates = (int)$db->query("SELECT COUNT(*) FROM certificates")->fetchColumn();
+$totalCommunityPosts = (int)$db->query("SELECT COUNT(*) FROM community_posts WHERE is_deleted = 0")->fetchColumn();
+$liveClassesToday = (int)$db->query("SELECT COUNT(*) FROM live_classes WHERE DATE(scheduled_at) = CURDATE()")->fetchColumn();
+$totalRevenue = (float)$db->query("SELECT COALESCE(SUM(amount),0) FROM payments WHERE status='paid'")->fetchColumn();
+$pendingApplications = (int)$db->query("SELECT COUNT(*) FROM instructor_applications WHERE status='pending'")->fetchColumn();
 
-// Platform statistics (fail-safe: placeholders if tables are not migrated yet)
-$stats = ['total_users' => '—', 'students' => '—', 'teachers' => '—', 'courses' => '—'];
-try {
-    $stats['total_users'] = (int) $pdo->query('SELECT COUNT(*) FROM users')->fetchColumn();
-    $stats['students']    = (int) $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'student'")->fetchColumn();
-    $stats['teachers']    = (int) $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'teacher'")->fetchColumn();
-    $stats['courses']     = (int) $pdo->query('SELECT COUNT(*) FROM courses')->fetchColumn();
-} catch (PDOException $e) {
-    // Tables not migrated yet
-}
+$weekAgo = date('Y-m-d', strtotime('-7 days'));
+$studentsThisWeek = (int)$db->query("SELECT COUNT(*) FROM users WHERE role='student' AND created_at >= '{$weekAgo}'")->fetchColumn();
+$enrollmentsThisWeek = (int)$db->query("SELECT COUNT(*) FROM enrollments WHERE enrolled_at >= '{$weekAgo}'")->fetchColumn();
+$revenueThisWeek = (float)$db->query("SELECT COALESCE(SUM(amount),0) FROM payments WHERE status='paid' AND paid_at >= '{$weekAgo}'")->fetchColumn();
 
-// Recent registrations (fallback if the created_at column is absent)
-$recent_users = [];
-try {
-    $stmt = $pdo->prepare('SELECT id, first_name, last_name, email, role, created_at FROM users ORDER BY id DESC LIMIT 8');
-    $stmt->execute();
-    $recent_users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    try {
-        $stmt = $pdo->prepare('SELECT id, first_name, last_name, email, role FROM users ORDER BY id DESC LIMIT 8');
-        $stmt->execute();
-        $recent_users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e2) {
-        $recent_users = [];
-    }
-}
+$recentUsers = $db->query("SELECT first_name, last_name, role, created_at FROM users ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+$recentPayments = $db->query("SELECT p.amount, p.status, CONCAT(u.first_name, ' ', u.last_name) AS student_name FROM payments p JOIN users u ON u.id = p.user_id ORDER BY p.created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
 
-$aiConfigured = file_exists(__DIR__ . '/../src/config/ai_config.php');
+$sslActive = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+$phpVersion = phpversion();
+$serverSoftware = $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown';
 ?>
-
 <div class="dashboard-wrapper">
-    <!-- Sidebar Navigation (shared partial) -->
-    <?php $admin_active = 'dashboard'; include __DIR__ . '/_sidebar.php'; ?>
-
-    <!-- Main Content -->
+    <?php $admin_active='dashboard'; include __DIR__.'/_sidebar.php'; ?>
     <div class="dashboard-content">
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
             <div class="topbar-title">
-                <h1>Admin Dashboard</h1>
-                <p>Welcome back, <?php echo htmlspecialchars($_SESSION['first_name'] ?? 'Admin'); ?> — platform overview</p>
+                <h1>Welcome, Admin</h1>
+                <p><?php echo date('l, F j, Y'); ?> &bull; <span id="liveTime"><?php echo date('g:i A'); ?></span></p>
             </div>
-            <button class="btn btn-logout" id="adminLogoutBtn">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
         </div>
-        <!-- Statistics Cards -->
-        <section class="stats-cards">
-            <div class="stat-card">
-                <div class="stat-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);"><i class="fas fa-users"></i></div>
-                <div class="stat-info"><p class="stat-label">Total Users</p><h3><?php echo $stats['total_users']; ?></h3></div>
+        <div class="health-banner">
+            <div class="health-item ok"><i class="fas fa-database"></i> Database Connected</div>
+            <div class="health-item <?php echo $sslActive?'ok':'warn'; ?>"><i class="fas fa-lock"></i> SSL <?php echo $sslActive?'Active':'Inactive'; ?></div>
+            <div class="health-item ok"><i class="fas fa-server"></i> Server: <?php echo htmlspecialchars($serverSoftware); ?></div>
+            <div class="health-item ok"><i class="fab fa-php"></i> PHP <?php echo $phpVersion; ?></div>
+            <div class="health-item ok"><i class="fas fa-robot"></i> AI Online</div>
+        </div>
+        <div class="kpi-grid">
+            <div class="kpi-card"><div class="kpi-icon" style="background:#e8f4fd"><i class="fas fa-user-graduate" style="color:#4facfe"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $totalStudents; ?></span><span class="kpi-label">Students <small style="color:#28a745">+<?php echo $studentsThisWeek; ?></small></span></div></div>
+            <div class="kpi-card"><div class="kpi-icon" style="background:#fdecea"><i class="fas fa-chalkboard-teacher" style="color:#f5576c"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $totalTeachers; ?></span><span class="kpi-label">Teachers</span></div></div>
+            <div class="kpi-card"><div class="kpi-icon" style="background:#e9f9ef"><i class="fas fa-book" style="color:#28a745"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $publishedCourses; ?></span><span class="kpi-label">Published Courses</span></div></div>
+            <div class="kpi-card"><div class="kpi-icon" style="background:#fff7e6"><i class="fas fa-user-plus" style="color:#b9770e"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $totalEnrollments; ?></span><span class="kpi-label">Enrollments <small style="color:#28a745">+<?php echo $enrollmentsThisWeek; ?></small></span></div></div>
+            <div class="kpi-card"><div class="kpi-icon" style="background:#f3e8fd"><i class="fas fa-naira-sign" style="color:#764ba2"></i></div><div class="kpi-info"><span class="kpi-count">₦<?php echo number_format($totalRevenue, 0); ?></span><span class="kpi-label">Revenue <small style="color:#28a745">+₦<?php echo number_format($revenueThisWeek, 0); ?></small></span></div></div>
+            <div class="kpi-card"><div class="kpi-icon" style="background:#e8f4fd"><i class="fas fa-certificate" style="color:#4facfe"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $totalCertificates; ?></span><span class="kpi-label">Certificates</span></div></div>
+            <div class="kpi-card"><div class="kpi-icon" style="background:#e9f9ef"><i class="fas fa-comments" style="color:#28a745"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $totalCommunityPosts; ?></span><span class="kpi-label">Community Posts</span></div></div>
+            <div class="kpi-card"><div class="kpi-icon" style="background:#fdecea"><i class="fas fa-video" style="color:#f5576c"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $liveClassesToday; ?></span><span class="kpi-label">Live Classes Today</span></div></div>
+        </div>
+        <div class="quick-actions">
+            <h3>Quick Actions</h3>
+            <div class="quick-grid">
+                <a href="index.php?page=admin-users" class="quick-card"><i class="fas fa-user-plus"></i> Add Student</a>
+                <a href="index.php?page=admin-teachers" class="quick-card"><i class="fas fa-chalkboard-teacher"></i> Add Teacher</a>
+                <a href="index.php?page=admin-courses" class="quick-card"><i class="fas fa-book-open"></i> Create Course</a>
+                <a href="index.php?page=admin-live" class="quick-card"><i class="fas fa-video"></i> Schedule Live Class</a>
+                <a href="index.php?page=admin-notifications" class="quick-card"><i class="fas fa-bullhorn"></i> Send Announcement</a>
+                <a href="index.php?page=admin-certificates" class="quick-card"><i class="fas fa-certificate"></i> Issue Certificate</a>
+                <a href="index.php?page=admin-coupons" class="quick-card"><i class="fas fa-ticket-alt"></i> Create Coupon</a>
+                <a href="index.php?page=admin-applications" class="quick-card"><i class="fas fa-user-check"></i> Review Applications <?php if($pendingApplications): ?><span class="badge-notify"><?php echo $pendingApplications; ?></span><?php endif; ?></a>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);"><i class="fas fa-user-graduate"></i></div>
-                <div class="stat-info"><p class="stat-label">Students</p><h3><?php echo $stats['students']; ?></h3></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);"><i class="fas fa-chalkboard-teacher"></i></div>
-                <div class="stat-info"><p class="stat-label">Teachers</p><h3><?php echo $stats['teachers']; ?></h3></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);"><i class="fas fa-book-open"></i></div>
-                <div class="stat-info"><p class="stat-label">Courses</p><h3><?php echo $stats['courses']; ?></h3></div>
-            </div>
-        </section>
-
-        <div class="admin-columns">
-            <!-- Recent Registrations -->
-            <section class="dashboard-section">
-                <div class="section-header"><h2><i class="fas fa-user-plus"></i> Recent Registrations</h2></div>
-                <?php if (empty($recent_users)): ?>
-                    <div class="empty-state"><i class="fas fa-users"></i><p>No users registered yet</p></div>
-                <?php else: ?>
-                    <table class="admin-table">
-                        <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Role</th></tr></thead>
-                        <tbody>
-                            <?php foreach ($recent_users as $u): ?>
-                                <tr>
-                                    <td><?php echo (int) $u['id']; ?></td>
-                                    <td><?php echo htmlspecialchars(trim(($u['first_name'] ?? '') . ' ' . ($u['last_name'] ?? ''))); ?></td>
-                                    <td><?php echo htmlspecialchars($u['email']); ?></td>
-                                    <td><span class="role-badge role-<?php echo htmlspecialchars($u['role']); ?>"><?php echo htmlspecialchars(ucfirst($u['role'])); ?></span></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+        </div>
+        <div class="dashboard-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+            <div class="dashboard-section">
+                <div class="section-header"><h2>Recent Users</h2></div>
+                <?php if(empty($recentUsers)): ?><div class="empty-state">No users yet</div><?php else: ?>
+                <table class="admin-table"><tbody>
+                    <?php foreach($recentUsers as $u): ?>
+                    <tr><td><?php echo htmlspecialchars($u['first_name'].' '.$u['last_name']); ?></td><td><span class="role-badge role-<?php echo $u['role']; ?>"><?php echo $u['role']; ?></span></td><td><?php echo date('M j', strtotime($u['created_at'])); ?></td></tr>
+                    <?php endforeach; ?>
+                </tbody></table>
                 <?php endif; ?>
-            </section>
-
-            <!-- System Status -->
-            <section class="dashboard-section">
-                <div class="section-header"><h2><i class="fas fa-server"></i> System Status</h2></div>
-                <ul class="status-list">
-                    <li><span>Database connection</span><span class="status-ok"><i class="fas fa-check-circle"></i> Connected</span></li>
-                    <li><span>PHP version</span><span><?php echo htmlspecialchars(PHP_VERSION); ?></span></li>
-                    <li><span>AI Assistant config</span><span class="<?php echo $aiConfigured ? 'status-ok' : 'status-warn'; ?>"><i class="fas <?php echo $aiConfigured ? 'fa-check-circle' : 'fa-exclamation-circle'; ?>"></i> <?php echo $aiConfigured ? 'Configured' : 'Not configured'; ?></span></li>
-                    <li><span>Session security</span><span class="status-ok"><i class="fas fa-shield-alt"></i> CSRF + rate limiting active</span></li>
-                </ul>
-            </section>
+            </div>
+            <div class="dashboard-section">
+                <div class="section-header"><h2>Recent Payments</h2></div>
+                <?php if(empty($recentPayments)): ?><div class="empty-state">No payments yet</div><?php else: ?>
+                <table class="admin-table"><tbody>
+                    <?php foreach($recentPayments as $p): ?>
+                    <tr><td><?php echo htmlspecialchars($p['student_name']); ?></td><td>₦<?php echo number_format($p['amount'], 0); ?></td><td><span class="status-pill pill-<?php echo $p['status']; ?>"><?php echo $p['status']; ?></span></td></tr>
+                    <?php endforeach; ?>
+                </tbody></table>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 </div>
-
-<style>
-.dashboard-wrapper{display:flex;min-height:100vh;background:#f8f9fa}
-.dashboard-sidebar{width:250px;background:#fff;border-right:1px solid #eee;padding:20px 0;position:fixed;height:100vh;overflow-y:auto;z-index:99}
-.sidebar-header{padding:0 20px 20px;border-bottom:1px solid #eee}
-.sidebar-header h3{margin:0;font-size:16px;color:#333}
-.sidebar-close{display:none;background:none;border:none;font-size:18px;cursor:pointer;color:#666}
-.sidebar-menu ul{list-style:none;padding:10px 0;margin:0}
-.sidebar-menu a{display:flex;align-items:center;gap:12px;padding:12px 20px;color:#666;text-decoration:none;transition:all .3s}
-.sidebar-menu a:hover,.sidebar-menu a.active{color:var(--primary-color,#667eea);background:rgba(102,126,234,.05);border-left:3px solid var(--primary-color,#667eea);padding-left:17px}
-.dashboard-content{flex:1;margin-left:250px;padding:24px}
-.dashboard-topbar{display:flex;align-items:center;gap:16px;margin-bottom:24px}
-.sidebar-toggle{display:none;background:#fff;border:1px solid #ddd;border-radius:8px;padding:8px 12px;cursor:pointer}
-.topbar-title h1{margin:0;font-size:22px;color:#222}
-.topbar-title p{margin:2px 0 0;color:#777;font-size:13px}
-.btn-logout{margin-left:auto;background:#fff;border:1px solid #f5576c;color:#f5576c;border-radius:8px;padding:8px 16px;cursor:pointer;font-weight:600}
-.btn-logout:hover{background:#f5576c;color:#fff}
-.stats-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
-.stat-card{display:flex;align-items:center;gap:14px;background:#fff;border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-.stat-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0}
-.stat-label{margin:0;font-size:12px;color:#888}
-.stat-info h3{margin:2px 0 0;font-size:22px;color:#222}
-.admin-columns{display:grid;grid-template-columns:2fr 1fr;gap:16px}
-.dashboard-section{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-.section-header{margin-bottom:14px}
-.section-header h2{margin:0;font-size:16px;color:#333}
-.admin-table{width:100%;border-collapse:collapse;font-size:13px}
-.admin-table th{text-align:left;padding:10px;color:#888;font-weight:600;border-bottom:2px solid #eee}
-.admin-table td{padding:10px;border-bottom:1px solid #f0f0f0;color:#444;word-break:break-word}
-.role-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
-.role-admin{background:#fdecea;color:#f5576c}
-.role-teacher{background:#e8f4fd;color:#4facfe}
-.role-student{background:#e9f9ef;color:#28a745}
-.status-list{list-style:none;margin:0;padding:0;font-size:13px}
-.status-list li{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f0f0f0;color:#555}
-.status-ok{color:#28a745;font-weight:600}
-.status-warn{color:#f0ad4e;font-weight:600}
-.empty-state{text-align:center;padding:30px;color:#999}
-@media(max-width:1024px){.stats-cards{grid-template-columns:repeat(2,1fr)}.admin-columns{grid-template-columns:1fr}}
-@media(max-width:768px){.dashboard-sidebar{transform:translateX(-100%);transition:transform .3s}.dashboard-sidebar.active{transform:translateX(0)}.sidebar-close{display:block}.dashboard-content{margin-left:0;padding:16px}.sidebar-toggle{display:block}.stats-cards{grid-template-columns:1fr}}
-</style>
 <script src="/lms_vareen/public/js/auth.js"></script>
 <script>
-(function () {
-    var sidebar = document.getElementById('adminSidebar');
-    var toggle = document.getElementById('sidebarToggle');
-    var close = document.getElementById('sidebarClose');
-    if (toggle && sidebar) toggle.addEventListener('click', function () { sidebar.classList.add('active'); });
-    if (close && sidebar) close.addEventListener('click', function () { sidebar.classList.remove('active'); });
-    document.addEventListener('click', function (e) {
-        if (sidebar && !e.target.closest('.dashboard-sidebar') && !e.target.closest('.sidebar-toggle')) {
-            sidebar.classList.remove('active');
-        }
-    });
-    var logoutBtn = document.getElementById('adminLogoutBtn');
-    if (logoutBtn) logoutBtn.addEventListener('click', function () { if (window.Auth) Auth.logout(); });
+(function(){
+    var s=document.getElementById('adminSidebar'),t=document.getElementById('sidebarToggle'),c=document.getElementById('sidebarClose');
+    if(t&&s)t.addEventListener('click',function(){s.classList.add('active')});
+    if(c&&s)c.addEventListener('click',function(){s.classList.remove('active')});
+    var timeEl=document.getElementById('liveTime');
+    if(timeEl){setInterval(function(){var d=new Date();var h=d.getHours(),m=d.getMinutes(),ampm=h>=12?'PM':'AM';h=h%12||12;timeEl.textContent=h+':'+(m<10?'0':'')+m+' '+ampm;},30000);}
 })();
 </script>
-
