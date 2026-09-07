@@ -51,7 +51,7 @@ $enrolled = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <span class="progress-text"><?php echo $c['progress']; ?>%</span>
                                 </div>
                                 <p class="course-meta"><?php echo $c['completed_lessons']; ?>/<?php echo $c['lesson_count']; ?> lessons completed</p>
-                                <a href="/index.php?page=course-learn&id=<?php echo $c['id']; ?>" class="btn btn-primary btn-sm">Continue Learning</a>
+                                <a href="/index.php?page=course-detail&id=<?php echo $c['id']; ?>" class="btn btn-primary btn-sm">Continue Learning</a>
                             </div>
                         </div>
                     <?php endforeach; ?>

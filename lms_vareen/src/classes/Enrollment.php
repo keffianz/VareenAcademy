@@ -101,6 +101,24 @@ class Enrollment {
     }
 
     /**
+     * Get all enrollments for one student (course_id + progress rows).
+     * Used by student/courses.php (Browse Courses) to filter out
+     * courses the student is already enrolled in.
+     */
+    public function getStudentEnrollments($student_id) {
+        try {
+            $sql = "SELECT course_id, progress, status, enrolled_at
+                    FROM enrollments
+                    WHERE student_id = :student_id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':student_id' => (int)$student_id]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+
+    /**
      * Get student dashboard data
      */
     public function getStudentDashboard($student_id) {

@@ -8,14 +8,17 @@ $admin_active = 'courses';
 $page_title = 'Manage Courses';
 $additional_css = [appBasePath() . '/public/css/dashboard.css'];
 ?>
-<div class="dash-shell">
+<div class="dashboard-wrapper">
 <?php include __DIR__ . '/_sidebar.php'; ?>
-<main class="dash-main">
-  <div class="dash-topbar"><div><h1>Manage Courses</h1><p class="dash-sub">Course status, teacher assignment, and student enrollment.</p></div></div>
-  <div class="dash-content">
+<div class="dashboard-content">
+  <div class="dashboard-topbar">
+    <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+    <div class="topbar-title"><h1>Manage Courses</h1><p>Course status, teacher assignment, and student enrollment.</p></div>
+  </div>
+  <div class="dashboard-section">
     <div id="msg" class="admin-msg" hidden></div>
-    <div class="card table-wrap"><table class="table"><thead><tr><th>ID</th><th>Title</th><th>Teacher</th><th>Category</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead><tbody id="rows"></tbody></table></div>
-    <form id="frmEnroll" class="card admin-form">
+    <div class="table-wrap"><table class="admin-table"><thead><tr><th>ID</th><th>Title</th><th>Teacher</th><th>Category</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead><tbody id="rows"></tbody></table></div>
+    <form id="frmEnroll" class="admin-form">
       <h2>Enroll a student</h2>
       <div class="admin-grid">
         <label>Student<select name="student_id" id="selStudent" required><option value="">Loading students…</option></select></label>
@@ -24,12 +27,13 @@ $additional_css = [appBasePath() . '/public/css/dashboard.css'];
       <button class="btn btn-primary" type="submit">Enroll</button>
     </form>
   </div>
-</main>
+</div>
 </div>
 <style>
 .admin-msg{padding:12px 14px;border-radius:8px;margin-bottom:14px;font-size:14px}
 .admin-msg.ok{background:#eefaf0;color:#1e7e34;border:1px solid #bfe6c8}
 .admin-msg.err{background:#fdeeee;color:#b02a2a;border:1px solid #f3c3c3}
+.admin-form{margin-top:20px;background:#fff;border:1px solid #eceef1;border-radius:12px;padding:18px}
 .admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0}
 .admin-grid label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#333}
 .admin-grid select{padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-weight:400}

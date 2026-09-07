@@ -14,7 +14,7 @@ $enrolled = $enrollment->getStudentEnrollments($user_id);
 $enrolledIds = array_column($enrolled, 'course_id');
 
 // Get all published courses
-$courses = $course->getAllCourses();
+$courses = $course->getAllCourses(1, 200);
 
 // Filter out enrolled courses
 $available = array_filter($courses, function($c) use ($enrolledIds) {

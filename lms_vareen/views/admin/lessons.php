@@ -16,7 +16,7 @@ $lessons = $db->query('SELECT l.*, c.title AS course_title FROM lessons l JOIN c
             <?php if(empty($lessons)): ?><div class="empty-state">No lessons found</div><?php else: ?>
             <table class="admin-table"><thead><tr><th>Title</th><th>Course</th><th>Type</th><th>Duration</th><th>Date</th></tr></thead><tbody>
                 <?php foreach($lessons as $l): ?>
-                <tr><td><?php echo htmlspecialchars($l['title']); ?></td><td><?php echo htmlspecialchars($l['course_title']); ?></td><td><?php echo $l['content_type']; ?></td><td><?php echo $l['duration_minutes']; ?> min</td><td><?php echo date('M j', strtotime($l['created_at'])); ?></td></tr>
+                <tr><td><?php echo htmlspecialchars($l['title']); ?></td><td><?php echo htmlspecialchars($l['course_title']); ?></td><td><?php echo !empty($l['video_url']) ? 'Video' : 'Reading'; ?></td><td><?php echo $l['video_duration'] ? (int)$l['video_duration'] . ' min' : '—'; ?></td><td><?php echo date('M j', strtotime($l['created_at'])); ?></td></tr>
                 <?php endforeach; ?>
             </tbody></table>
             <?php endif; ?>
