@@ -1,5 +1,8 @@
 -- VAREEN Academy — Community & Admin Enhancement Migration
 -- Safe to run multiple times (IF NOT EXISTS / INSERT IGNORE)
+-- Run this in phpMyAdmin on u374397808_vereen_academy if the community
+-- tables are missing — the dashboards degrade gracefully without them,
+-- but Community features require these tables.
 
 CREATE TABLE IF NOT EXISTS communities (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -105,6 +108,16 @@ CREATE TABLE IF NOT EXISTS announcements (
     admin_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
+    target_type ENUM('global','course','teacher','student') DEFAULT 'global',
+    target_id INT NULL,
+    is_scheduled TINYINT(1) DEFAULT 0,
+    scheduled_at DATETIME NULL,
+    sent_at DATETIME NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_announcements_target (target_type),
+    INDEX idx_announcements_sent (sent_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- Default communities
 INSERT IGNORE INTO communities (id, name, slug, description, icon, category, sort_order) VALUES
 (1, 'General', 'general', 'General discussion for all', 'fa-comments', 'general', 1),
@@ -125,13 +138,3 @@ INSERT IGNORE INTO community_channels (community_id, name, slug, description, so
 (2, 'JavaScript', 'javascript', 'JS development', 3),
 (2, 'PHP', 'php', 'PHP development', 4),
 (2, 'Python', 'python', 'Python programming', 5);
-
-    target_type ENUM('global','course','teacher','student') DEFAULT 'global',
-    target_id INT NULL,
-    is_scheduled TINYINT(1) DEFAULT 0,
-    scheduled_at DATETIME NULL,
-    sent_at DATETIME NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_announcements_target (target_type),
-    INDEX idx_announcements_sent (sent_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

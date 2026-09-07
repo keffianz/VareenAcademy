@@ -1,33 +1,71 @@
 <?php
+/* ------------------------------------------------------------------
+ * Error visibility: log everything to the server error log (Hostinger),
+ * display nothing to end users in production (prevents info leaks).
+ * ------------------------------------------------------------------ */
+ini_set('log_errors', 1);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(E_ALL);
+
 requireRole('admin');
 require_once 'src/classes/Database.php';
 $db = (new Database())->connect();
 
-$totalStudents = (int)$db->query("SELECT COUNT(*) FROM users WHERE role='student'")->fetchColumn();
-$totalTeachers = (int)$db->query("SELECT COUNT(*) FROM users WHERE role='teacher'")->fetchColumn();
-$totalCourses = (int)$db->query("SELECT COUNT(*) FROM courses")->fetchColumn();
-$publishedCourses = (int)$db->query("SELECT COUNT(*) FROM courses WHERE status='published'")->fetchColumn();
-$totalEnrollments = (int)$db->query("SELECT COUNT(*) FROM enrollments")->fetchColumn();
-$totalCertificates = (int)$db->query("SELECT COUNT(*) FROM certificates")->fetchColumn();
-$totalCommunityPosts = (int)$db->query("SELECT COUNT(*) FROM community_posts WHERE is_deleted = 0")->fetchColumn();
-$liveClassesToday = (int)$db->query("SELECT COUNT(*) FROM live_classes WHERE DATE(scheduled_at) = CURDATE()")->fetchColumn();
-$totalRevenue = (float)$db->query("SELECT COALESCE(SUM(amount),0) FROM payments WHERE status='paid'")->fetchColumn();
-$pendingApplications = (int)$db->query("SELECT COUNT(*) FROM instructor_applications WHERE status='pending'")->fetchColumn();
+/**
+ * Safe scalar query — returns $default instead of a fatal HTTP 500 when a
+ * table is missing (e.g. optional migration not yet run on the live DB).
+ */
+function admin_scalar($db, string $sql, $default = 0) {
+    try {
+        $v = $db->query($sql)->fetchColumn();
+        return ($v === false || $v === null) ? $default : $v;
+    } catch (Throwable $e) {
+        error_log('[admin-dashboard] scalar query failed: ' . $e->getMessage() . ' | ' . $sql);
+        return $default;
+    }
+}
+
+/** Safe fetch-all — returns [] instead of crashing. */
+function admin_rows($db, string $sql, array $params = []) {
+    try {
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Throwable $e) {
+        error_log('[admin-dashboard] rows query failed: ' . $e->getMessage() . ' | ' . $sql);
+        return [];
+    }
+}
+
+$totalStudents = (int)admin_scalar($db, "SELECT COUNT(*) FROM users WHERE role='student'");
+$totalTeachers = (int)admin_scalar($db, "SELECT COUNT(*) FROM users WHERE role='teacher'");
+$totalCourses = (int)admin_scalar($db, "SELECT COUNT(*) FROM courses");
+$publishedCourses = (int)admin_scalar($db, "SELECT COUNT(*) FROM courses WHERE status='published'");
+$totalEnrollments = (int)admin_scalar($db, "SELECT COUNT(*) FROM enrollments");
+$totalCertificates = (int)admin_scalar($db, "SELECT COUNT(*) FROM certificates");
+$totalCommunityPosts = (int)admin_scalar($db, "SELECT COUNT(*) FROM community_posts WHERE is_deleted = 0");
+$liveClassesToday = (int)admin_scalar($db, "SELECT COUNT(*) FROM live_classes WHERE DATE(scheduled_at) = CURDATE()");
+$totalRevenue = (float)admin_scalar($db, "SELECT COALESCE(SUM(amount),0) FROM payments WHERE status='paid'");
+$pendingApplications = (int)admin_scalar($db, "SELECT COUNT(*) FROM instructor_applications WHERE status='pending'");
 
 $weekAgo = date('Y-m-d', strtotime('-7 days'));
-$studentsThisWeek = (int)$db->query("SELECT COUNT(*) FROM users WHERE role='student' AND created_at >= '{$weekAgo}'")->fetchColumn();
-$enrollmentsThisWeek = (int)$db->query("SELECT COUNT(*) FROM enrollments WHERE enrolled_at >= '{$weekAgo}'")->fetchColumn();
-$revenueThisWeek = (float)$db->query("SELECT COALESCE(SUM(amount),0) FROM payments WHERE status='paid' AND paid_at >= '{$weekAgo}'")->fetchColumn();
+$studentsThisWeek = (int)admin_scalar($db, "SELECT COUNT(*) FROM users WHERE role='student' AND created_at >= '{$weekAgo}'");
+$enrollmentsThisWeek = (int)admin_scalar($db, "SELECT COUNT(*) FROM enrollments WHERE enrolled_at >= '{$weekAgo}'");
+$revenueThisWeek = (float)admin_scalar($db, "SELECT COALESCE(SUM(amount),0) FROM payments WHERE status='paid' AND paid_at >= '{$weekAgo}'");
 
-$recentUsers = $db->query("SELECT first_name, last_name, role, created_at FROM users ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
-$recentPayments = $db->query("SELECT p.amount, p.status, CONCAT(u.first_name, ' ', u.last_name) AS student_name FROM payments p JOIN users u ON u.id = p.user_id ORDER BY p.created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+$recentUsers = admin_rows($db, "SELECT first_name, last_name, role, created_at FROM users ORDER BY created_at DESC LIMIT 5");
+$recentPayments = admin_rows($db, "SELECT p.amount, p.status, CONCAT(u.first_name, ' ', u.last_name) AS student_name FROM payments p JOIN users u ON u.id = p.user_id ORDER BY p.created_at DESC LIMIT 5");
 
 $sslActive = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
 $phpVersion = phpversion();
 $serverSoftware = $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown';
 
-// Payment gateway status
-$payConfig = require __DIR__ . '/../src/config/payments.php';
+// Payment gateway status — config lives at lms_vareen/src/config/payments.php;
+// from views/admin that is TWO levels up, and the file must exist.
+$payConfigFile = __DIR__ . '/../../src/config/payments.php';
+$payConfig = file_exists($payConfigFile) ? require $payConfigFile : [];
+if (!is_array($payConfig)) { $payConfig = []; }
 $paystackStatus = !empty($payConfig['paystack']['enabled']) && !empty($payConfig['paystack']['secret_key']);
 $flutterwaveStatus = !empty($payConfig['flutterwave']['enabled']) && !empty($payConfig['flutterwave']['secret_key']);
 $bankTransferStatus = !empty($payConfig['bank_transfer']['enabled']);

@@ -1,8 +1,35 @@
 -- VAREEN Academy — Teacher Enhancement Migration
--- Adds bio column to users table for teacher profiles
+-- NOTE: uses MySQL-compatible column-add guards. MariaDB's
+-- "ADD COLUMN IF NOT EXISTS" is NOT supported on Hostinger MySQL,
+-- so this migration instead creates a tiny helper procedure to check
+-- information_schema before altering. Safe to run multiple times.
 
-ALTER TABLE users ADD COLUMN IF NOT EXISTS bio TEXT NULL AFTER specialization;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar VARCHAR(255) NULL AFTER bio;
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS vareen_add_column $$
+CREATE PROCEDURE vareen_add_column()
+BEGIN
+    -- Add bio column if missing (teacher profiles)
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'bio'
+    ) THEN
+        ALTER TABLE users ADD COLUMN bio TEXT NULL AFTER specialization;
+    END IF;
+
+    -- Add avatar column if missing
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'avatar'
+    ) THEN
+        ALTER TABLE users ADD COLUMN avatar VARCHAR(255) NULL AFTER bio;
+    END IF;
+END $$
+
+DELIMITER ;
+
+CALL vareen_add_column();
+DROP PROCEDURE IF EXISTS vareen_add_column;
 
 -- Teacher announcements (course-specific)
 CREATE TABLE IF NOT EXISTS teacher_announcements (

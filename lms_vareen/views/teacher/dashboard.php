@@ -1,60 +1,99 @@
 <?php
+/* ------------------------------------------------------------------
+ * Error visibility: log everything to the server error log (Hostinger),
+ * display nothing to end users in production (prevents info leaks).
+ * ------------------------------------------------------------------ */
+ini_set('log_errors', 1);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(E_ALL);
+
 requireRoles(['teacher', 'admin']);
 require_once 'src/classes/Database.php';
 require_once 'src/classes/Course.php';
 require_once 'src/classes/Community.php';
 
+/**
+ * Safe scalar query — returns $default instead of a fatal HTTP 500 when a
+ * table is missing or a query fails.
+ */
+function teacher_scalar($db, string $sql, array $params = [], $default = 0) {
+    try {
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        $v = $stmt->fetchColumn();
+        return ($v === false || $v === null) ? $default : $v;
+    } catch (Throwable $e) {
+        error_log('[teacher-dashboard] scalar query failed: ' . $e->getMessage() . ' | ' . $sql);
+        return $default;
+    }
+}
+
+/** Safe fetch-all — returns [] instead of crashing. */
+function teacher_rows($db, string $sql, array $params = []) {
+    try {
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Throwable $e) {
+        error_log('[teacher-dashboard] rows query failed: ' . $e->getMessage() . ' | ' . $sql);
+        return [];
+    }
+}
+
 $userId = getCurrentUserId();
 $role = getCurrentUserRole();
 $db = (new Database())->connect();
-$courseModel = new Course();
 $community = new Community();
 
-$allCourses = $courseModel->getAllCourses(1, 100);
+$allCourses = teacher_rows($db, 'SELECT id, title, teacher_id FROM courses WHERE is_active = 1 LIMIT 100');
 $courseList = [];
 foreach ($allCourses as $c) {
     if ($role === 'admin' || (int)($c['teacher_id'] ?? 0) === (int)$userId) $courseList[] = $c;
 }
 
-$totalStudents = 0; $courseIds = array_column($courseList, 'id'); $totalCourses = count($courseList);
-foreach ($courseList as $c) {
-    $stmt = $db->prepare('SELECT COUNT(*) FROM enrollments WHERE course_id = :cid');
-    $stmt->execute([':cid' => (int)$c['id']]);
-    $totalStudents += (int)$stmt->fetchColumn();
+$totalStudents = 0; $courseIds = array_map('intval', array_column($courseList, 'id')); $totalCourses = count($courseList);
+if (!empty($courseIds)) {
+    $ph = implode(',', array_fill(0, count($courseIds), '?'));
+    $totalStudents = (int)teacher_scalar($db, "SELECT COUNT(*) FROM enrollments WHERE course_id IN ($ph)", $courseIds);
 }
 
+// NOTE: submissions live in the `submissions` table (assignment_id, student_id, score, status)
 $pendingSubmissions = 0;
 if (!empty($courseIds)) {
     $ph = implode(',', array_fill(0, count($courseIds), '?'));
-    $stmt = $db->prepare("SELECT COUNT(*) FROM assignment_submissions s JOIN assignments a ON a.id = s.assignment_id WHERE a.course_id IN ($ph) AND s.score IS NULL");
-    $stmt->execute($courseIds);
-    $pendingSubmissions = (int)$stmt->fetchColumn();
+    $pendingSubmissions = (int)teacher_scalar(
+        $db,
+        "SELECT COUNT(*) FROM submissions s JOIN assignments a ON a.id = s.assignment_id WHERE a.course_id IN ($ph) AND s.score IS NULL",
+        $courseIds
+    );
 }
 
 $liveToday = 0; $upcomingClasses = [];
 if (!empty($courseIds)) {
     $ph = implode(',', array_fill(0, count($courseIds), '?'));
-    $stmt = $db->prepare("SELECT l.*, c.title AS course_title FROM live_classes l JOIN courses c ON c.id = l.course_id WHERE l.course_id IN ($ph) AND DATE(l.scheduled_at) = CURDATE() ORDER BY l.scheduled_at ASC");
-    $stmt->execute($courseIds);
-    $liveToday = $stmt->rowCount();
-    $stmt = $db->prepare("SELECT l.*, c.title AS course_title FROM live_classes l JOIN courses c ON c.id = l.course_id WHERE l.course_id IN ($ph) AND l.scheduled_at > NOW() AND l.scheduled_at <= DATE_ADD(NOW(), INTERVAL 7 DAY) ORDER BY l.scheduled_at ASC LIMIT 5");
-    $stmt->execute($courseIds);
-    $upcomingClasses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $liveToday = (int)teacher_scalar($db, "SELECT COUNT(*) FROM live_classes l WHERE l.course_id IN ($ph) AND DATE(l.scheduled_at) = CURDATE()", $courseIds);
+    $upcomingClasses = teacher_rows($db, "SELECT l.*, c.title AS course_title FROM live_classes l JOIN courses c ON c.id = l.course_id WHERE l.course_id IN ($ph) AND l.scheduled_at > NOW() AND l.scheduled_at <= DATE_ADD(NOW(), INTERVAL 7 DAY) ORDER BY l.scheduled_at ASC LIMIT 5", $courseIds);
 }
 
-$communityQuestions = $community->totalCount();
+// Community posts table comes from migration_community.sql — degrade to 0 if missing
+try {
+    $communityQuestions = (int)$community->totalCount();
+} catch (Throwable $e) {
+    error_log('[teacher-dashboard] community count failed: ' . $e->getMessage());
+    $communityQuestions = 0;
+}
+
 $avgProgress = 0;
-if ($totalCourses > 0) {
-    $stmt = $db->prepare("SELECT AVG(progress_percent) FROM enrollments WHERE course_id IN (" . implode(',', array_fill(0, count($courseIds), '?')) . ")");
-    $stmt->execute($courseIds);
-    $avgProgress = round((float)$stmt->fetchColumn());
+if (!empty($courseIds)) {
+    $ph = implode(',', array_fill(0, count($courseIds), '?'));
+    $avgProgress = round((float)teacher_scalar($db, "SELECT AVG(progress_percent) FROM enrollments WHERE course_id IN ($ph)", $courseIds));
 }
 
 $recentActivity = [];
 if (!empty($courseIds)) {
-    $stmt = $db->prepare("SELECT lp.*, CONCAT(u.first_name,' ',u.last_name) AS student_name, l.title AS lesson_title FROM lesson_progress lp JOIN users u ON u.id=lp.user_id JOIN lessons l ON l.id=lp.lesson_id JOIN modules m ON m.id=l.module_id WHERE m.course_id IN (" . implode(',', array_fill(0, count($courseIds), '?')) . ") ORDER BY lp.updated_at DESC LIMIT 8");
-    $stmt->execute($courseIds);
-    $recentActivity = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $ph = implode(',', array_fill(0, count($courseIds), '?'));
+    $recentActivity = teacher_rows($db, "SELECT lp.*, CONCAT(u.first_name,' ',u.last_name) AS student_name, l.title AS lesson_title FROM lesson_progress lp JOIN users u ON u.id=lp.user_id JOIN lessons l ON l.id=lp.lesson_id JOIN modules m ON m.id=l.module_id WHERE m.course_id IN ($ph) ORDER BY lp.updated_at DESC LIMIT 8", $courseIds);
 }
 ?>
 <div class="dashboard-wrapper">
