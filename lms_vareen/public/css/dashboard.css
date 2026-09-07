@@ -1,19 +1,20 @@
 /* Shared Admin/Teacher dashboard shell — premium SaaS design */
-.dashboard-wrapper{display:flex;min-height:100vh;background:#f4f6fb}
-.dashboard-sidebar{width:260px;background:#1a1d29;min-height:100vh;position:fixed;top:0;left:0;bottom:0;z-index:100;box-shadow:2px 0 20px rgba(0,0,0,.1);overflow-y:auto}
+.dashboard-wrapper{display:flex;min-height:100vh;background:#f4f6fb;max-width:100%;overflow-x:hidden}
+.dashboard-wrapper,.dashboard-wrapper *,.dashboard-wrapper *::before,.dashboard-wrapper *::after{box-sizing:border-box}
+.dashboard-sidebar{width:260px;flex-shrink:0;background:#1a1d29;min-height:100vh;position:fixed;top:0;left:0;bottom:0;z-index:100;box-shadow:2px 0 20px rgba(0,0,0,.1);overflow-y:auto}
 .sidebar-header{display:flex;justify-content:space-between;align-items:center;padding:20px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
 .sidebar-brand{display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:16px}
 .sidebar-brand i{color:#667eea;font-size:20px}
 .sidebar-close{display:none;background:none;border:none;font-size:18px;cursor:pointer;color:rgba(255,255,255,.5)}
 .sidebar-menu{padding:8px 0}
 .sidebar-group{margin-bottom:4px}
-.sidebar-group-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.35);padding:12px 20px 6px;margin:0}
+.sidebar-group-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.6);padding:12px 20px 6px;margin:0}
 .sidebar-menu ul{list-style:none;margin:0;padding:0}
-.sidebar-menu a{display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;color:rgba(255,255,255,.65);text-decoration:none;transition:all .2s;border-left:3px solid transparent}
+.sidebar-menu a{display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;color:rgba(255,255,255,.8);text-decoration:none;transition:all .2s;border-left:3px solid transparent}
 .sidebar-menu a:hover{color:#fff;background:rgba(255,255,255,.05)}
 .sidebar-menu a.active{color:#fff;background:rgba(102,126,234,.15);border-left-color:#667eea}
 .sidebar-menu a i{width:18px;text-align:center;font-size:14px}
-.dashboard-content{flex:1;margin-left:260px;padding:24px}
+.dashboard-content{flex:1;margin-left:260px;padding:24px;min-width:0;max-width:100%}
 .dashboard-topbar{display:flex;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap}
 .sidebar-toggle{display:none;background:#fff;border:1px solid #ddd;border-radius:8px;padding:8px 12px;cursor:pointer}
 .topbar-title h1{margin:0;font-size:22px;color:#222}
@@ -105,7 +106,10 @@
 .alert-danger{background:#fdecea;color:#c0392b;border:1px solid #f5c6c2}
 .alert-warning{background:#fff7e6;color:#b9770e;border:1px solid #ffe4b3}
 /* Dashboard Section */
-.dashboard-section{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:20px}
+.dashboard-section{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:20px;overflow-x:auto}
+/* Two-column dashboard grid (Recent Users / Recent Payments etc.) */
+.dashboard-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start}
+.dashboard-grid>.dashboard-section{min-width:0}
 .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px}
 .section-header h2{margin:0;font-size:16px;color:#333}
 /* Search & Filter */
@@ -119,7 +123,7 @@
 /* Empty state */
 .empty-state{text-align:center;padding:30px;color:#888;font-size:13px}
 /* Dashboard grid responsive */
-@media(max-width:768px){
+@media(max-width:992px){
     .dashboard-grid{grid-template-columns:1fr!important}
 }
 /* Responsive */

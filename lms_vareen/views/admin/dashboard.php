@@ -113,7 +113,7 @@ $gatewayOk = $paystackStatus || $flutterwaveStatus || $bankTransferStatus;
                 <a href="index.php?page=admin-applications" class="quick-card"><i class="fas fa-user-check"></i> Review Applications <?php if($pendingApplications): ?><span class="badge-notify"><?php echo $pendingApplications; ?></span><?php endif; ?></a>
             </div>
         </div>
-        <div class="dashboard-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="dashboard-grid">
             <div class="dashboard-section">
                 <div class="section-header"><h2>Recent Users</h2></div>
                 <?php if(empty($recentUsers)): ?><div class="empty-state">No users yet</div><?php else: ?>
