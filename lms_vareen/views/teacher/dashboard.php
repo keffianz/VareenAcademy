@@ -87,13 +87,16 @@ try {
 $avgProgress = 0;
 if (!empty($courseIds)) {
     $ph = implode(',', array_fill(0, count($courseIds), '?'));
-    $avgProgress = round((float)teacher_scalar($db, "SELECT AVG(progress_percent) FROM enrollments WHERE course_id IN ($ph)", $courseIds));
+    // NOTE: enrollments has NO progress_percent column — the real column is `progress` DECIMAL(5,2)
+    $avgProgress = round((float)teacher_scalar($db, "SELECT AVG(progress) FROM enrollments WHERE course_id IN ($ph)", $courseIds));
 }
 
 $recentActivity = [];
 if (!empty($courseIds)) {
     $ph = implode(',', array_fill(0, count($courseIds), '?'));
-    $recentActivity = teacher_rows($db, "SELECT lp.*, CONCAT(u.first_name,' ',u.last_name) AS student_name, l.title AS lesson_title FROM lesson_progress lp JOIN users u ON u.id=lp.user_id JOIN lessons l ON l.id=lp.lesson_id JOIN modules m ON m.id=l.module_id WHERE m.course_id IN ($ph) ORDER BY lp.updated_at DESC LIMIT 8", $courseIds);
+    // NOTE: lesson_progress columns are student_id / last_watched_at (NOT user_id / updated_at).
+    // last_watched_at is aliased to updated_at so the template below keeps working.
+    $recentActivity = teacher_rows($db, "SELECT lp.*, lp.last_watched_at AS updated_at, CONCAT(u.first_name,' ',u.last_name) AS student_name, l.title AS lesson_title FROM lesson_progress lp JOIN users u ON u.id=lp.student_id JOIN lessons l ON l.id=lp.lesson_id JOIN modules m ON m.id=l.module_id WHERE m.course_id IN ($ph) ORDER BY lp.last_watched_at DESC LIMIT 8", $courseIds);
 }
 ?>
 <div class="dashboard-wrapper">
