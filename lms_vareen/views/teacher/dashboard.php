@@ -108,12 +108,12 @@ if (!empty($courseIds)) {
             <button class="btn btn-logout" id="teacherLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
         <div class="kpi-grid">
-            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-users"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $totalStudents; ?></span><span class="kpi-label">Students</span></div></div>
-            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-book"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $totalCourses; ?></span><span class="kpi-label">Courses</span></div></div>
-            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-tasks"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $pendingSubmissions; ?></span><span class="kpi-label">Pending Grading</span></div></div>
-            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-video"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $liveToday; ?></span><span class="kpi-label">Live Today</span></div></div>
-            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-comments"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $communityQuestions; ?></span><span class="kpi-label">Posts</span></div></div>
-            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-line"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $avgProgress; ?>%</span><span class="kpi-label">Avg Progress</span></div></div>
+            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-users"></i></div><div class="kpi-info"><span class="kpi-count" data-target="<?php echo $totalStudents; ?>"><?php echo $totalStudents; ?></span><span class="kpi-label">Students</span></div></div>
+            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-book"></i></div><div class="kpi-info"><span class="kpi-count" data-target="<?php echo $totalCourses; ?>"><?php echo $totalCourses; ?></span><span class="kpi-label">Courses</span></div></div>
+            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-tasks"></i></div><div class="kpi-info"><span class="kpi-count" data-target="<?php echo $pendingSubmissions; ?>"><?php echo $pendingSubmissions; ?></span><span class="kpi-label">Pending Grading</span></div></div>
+            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-video"></i></div><div class="kpi-info"><span class="kpi-count" data-target="<?php echo $liveToday; ?>"><?php echo $liveToday; ?></span><span class="kpi-label">Live Today</span></div></div>
+            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-comments"></i></div><div class="kpi-info"><span class="kpi-count" data-target="<?php echo $communityQuestions; ?>"><?php echo $communityQuestions; ?></span><span class="kpi-label">Posts</span></div></div>
+            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-line"></i></div><div class="kpi-info"><span class="kpi-count" data-target="<?php echo $avgProgress; ?>"><?php echo $avgProgress; ?></span><span class="kpi-label">Avg Progress</span></div></div>
         </div>
         <div class="dashboard-section">
             <div class="section-header"><h2>Quick Actions</h2></div>

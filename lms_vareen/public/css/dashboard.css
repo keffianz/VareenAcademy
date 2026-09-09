@@ -528,3 +528,91 @@ body { font-family: var(--va-font-sans); font-size: var(--va-text-base); line-he
 @media(max-width:640px){
     .showcase-grid{grid-template-columns:1fr}
 }
+
+/* =================================================================
+   RESPONSIVE BREAKPOINTS — 480px and 320px
+   Ensures KPI cards, quick actions, and activity sections
+   align consistently across all mobile devices.
+   ================================================================= */
+
+/* Small mobile: 480px */
+@media(max-width:480px){
+    /* Dashboard shell */
+    .dashboard-content{padding:var(--va-space-3)}
+    .dashboard-topbar{flex-wrap:wrap;gap:var(--va-space-2)}
+    .topbar-title h1{font-size:var(--va-text-base)}
+    .topbar-title p{display:none}
+
+    /* KPI cards: single column, compact */
+    .kpi-grid{grid-template-columns:1fr;gap:var(--va-space-2)}
+    .kpi-card{padding:var(--va-space-3);gap:var(--va-space-3)}
+    .kpi-icon{width:40px;height:40px;font-size:var(--va-text-base);border-radius:var(--va-radius-sm)}
+    .kpi-count{font-size:var(--va-text-xl)}
+    .kpi-label{font-size:var(--va-text-xs)}
+
+    /* Quick actions: single column */
+    .quick-grid{grid-template-columns:1fr;gap:var(--va-space-2)}
+    .quick-action-grid{grid-template-columns:1fr;gap:var(--va-space-2)}
+    .quick-card{padding:var(--va-space-3);font-size:var(--va-text-xs);min-height:44px}
+    .quick-action-card{padding:var(--va-space-3);min-height:48px;font-size:var(--va-text-xs)}
+    .quick-action-card i{font-size:var(--va-text-base)}
+
+    /* Stats cards (student dashboard): single column */
+    .stats-cards{grid-template-columns:1fr;gap:var(--va-space-2)}
+    .stat-card{padding:var(--va-space-3);flex-direction:row;text-align:left}
+    .stat-icon{width:40px;height:40px;font-size:var(--va-text-base)}
+    .stat-label{font-size:var(--va-text-xs)}
+    .stat-info h3{font-size:var(--va-text-xl)}
+
+    /* Dashboard grid */
+    .dashboard-grid{grid-template-columns:1fr;gap:var(--va-space-3)}
+    .dashboard-section{padding:var(--va-space-3)}
+
+    /* Activity list */
+    .activity-item{flex-wrap:wrap;gap:var(--va-space-2)}
+    .activity-info{flex:1;min-width:0}
+    .activity-time{font-size:var(--va-text-xs)}
+
+    /* Section headers */
+    .section-header h2{font-size:var(--va-text-base)}
+    .section-header{margin-bottom:var(--va-space-3)}
+
+    /* Tables */
+    .admin-table{font-size:var(--va-text-xs)}
+    .admin-table td,.admin-table th{padding:var(--va-space-2)}
+
+    /* Health banner */
+    .health-banner{gap:var(--va-space-2)}
+    .health-item{font-size:var(--va-text-xs);padding:var(--va-space-2)}
+
+    /* Health banner */
+    .health-banner{gap:var(--va-space-2)}
+    .health-item{font-size:var(--va-text-xs);padding:var(--va-space-2)}
+}
+
+/* Extra small mobile: 320px */
+@media(max-width:320px){
+    .dashboard-content{padding:var(--va-space-2)}
+    .kpi-grid{gap:var(--va-space-1)}
+    .kpi-card{padding:var(--va-space-2);gap:var(--va-space-2)}
+    .kpi-icon{width:32px;height:32px;font-size:var(--va-text-sm)}
+    .kpi-count{font-size:var(--va-text-lg)}
+    .kpi-label{font-size:10px}
+
+    .quick-grid{gap:var(--va-space-1)}
+    .quick-action-grid{gap:var(--va-space-1)}
+    .quick-card{padding:var(--va-space-2)}
+    .quick-action-card{padding:var(--va-space-2);min-height:44px}
+
+    .stats-cards{gap:var(--va-space-1)}
+    .stat-card{padding:var(--va-space-2)}
+    .stat-icon{width:32px;height:32px;font-size:var(--va-text-sm)}
+    .stat-info h3{font-size:var(--va-text-lg)}
+
+    .topbar-title h1{font-size:var(--va-text-sm)}
+    .btn-logout{padding:var(--va-space-2);font-size:var(--va-text-xs)}
+
+    /* Hide non-essential sidebar text on very small screens */
+    .sidebar-brand span{display:none}
+    .sidebar-menu a{font-size:var(--va-text-xs);padding:10px var(--va-space-4)}
+}

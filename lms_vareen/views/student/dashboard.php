@@ -74,7 +74,7 @@ if (!function_exists('timeAgo')) {
                 </div>
                 <div class="stat-info">
                     <p class="stat-label">Enrolled Courses</p>
-                    <h3><?php echo $stats['total_courses'] ?? 0; ?></h3>
+                    <h3 data-target="<?php echo $stats['total_courses'] ?? 0; ?>"><?php echo $stats['total_courses'] ?? 0; ?></h3>
                 </div>
             </div>
 
@@ -84,7 +84,7 @@ if (!function_exists('timeAgo')) {
                 </div>
                 <div class="stat-info">
                     <p class="stat-label">Pending Tasks</p>
-                    <h3><?php echo $stats['pending_assignments'] ?? 0; ?></h3>
+                    <h3 data-target="<?php echo $stats['pending_assignments'] ?? 0; ?>"><?php echo $stats['pending_assignments'] ?? 0; ?></h3>
                 </div>
             </div>
 
@@ -94,7 +94,7 @@ if (!function_exists('timeAgo')) {
                 </div>
                 <div class="stat-info">
                     <p class="stat-label">New Notifications</p>
-                    <h3><?php echo $stats['unread_notifications'] ?? 0; ?></h3>
+                    <h3 data-target="<?php echo $stats['unread_notifications'] ?? 0; ?>"><?php echo $stats['unread_notifications'] ?? 0; ?></h3>
                 </div>
             </div>
 

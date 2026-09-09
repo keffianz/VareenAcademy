@@ -66,35 +66,78 @@
     }
 
     // --- KPI count-up animation ---
+    // Uses data-target attribute for numeric values (avoids NaN from parsing
+    // formatted DOM text like "₦25,000"). Falls back to text parsing only
+    // when data-target is absent, with strict sanitization.
     var kpiCards = document.querySelectorAll(".kpi-count");
     if (kpiCards.length) {
         var observer = new IntersectionObserver(function (entries) {
             entries.forEach(function (entry) {
                 if (entry.isIntersecting) {
                     var el = entry.target;
-                    // Robust parse: server renders values like "₦25,000" or "1,204".
-                    // parseFloat("₦25,000") is NaN and parseFloat("25,000") is 25 —
-                    // strip everything except digits and the decimal point first.
-                    var raw = el.getAttribute("data-target") || el.textContent;
-                    var target = parseFloat(String(raw).replace(/[^0-9.]/g, ""));
-                    var isCurrency = el.textContent.indexOf("₦") !== -1 || el.getAttribute("data-currency");
-                    if (isNaN(target)) { observer.unobserve(el); return; }
+                    var target = null;
+                    var isCurrency = false;
+                    var currencySymbol = "";
+
+                    // PRIMARY: use data-target attribute (set by PHP or previous run)
+                    var dataTarget = el.getAttribute("data-target");
+                    if (dataTarget !== null && dataTarget !== "") {
+                        target = parseFloat(String(dataTarget).replace(/[^0-9.-]/g, ""));
+                        isCurrency = el.getAttribute("data-currency") !== null || dataTarget.indexOf("₦") === 0;
+                        if (isCurrency) currencySymbol = "₦";
+                    }
+
+                    // FALLBACK: parse text content only if no data-target
+                    if (isNaN(target) || target === null) {
+                        var text = el.textContent || "";
+                        // Detect currency symbol
+                        if (text.indexOf("₦") !== -1) { isCurrency = true; currencySymbol = "₦"; }
+                        else if (text.indexOf("$") !== -1) { isCurrency = true; currencySymbol = "$"; }
+                        else if (text.indexOf("€") !== -1) { isCurrency = true; currencySymbol = "€"; }
+                        else if (text.indexOf("£") !== -1) { isCurrency = true; currencySymbol = "£"; }
+                        // Strip everything except digits, decimal point, and minus sign
+                        var cleaned = String(text).replace(/[^0-9.\-]/g, "");
+                        target = parseFloat(cleaned);
+                    }
+
+                    // If still NaN, skip animation (non-numeric KPI like "N/A")
+                    if (isNaN(target) || target === null) { observer.unobserve(el); return; }
+
+                    // Store clean numeric target in data-target for future use
+                    el.setAttribute("data-target", target);
+
                     var isDecimal = target % 1 !== 0;
-                    var start = 0;
                     var duration = 1500;
                     var startTime = null;
+
                     function animate(timestamp) {
                         if (!startTime) startTime = timestamp;
                         var progress = Math.min((timestamp - startTime) / duration, 1);
-                        var value = Math.floor(target * progress);
-                        if (isCurrency) el.textContent = "₦" + value.toLocaleString();
-                        else if (isDecimal) el.textContent = target.toFixed(2);
-                        else el.textContent = value.toLocaleString();
-                        if (progress < 1) requestAnimationFrame(animate);
+                        // Ease-out curve for natural feel
+                        var eased = 1 - Math.pow(1 - progress, 3);
+                        var current = target * eased;
+
+                        if (isCurrency) {
+                            el.textContent = currencySymbol + Math.floor(current).toLocaleString();
+                        } else if (isDecimal) {
+                            el.textContent = current.toFixed(2);
+                        } else {
+                            el.textContent = Math.floor(current).toLocaleString();
+                        }
+
+                        if (progress < 1) {
+                            requestAnimationFrame(animate);
+                        } else {
+                            // Ensure final value is exact
+                            if (isCurrency) {
+                                el.textContent = currencySymbol + Math.floor(target).toLocaleString();
+                            } else if (isDecimal) {
+                                el.textContent = target.toFixed(2);
+                            } else {
+                                el.textContent = Math.floor(target).toLocaleString();
+                            }
+                        }
                     }
-                    // Store original target text
-                    var origText = el.textContent;
-                    el.setAttribute("data-target", isCurrency ? target : (isDecimal ? target : Math.floor(target)));
                     requestAnimationFrame(animate);
                     observer.unobserve(el);
                 }
