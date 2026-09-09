@@ -837,7 +837,10 @@ body {
             },
             body: JSON.stringify({ email: email, password: password, intended_role: selectedRole })
         })
-        .then(function (r) { return r.json(); })
+        .then(function (r) {
+            if (!r.ok) throw new Error('Server returned ' + r.status);
+            return r.json();
+        })
         .then(function (data) {
             signinBtn.classList.remove('is-loading');
             signinBtn.disabled = false;
@@ -858,9 +861,11 @@ body {
                 loginError.classList.add('alert--error');
             }
         })
-        .catch(function () {
+        .catch(function (err) {
             signinBtn.classList.remove('is-loading');
             signinBtn.disabled = false;
+            // Log the actual error to the console for debugging
+            console.error('Login Fetch Error:', err);
             loginErrorText.textContent = 'An error occurred. Please try again.';
             loginError.classList.add('alert--error');
         });
