@@ -47,20 +47,25 @@
                     document.getElementById("studentLogoutBtnTop");
     if (logoutBtn) {
         logoutBtn.addEventListener("click", function () {
-            // Try API logout first, fall back to direct redirect
+            // Build base path from PHP (injected into a data attribute on <html>)
+            var basePath = document.documentElement.getAttribute("data-basepath") || "";
             var csrf = "";
             var meta = document.querySelector('meta[name="csrf-token"]');
             if (meta) csrf = meta.getAttribute("content");
-            fetch("/lms_vareen/src/api/auth.php?action=logout", {
+            fetch(basePath + "/src/api/auth.php?action=logout", {
                 method: "POST",
                 headers: { "X-CSRF-Token": csrf }
             })
-                .then(function (r) { return r.json(); })
+                .then(function (r) {
+                    if (!r.ok) throw new Error("HTTP " + r.status);
+                    return r.json();
+                })
                 .then(function (data) {
-                    window.location.href = "/lms_vareen/index.php?page=login";
+                    window.location.href = basePath + "/index.php?page=login";
                 })
                 .catch(function () {
-                    window.location.href = "/lms_vareen/index.php?page=login";
+                    // Fallback: redirect to login even if API fails
+                    window.location.href = basePath + "/index.php?page=login";
                 });
         });
     }

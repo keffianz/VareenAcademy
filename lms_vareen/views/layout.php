@@ -5,7 +5,7 @@
  */
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-basepath="<?php echo appBasePath(); ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -25,29 +25,9 @@
     <?php endif; ?>
     <link rel="stylesheet" href="<?php echo appBasePath() . '/public/css/responsive.css?v=1.0.1'; ?>">
 
-    <!-- Font Awesome (self-hosted — sidebar/KPI/button icons across all dashboards) -->
-    <link rel="preload" href="<?php echo appBasePath() . '/public/css/font-awesome-local.css'; ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="<?php echo appBasePath() . '/public/css/font-awesome-local.css'; ?>"></noscript>
-    <!-- Fallback: if local font files are missing, load from CDN -->
-    <script>
-    (function(){
-        var test=document.createElement('span');
-        test.className='fa';
-        test.style.cssText='position:absolute;visibility:hidden;font-family:\'Font Awesome 6 Free\'';
-        test.innerHTML='&#xf005;'; /* star */
-        document.body.appendChild(test);
-        var w=test.offsetWidth;
-        document.body.removeChild(test);
-        if(!w||w<10){
-            var link=document.createElement('link');
-            link.rel='stylesheet';
-            link.href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css';
-            link.crossOrigin='anonymous';
-            link.referrerPolicy='no-referrer';
-            document.head.appendChild(link);
-        }
-    })();
-    </script>
+    <!-- Font Awesome 6.5.2 (self-hosted with CDN fallback) -->
+    <link rel="stylesheet" href="<?php echo appBasePath() . '/public/css/font-awesome-local.css'; ?>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     
     <!-- AI Assistant Widget CSS (only for students) -->
     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'student'): ?>
