@@ -25,9 +25,9 @@
     <?php endif; ?>
     <link rel="stylesheet" href="<?php echo appBasePath() . '/public/css/responsive.css?v=1.0.1'; ?>">
 
-    <!-- Font Awesome 6.5.2 (self-hosted with CDN fallback) -->
+    <!-- Font Awesome 7.3.1 (self-hosted with CDN fallback) -->
     <link rel="stylesheet" href="<?php echo appBasePath() . '/public/css/font-awesome-local.css'; ?>">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     
     <!-- AI Assistant Widget CSS (only for students) -->
     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'student'): ?>
