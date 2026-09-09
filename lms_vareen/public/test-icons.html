@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon Test - Font Awesome</title>
+    <link rel="stylesheet" href="/lms_vareen/public/css/font-awesome-local.css?v=7.3.2">
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
+        .test-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 20px; }
+        .icon-box { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 15px; text-align: center; }
+        .icon-box i { font-size: 32px; color: #333; margin-bottom: 8px; display: block; }
+        .icon-box span { font-size: 11px; color: #666; word-break: break-all; }
+        .status { padding: 10px; border-radius: 4px; margin-bottom: 20px; font-weight: bold; }
+        .status.ok { background: #d4edda; color: #155724; }
+        .status.fail { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Font Awesome Icon Test</h1>
+    <div id="status" class="status">Testing...</div>
+    
+    <h2>KPI Icons Used in Dashboard</h2>
+    <div class="test-grid">
+        <div class="icon-box"><i class="fas fa-user-graduate"></i><span>fa-user-graduate</span></div>
+        <div class="icon-box"><i class="fas fa-chalkboard-teacher"></i><span>fa-chalkboard-teacher</span></div>
+        <div class="icon-box"><i class="fas fa-book"></i><span>fa-book</span></div>
+        <div class="icon-box"><i class="fas fa-user-plus"></i><span>fa-user-plus</span></div>
+        <div class="icon-box"><i class="fas fa-naira-sign"></i><span>fa-naira-sign</span></div>
+        <div class="icon-box"><i class="fas fa-certificate"></i><span>fa-certificate</span></div>
+        <div class="icon-box"><i class="fas fa-comments"></i><span>fa-comments</span></div>
+        <div class="icon-box"><i class="fas fa-video"></i><span>fa-video</span></div>
+    </div>
+
+    <h2>Sidebar Icons</h2>
+    <div class="test-grid">
+        <div class="icon-box"><i class="fas fa-tachometer-alt"></i><span>fa-tachometer-alt</span></div>
+        <div class="icon-box"><i class="fas fa-users-cog"></i><span>fa-users-cog</span></div>
+        <div class="icon-box"><i class="fas fa-list-ul"></i><span>fa-list-ul</span></div>
+        <div class="icon-box"><i class="fa-solid fa-list-ul"></i><span>fa-solid fa-list-ul</span></div>
+        <div class="icon-box"><i class="fas fa-question-circle"></i><span>fa-question-circle</span></div>
+        <div class="icon-box"><i class="fas fa-credit-card"></i><span>fa-credit-card</span></div>
+        <div class="icon-box"><i class="fas fa-robot"></i><span>fa-robot</span></div>
+        <div class="icon-box"><i class="fas fa-sign-out-alt"></i><span>fa-sign-out-alt</span></div>
+        <div class="icon-box"><i class="fas fa-bars"></i><span>fa-bars</span></div>
+        <div class="icon-box"><i class="fas fa-graduation-cap"></i><span>fa-graduation-cap</span></div>
+    </div>
+
+    <h2>Quick Action Icons</h2>
+    <div class="test-grid">
+        <div class="icon-box"><i class="fas fa-book-open"></i><span>fa-book-open</span></div>
+        <div class="icon-box"><i class="fas fa-bullhorn"></i><span>fa-bullhorn</span></div>
+        <div class="icon-box"><i class="fas fa-ticket-alt"></i><span>fa-ticket-alt</span></div>
+        <div class="icon-box"><i class="fas fa-user-check"></i><span>fa-user-check</span></div>
+        <div class="icon-box"><i class="fas fa-history"></i><span>fa-history</span></div>
+        <div class="icon-box"><i class="fas fa-cog"></i><span>fa-cog</span></div>
+    </div>
+
+    <script>
+    (function() {
+        // Check if icons are rendering
+        const icons = document.querySelectorAll('.icon-box i');
+        let visible = 0;
+        let hidden = 0;
+        icons.forEach(icon => {
+            const rect = icon.getBoundingClientRect();
+            const cs = getComputedStyle(icon);
+            // Check if icon has visible dimensions and content
+            if (rect.width > 0 && rect.height > 0 && cs.content !== 'none' && cs.content !== 'normal') {
+                visible++;
+                icon.style.color = '#28a745'; // Green = visible
+            } else {
+                hidden++;
+                icon.style.color = '#dc3545'; // Red = hidden
+            }
+        });
+        const status = document.getElementById('status');
+        if (hidden === 0) {
+            status.className = 'status ok';
+            status.textContent = `✅ All ${visible} icons are rendering correctly!`;
+        } else {
+            status.className = 'status fail';
+            status.textContent = `❌ ${hidden} of ${icons.length} icons are NOT visible. ${visible} are working.`;
+        }
+    })();
+    </script>
+</body>
+</html>

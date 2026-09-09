@@ -66,10 +66,15 @@
 </IfModule>
 
 # Resource Hints (Preload critical resources)
+# Only preload marketing-site assets on non-LMS pages — the LMS (/lms_vareen/)
+# never uses these files, so preloading them there wastes bandwidth and
+# triggers "resource was preloaded but not used" console warnings.
 <IfModule mod_headers.c>
-    Header add Link "</assets/css/main.css>; rel=preload; as=style"
-    Header add Link "</assets/js/main.js>; rel=preload; as=script"
-    Header add Link "</images/main-logo.png>; rel=preload; as=image"
+    <If "%{REQUEST_URI} !~ m#^/lms_vareen/#">
+        Header add Link "</assets/css/main.css>; rel=preload; as=style"
+        Header add Link "</assets/js/main.js>; rel=preload; as=script"
+        Header add Link "</images/main-logo.png>; rel=preload; as=image"
+    </If>
 </IfModule>
 
 # Rate Limiting (basic protection)
