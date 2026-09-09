@@ -423,11 +423,11 @@ a:focus, button:focus, input:focus, textarea:focus, .nav-link:focus, .btn:focus 
 /* Why Choose Us Section */
 .why-choose-section {
   padding: 5rem 0;
-  background: var(--neutral-light);
+  background: #f8fafc; /* Always light — never follows theme variable */
 }
 
 .feature-item {
-  background: var(--white);
+  background: #ffffff; /* Always light — never follows theme variable */
   padding: 2rem;
   border-radius: 1rem;
   box-shadow: 0 4px 6px var(--shadow-light);
@@ -448,22 +448,22 @@ a:focus, button:focus, input:focus, textarea:focus, .nav-link:focus, .btn:focus 
 }
 
 .feature-item h4 {
-  color: var(--text-primary);
+  color: #1e293b !important; /* Always dark — white panel */
   margin-bottom: 1rem;
 }
 
 .feature-item p {
-  color: var(--text-secondary);
+  color: #4b5563 !important; /* Always dark — white panel */
 }
 
 /* Services Section */
 .services-section {
   padding: 5rem 0;
-  background: var(--white);
+  background: #ffffff; /* Always light — never follows theme variable */
 }
 
 .service-card {
-  background: var(--white);
+  background: #ffffff; /* Always light — never follows theme variable */
   border: 1px solid var(--neutral-medium);
   border-radius: 1rem;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -499,7 +499,7 @@ a:focus, button:focus, input:focus, textarea:focus, .nav-link:focus, .btn:focus 
 /* Gallery Styles */
 .gallery-preview-section {
   padding: 5rem 0;
-  background: var(--neutral-light);
+  background: #f8fafc; /* Always light — never follows theme variable */
 }
 
 .gallery-grid {
@@ -551,11 +551,11 @@ a:focus, button:focus, input:focus, textarea:focus, .nav-link:focus, .btn:focus 
 /* News Section */
 .news-section {
   padding: 5rem 0;
-  background: var(--white);
+  background: #ffffff; /* Always light — never follows theme variable */
 }
 
 .news-card {
-  background: var(--white);
+  background: #ffffff; /* Always light — never follows theme variable */
   border: 1px solid var(--neutral-medium);
   border-radius: 1rem;
   box-shadow: 0 4px 6px var(--shadow-light);
@@ -580,7 +580,7 @@ a:focus, button:focus, input:focus, textarea:focus, .nav-link:focus, .btn:focus 
 /* Testimonials Section */
 .testimonials-section {
   padding: 5rem 0;
-  background: var(--neutral-light);
+  background: #f8fafc; /* Always light — never follows theme variable */
 }
 
 .testimonials-swiper {
@@ -622,7 +622,7 @@ a:focus, button:focus, input:focus, textarea:focus, .nav-link:focus, .btn:focus 
 }
 
 .testimonial-card-small {
-  background: var(--white);
+  background: #ffffff; /* Always light — never follows theme variable */
   padding: 1.5rem;
   border-radius: 0.75rem;
   box-shadow: 0 4px 6px var(--shadow-light);
@@ -651,7 +651,7 @@ a:focus, button:focus, input:focus, textarea:focus, .nav-link:focus, .btn:focus 
 }
 
 .testimonial-card {
-  background: var(--white);
+  background: #ffffff; /* Always light — never follows theme variable */
   padding: 1.5rem;
   border-radius: 0.75rem;
   box-shadow: 0 4px 6px var(--shadow-light);
@@ -753,14 +753,14 @@ footer h3, footer h4 {
   border-radius: 0.75rem;
   padding: 0.75rem 1rem;
   transition: var(--transition-normal);
-  background: var(--white);
+  background: #ffffff !important; /* Always light — pairs with hardcoded dark text below */
   color: #1e293b !important; /* Explicit dark text for visibility */
 }
 
 .form-control:focus {
   border-color: var(--secondary-color);
   box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
-  background: var(--white);
+  background: #ffffff !important; /* Always light — pairs with hardcoded dark text below */
   color: #1e293b !important; /* Keep text dark on focus */
 }
 
@@ -772,7 +772,7 @@ footer h3, footer h4 {
   -webkit-box-shadow: 0 0 0 30px white inset !important;
   -webkit-text-fill-color: #1e293b !important;
   color: #1e293b !important;
-  background-color: var(--white) !important;
+  background-color: #ffffff !important; /* Always light — pairs with hardcoded dark fill color */
 }
 
 /* Ensure placeholder text is visible */
@@ -1240,7 +1240,7 @@ textarea:focus {
 }
 
 .bg-light {
-  background-color: var(--neutral-light) !important;
+  background-color: #f8fafc !important; /* Always light — never follows theme variable */
 }
 
 .text-muted {
@@ -1248,7 +1248,7 @@ textarea:focus {
 }
 
 .card {
-  background-color: var(--white);
+  background-color: #ffffff; /* Always light — never follows theme variable */
   border: 1px solid var(--neutral-medium);
   border-radius: 1rem;
   box-shadow: 0 4px 6px var(--shadow-light);
@@ -1259,11 +1259,11 @@ textarea:focus {
 }
 
 .card-title {
-  color: var(--text-primary);
+  color: #1e293b !important; /* Always dark — white card */
 }
 
 .card-text {
-  color: var(--text-secondary);
+  color: #4b5563 !important; /* Always dark — white card */
 }
 
 .py-5 {
@@ -1869,6 +1869,6 @@ textarea:focus {
 .testimonial-card,
 .testimonial-card-small,
 .card {
-  color: var(--text-primary);
+  color: #1e293b !important; /* Always dark — never follows theme variable (white panels) */
 }
 

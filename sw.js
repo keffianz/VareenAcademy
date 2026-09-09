@@ -14,7 +14,7 @@ const STATIC_ASSETS = [
   '/online-classes.html',
   '/apply.html',
   '/contact.html',
-  '/assets/css/main.css',
+  '/assets/css/main.css?v=2',
   '/assets/js/main.js',
   '/images/main-logo.png',
   '/images/icon-192x192.png',
