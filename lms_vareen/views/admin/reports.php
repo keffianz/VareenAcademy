@@ -15,7 +15,7 @@ $admin_active = 'reports';
                 <h1>Reports</h1>
                 <p>Platform totals and per-course academic performance.</p>
             </div>
-            <button class="btn-logout" id="logoutBtn" type="button">Logout</button>
+            <button class="btn-logout" id="adminLogoutBtnTop" type="button">Logout</button>
         </div>
 
         <div class="notice" id="notice"></div>

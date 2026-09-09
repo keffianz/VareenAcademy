@@ -23,6 +23,7 @@ $posts = $db->query('SELECT p.*, CONCAT(u.first_name, " ", u.last_name) AS autho
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
             <div class="topbar-title"><h1>Discussions</h1><p>All community posts</p></div>
+            <button class="btn btn-logout" id="adminLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
         <div class="dashboard-section">
             <div class="section-header"><h2>Recent Posts</h2></div>

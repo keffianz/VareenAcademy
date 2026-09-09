@@ -29,6 +29,7 @@ if (!empty($courseIds)) {
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu"><i class="fas fa-bars"></i></button>
             <div class="topbar-title"><h1>Student Progress</h1><p>Track how your students are doing</p></div>
+            <button class="btn btn-logout" id="teacherLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
         <?php if(empty($studentProgress)): ?><div class="empty-state"><i class="fas fa-chart-line"></i><p>No student data yet</p></div>
         <?php else: ?>

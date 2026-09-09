@@ -17,6 +17,7 @@ $pendingReports = $community->totalReports('pending');
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu"><i class="fas fa-bars"></i></button>
             <div class="topbar-title"><h1>Community Hub</h1><p>Engage with students and fellow instructors</p></div>
+            <button class="btn btn-logout" id="teacherLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
         <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
             <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-comments"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo count($communities); ?></span><span class="kpi-label">Communities</span></div></div>

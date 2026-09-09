@@ -30,6 +30,7 @@ $apiBase = appBasePath() . '/src/api/live_classes.php';
                 <h1>Attendance</h1>
                 <p>Mark which students attended each live class</p>
             </div>
+            <button class="btn btn-logout" id="teacherLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
         <section class="dashboard-section">
             <?php if (empty($classes)): ?>

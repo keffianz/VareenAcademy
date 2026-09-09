@@ -74,4 +74,10 @@ $student_active = $student_active ?? 'student-dashboard';
             </div>
         <?php endforeach; ?>
     </nav>
+    <div class="sidebar-footer">
+        <button class="sidebar-logout" id="studentLogoutBtn" type="button">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </button>
+    </div>
 </aside>

@@ -105,7 +105,7 @@ if (!empty($courseIds)) {
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu"><i class="fas fa-bars"></i></button>
             <div class="topbar-title"><h1>Teacher Dashboard</h1><p>Welcome back! Here's your teaching overview.</p></div>
-            <div class="topbar-actions"><a href="/index.php?page=teacher-ai" class="btn btn-ai"><i class="fas fa-robot"></i> AI</a></div>
+            <button class="btn btn-logout" id="teacherLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
         <div class="kpi-grid">
             <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-users"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $totalStudents; ?></span><span class="kpi-label">Students</span></div></div>

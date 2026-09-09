@@ -63,6 +63,7 @@ if (!function_exists('timeAgo')) {
                 <h1>Welcome, <?php echo htmlspecialchars($user->first_name); ?>! 👋</h1>
                 <p>Here's what's happening with your courses</p>
             </div>
+            <button class="btn btn-logout" id="studentLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
 
         <!-- Statistics Cards -->

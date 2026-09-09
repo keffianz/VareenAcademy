@@ -28,6 +28,7 @@ $showcaseCommunity = $stmt2->fetch(PDO::FETCH_ASSOC);
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
             <div class="topbar-title"><h1>Student Showcase</h1><p>Share your projects and get feedback</p></div>
+            <button class="btn btn-logout" id="studentLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
 
         <div class="dashboard-section">

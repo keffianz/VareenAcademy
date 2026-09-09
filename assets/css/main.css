@@ -754,13 +754,31 @@ footer h3, footer h4 {
   padding: 0.75rem 1rem;
   transition: var(--transition-normal);
   background: var(--white);
-  color: var(--text-primary);
+  color: #1e293b !important; /* Explicit dark text for visibility */
 }
 
 .form-control:focus {
   border-color: var(--secondary-color);
   box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
   background: var(--white);
+  color: #1e293b !important; /* Keep text dark on focus */
+}
+
+/* Fix browser autofill styling - prevent yellow background with white text */
+.form-control:-webkit-autofill,
+.form-control:-webkit-autofill:hover,
+.form-control:-webkit-autofill:focus,
+.form-control:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px white inset !important;
+  -webkit-text-fill-color: #1e293b !important;
+  color: #1e293b !important;
+  background-color: var(--white) !important;
+}
+
+/* Ensure placeholder text is visible */
+.form-control::placeholder {
+  color: #6b7280;
+  opacity: 1;
 }
 
 .btn-primary {

@@ -44,9 +44,12 @@ if (!empty($courseIds)) {
 ?>
 
 <div class="container">
-    <div class="page-header">
-        <h1>Live Class Management</h1>
-        <p>Create, update and manage your scheduled live classes.</p>
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+            <h1>Live Class Management</h1>
+            <p>Create, update and manage your scheduled live classes.</p>
+        </div>
+        <button class="btn btn-logout" id="teacherLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
 
     <div class="card">

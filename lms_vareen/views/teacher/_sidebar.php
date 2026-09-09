@@ -91,4 +91,10 @@ $teacher_active = $teacher_active ?? 'dashboard';
             </div>
         <?php endforeach; ?>
     </nav>
+    <div class="sidebar-footer">
+        <button class="sidebar-logout" id="teacherLogoutBtn" type="button">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </button>
+    </div>
 </aside>

@@ -32,6 +32,7 @@ $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <h1>My Assignments</h1>
                 <p>View and submit your assignments before the deadline.</p>
             </div>
+            <button class="btn btn-logout" id="studentLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
 
         <div class="dashboard-section">

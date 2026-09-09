@@ -7,6 +7,7 @@ requireRole('student');
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
             <div class="topbar-title"><h1>Ask My Lesson</h1><p>Your AI study tutor — ask questions about your enrolled lessons</p></div>
+            <button class="btn btn-logout" id="studentLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
 
         <div class="dashboard-section">

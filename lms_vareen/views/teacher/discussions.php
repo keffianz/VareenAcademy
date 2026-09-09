@@ -14,6 +14,7 @@ $posts = $community->getPosts(null, null, 30, 0);
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu"><i class="fas fa-bars"></i></button>
             <div class="topbar-title"><h1>Discussions</h1><p>Community discussions across all channels</p></div>
+            <button class="btn btn-logout" id="teacherLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
         <?php if(empty($posts)): ?><div class="empty-state"><i class="fas fa-comment-dots"></i><p>No discussions yet</p></div>
         <?php else: ?>

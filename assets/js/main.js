@@ -858,6 +858,13 @@ const initializePWA = () => {
         });
     }
 
+    // Completely disable automatic PWA install prompt
+    // Intercept beforeinstallprompt and prevent default behavior everywhere
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        // Do not store the event - we don't want to show the prompt anywhere
+    });
+
     // Enhanced online/offline status with animations
     window.addEventListener('online', () => {
         showOnlineStatus();

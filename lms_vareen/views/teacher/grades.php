@@ -29,6 +29,7 @@ if (!empty($courseIds)) {
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu"><i class="fas fa-bars"></i></button>
             <div class="topbar-title"><h1>Grades</h1><p>Recently graded submissions</p></div>
+            <button class="btn btn-logout" id="teacherLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
         <?php if(empty($grades)): ?><div class="empty-state"><i class="fas fa-award"></i><p>No grades yet</p></div>
         <?php else: ?>

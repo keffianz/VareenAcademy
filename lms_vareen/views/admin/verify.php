@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
             <div class="topbar-title"><h1>Certificate Verification</h1><p>Verify certificate authenticity</p></div>
+            <button class="btn btn-logout" id="adminLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
         <div class="dashboard-section">
             <div class="section-header"><h2>Verify Certificate</h2></div>

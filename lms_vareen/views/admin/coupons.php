@@ -27,6 +27,7 @@ $coupons = $db->query('SELECT * FROM coupons ORDER BY created_at DESC LIMIT 50')
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
             <div class="topbar-title"><h1>Coupons</h1><p>Manage discount coupons</p></div>
+            <button class="btn btn-logout" id="adminLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
         <?php if($message): ?><div class="alert alert-success"><?php echo htmlspecialchars($message); ?></div><?php endif; ?>
         <div class="dashboard-section">

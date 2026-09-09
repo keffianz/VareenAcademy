@@ -39,6 +39,7 @@ $printBase  = appBasePath() . '/index.php?page=certificate-print';
                 <h1>My Certificates</h1>
                 <p>Certificates you have earned by completing courses. Download a PDF copy or verify a code publicly.</p>
             </div>
+            <button class="btn btn-logout" id="studentLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
 
         <section class="dashboard-section">

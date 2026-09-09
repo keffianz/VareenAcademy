@@ -11,7 +11,7 @@ $additional_css = [appBasePath() . '/public/css/dashboard.css'];
 <div class="dash-shell">
 <?php include __DIR__ . '/_sidebar.php'; ?>
 <main class="dash-main">
-  <div class="dash-topbar"><div><h1>Settings</h1><p class="dash-sub">Site-wide configuration.</p></div></div>
+  <div class="dash-topbar"><div><h1>Settings</h1><p class="dash-sub">Site-wide configuration.</p></div><button class="btn btn-logout" id="adminLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
   <div class="dash-content">
     <div id="msg" class="admin-msg" hidden></div>
     <form id="frm" class="card admin-form">

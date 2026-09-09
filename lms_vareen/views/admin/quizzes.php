@@ -10,6 +10,7 @@ $quizzes = $db->query('SELECT q.*, c.title AS course_title FROM quizzes q JOIN c
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
             <div class="topbar-title"><h1>Quizzes</h1><p>Manage course quizzes</p></div>
+            <button class="btn btn-logout" id="adminLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
         <div class="dashboard-section">
             <div class="section-header"><h2>All Quizzes</h2></div>

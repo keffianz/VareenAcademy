@@ -17,6 +17,7 @@ $posts = $selectedCommunity ? $community->getPosts($selectedCommunity, null, 20)
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
             <div class="topbar-title"><h1>Community Hub</h1><p>Connect with fellow students and teachers</p></div>
+            <button class="btn btn-logout" id="studentLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
 
         <div class="community-container">

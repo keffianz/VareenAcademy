@@ -34,9 +34,12 @@ if ($selectedCourseId) {
 ?>
 
 <div class="container">
-    <div class="page-header">
-        <h1>Assignments</h1>
-        <p>Create assignments and grade submissions.</p>
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+            <h1>Assignments</h1>
+            <p>Create assignments and grade submissions.</p>
+        </div>
+        <button class="btn btn-logout" id="teacherLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
 
     <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 18px;">

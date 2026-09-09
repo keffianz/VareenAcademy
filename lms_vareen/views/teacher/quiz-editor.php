@@ -68,9 +68,12 @@ $selectedQuizId = (int)($_GET['quiz_id'] ?? 0);
 
 <div class="quiz-editor-page">
     <div class="container">
-        <div class="page-header">
-            <h1>Quiz Builder</h1>
-            <p>Create quizzes, add questions and options.</p>
+        <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div>
+                <h1>Quiz Builder</h1>
+                <p>Create quizzes, add questions and options.</p>
+            </div>
+            <button class="btn btn-logout" id="teacherLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
 
         <div class="grid-2">

@@ -20,6 +20,7 @@ $actionedCount = (int)$db->query("SELECT COUNT(*) FROM community_reports WHERE s
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
             <div class="topbar-title"><h1>AI Moderation</h1><p>Review reported content</p></div>
+            <button class="btn btn-logout" id="adminLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
         <div class="kpi-grid" style="grid-template-columns:repeat(2,1fr)">
             <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-flag"></i></div><div class="kpi-info"><span class="kpi-count"><?php echo $pendingCount; ?></span><span class="kpi-label">Pending</span></div></div>

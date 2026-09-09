@@ -29,6 +29,7 @@ if (!empty($courseIds)) {
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu"><i class="fas fa-bars"></i></button>
             <div class="topbar-title"><h1>My Students</h1><p><?php echo count($students); ?> students enrolled in your courses</p></div>
+            <button class="btn btn-logout" id="teacherLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
         <?php if(empty($students)): ?><div class="empty-state"><i class="fas fa-users"></i><p>No students enrolled yet</p></div>
         <?php else: ?>

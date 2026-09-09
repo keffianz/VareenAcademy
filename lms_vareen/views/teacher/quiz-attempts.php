@@ -3,7 +3,12 @@
 requireRoles(['teacher','admin']);
 ?>
 <div class="container">
-    <h1>Quiz Attempts</h1>
-    <p class="muted">MVP: grading/results are auto-graded for MC/TF only.</p>
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+            <h1>Quiz Attempts</h1>
+            <p class="muted">MVP: grading/results are auto-graded for MC/TF only.</p>
+        </div>
+        <button class="btn btn-logout" id="teacherLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
 </div>
 

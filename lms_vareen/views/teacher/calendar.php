@@ -33,6 +33,7 @@ if (!empty($courseIds)) {
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu"><i class="fas fa-bars"></i></button>
             <div class="topbar-title"><h1>Calendar</h1><p>Your teaching schedule at a glance</p></div>
+            <button class="btn btn-logout" id="teacherLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
         <?php if(empty($upcomingEvents)): ?><div class="empty-state"><i class="fas fa-calendar"></i><p>No upcoming events</p></div>
         <?php else: ?>

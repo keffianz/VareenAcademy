@@ -31,6 +31,7 @@ foreach ($payments as $p) {
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
             <div class="topbar-title"><h1>My Payments</h1><p>View your payment history</p></div>
+            <button class="btn btn-logout" id="studentLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
 
         <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">

@@ -38,7 +38,13 @@
     });
 
     // --- Logout button handler ---
-    var logoutBtn = document.getElementById("adminLogoutBtn");
+    // Handles all logout buttons: sidebar and topbar variants
+    var logoutBtn = document.getElementById("adminLogoutBtn") ||
+                    document.getElementById("teacherLogoutBtn") ||
+                    document.getElementById("studentLogoutBtn") ||
+                    document.getElementById("adminLogoutBtnTop") ||
+                    document.getElementById("teacherLogoutBtnTop") ||
+                    document.getElementById("studentLogoutBtnTop");
     if (logoutBtn) {
         logoutBtn.addEventListener("click", function () {
             // Try API logout first, fall back to direct redirect

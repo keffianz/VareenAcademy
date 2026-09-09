@@ -26,6 +26,7 @@ $quizzes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
             <div class="topbar-title"><h1>Quizzes</h1><p>Test your knowledge and track your scores</p></div>
+            <button class="btn btn-logout" id="studentLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
 
         <div class="dashboard-section">

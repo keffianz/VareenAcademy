@@ -14,6 +14,7 @@ $additional_css = [appBasePath() . '/public/css/dashboard.css'];
   <div class="dashboard-topbar">
     <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
     <div class="topbar-title"><h1>Manage Courses</h1><p>Course status, teacher assignment, and student enrollment.</p></div>
+    <button class="btn btn-logout" id="adminLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
   </div>
   <div class="dashboard-section">
     <div id="msg" class="admin-msg" hidden></div>

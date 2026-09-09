@@ -41,9 +41,12 @@ $lessons = $lesson->getLessonsByModule($module_id);
 ?>
 
 <div class="container">
-    <div class="page-header">
-        <h1>Manage Lessons</h1>
-        <p>Module: <?php echo htmlspecialchars($module_data['title'] ?? ''); ?></p>
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+            <h1>Manage Lessons</h1>
+            <p>Module: <?php echo htmlspecialchars($module_data['title'] ?? ''); ?></p>
+        </div>
+        <button class="btn btn-logout" id="teacherLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
 
     <div class="card">

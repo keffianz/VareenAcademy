@@ -22,6 +22,7 @@ $announcements = $db->query('SELECT a.*, CONCAT(u.first_name, " ", u.last_name) 
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
             <div class="topbar-title"><h1>Notifications</h1><p>Send announcements to users</p></div>
+            <button class="btn btn-logout" id="adminLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
         <?php if($message): ?><div class="alert alert-success"><?php echo htmlspecialchars($message); ?></div><?php endif; ?>
         <div class="dashboard-section">
