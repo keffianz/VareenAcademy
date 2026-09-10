@@ -729,13 +729,155 @@ a:focus, button:focus, input:focus, textarea:focus, .nav-link:focus, .btn:focus 
 /* Footer */
 footer {
   background: var(--neutral-dark);
-  color: var(--white);
+  color: #e2e8f0 !important;
   padding: 3rem 0 1rem;
 }
 
 footer h3, footer h4 {
-  color: var(--white);
+  color: #ffffff !important;
   margin-bottom: 1rem;
+}
+
+footer p, footer a, footer span, footer li {
+  color: #e2e8f0 !important;
+}
+
+footer a:hover {
+  color: #ffffff !important;
+}
+
+/* FAQ accordion: always-dark text on light panel, even in dark mode */
+.faq-section {
+  color: #1e293b !important;
+}
+
+.faq-section .accordion-button {
+  color: #1e293b !important;
+  background: #ffffff;
+  border-color: var(--neutral-medium);
+}
+
+.faq-section .accordion-button:not(.collapsed) {
+  background: #f1f5f9;
+  color: #1e293b !important;
+}
+
+.faq-section .accordion-button::after {
+  filter: invert(0);
+}
+
+.faq-section .accordion-button:not(.collapsed)::after {
+  filter: invert(0);
+}
+
+.faq-section .accordion-body {
+  color: #4b5563 !important;
+  background: #ffffff;
+}
+
+.faq-section .accordion-item {
+  border-color: var(--neutral-medium);
+}
+
+.faq-section .accordion-item:not(.collapsed) {
+  border-color: var(--neutral-medium);
+}
+
+/* Ensure the FAQ accordion chevron icon stays dark on the always-white
+   panel in prefers-color-scheme: dark — Bootstrap's auto dark-mode
+   color-scheme may otherwise flip the ::after glyph to white. */
+@media (prefers-color-scheme: dark) {
+  .faq-section .accordion-button::after {
+    color: #4b5563 !important;
+  }
+  .faq-section .accordion-button:not(.collapsed)::after {
+    color: #4b5563 !important;
+  }
+}
+
+/* Light panels always render readable dark text (headings, paragraphs, and
+   Bootstrap .text-muted leads inside them — these must all stay dark on the
+   always-white panel backgrounds, even in prefers-color-scheme: dark). */
+.bg-light,
+.bg-white,
+.why-choose-section,
+.testimonials-section,
+.online-testimonials-section,
+.application-section,
+.gallery-preview-section,
+.news-section,
+.services-section,
+.feature-item,
+.service-card,
+.news-card,
+.testimonial-card,
+.testimonial-card-small,
+.card,
+.faq-section {
+  color: #1e293b !important; /* Always dark — never follows theme variable (white panels) */
+}
+
+.bg-light h1,
+.bg-light h2,
+.bg-light h3,
+.bg-light h4,
+.bg-light h5,
+.bg-light h6,
+.bg-white h1,
+.bg-white h2,
+.bg-white h3,
+.bg-white h4,
+.bg-white h5,
+.bg-white h6,
+.testimonials-section h1,
+.testimonials-section h2,
+.testimonials-section h3,
+.testimonials-section h4,
+.testimonials-section h5,
+.testimonials-section h6,
+.online-testimonials-section h1,
+.online-testimonials-section h2,
+.online-testimonials-section h3,
+.online-testimonials-section h4,
+.online-testimonials-section h5,
+.online-testimonials-section h6,
+.application-section h1,
+.application-section h2,
+.application-section h3,
+.application-section h4,
+.application-section h5,
+.application-section h6,
+.faq-section h1,
+.faq-section h2,
+.faq-section h3,
+.faq-section h4,
+.faq-section h5,
+.faq-section h6 {
+  color: #1e293b !important; /* Always dark — white panels */
+}
+
+.bg-light p,
+.bg-white p,
+.testimonials-section p,
+.online-testimonials-section p,
+.application-section p,
+.faq-section p {
+  color: #4b5563 !important; /* Always dark-readable body text — white panels */
+}
+
+.bg-light .lead,
+.bg-light .text-muted,
+.bg-white .lead,
+.bg-white .text-muted,
+.testimonials-section .lead,
+.testimonials-section .text-muted,
+.online-testimonials-section .lead,
+.online-testimonials-section .text-muted,
+.application-section .lead,
+.application-section .text-muted,
+.faq-section .lead,
+.faq-section .text-muted {
+  color: #4b5563 !important; /* Override theme-flipped var(--text-secondary) */
 }
 
 .social-links a {
@@ -983,6 +1125,18 @@ footer h3, footer h4 {
   .gallery-grid {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1rem;
+  }
+
+  .why-choose-section,
+  .gallery-preview-section,
+  .news-section,
+  .application-section,
+  .faq-section {
+    padding: 3rem 0;
+  }
+
+  .cta-section {
+    padding: 2.5rem 0;
   }
 
   .contact-info {
@@ -1415,9 +1569,10 @@ textarea:focus {
 /* Online Learning Success Stories (Swiper) */
 .online-testimonials-swiper {
   width: 100%;
-  padding: 1rem 3rem 3rem;
-  overflow: visible;
+  padding: 1rem 1rem 2rem;
+  overflow: hidden;
   position: relative;
+  --swiper-nav-offset: 40px;
 }
 
 .online-testimonials-swiper .swiper-wrapper {
@@ -1453,7 +1608,7 @@ textarea:focus {
 
 .online-testimonials-swiper .testimonial-content p {
   margin-bottom: 1rem;
-  color: var(--text-secondary);
+  color: #4b5563 !important;
   line-height: 1.6;
 }
 
@@ -1463,6 +1618,7 @@ textarea:focus {
   font-weight: 600;
 }
 
+/* Navigation buttons: constrain to swiper bounds, never overflow the viewport */
 .online-testimonials-swiper .swiper-button-next,
 .online-testimonials-swiper .swiper-button-prev {
   position: absolute;
@@ -1475,6 +1631,16 @@ textarea:focus {
   height: 40px;
   border-radius: 50%;
   box-shadow: 0 2px 10px var(--shadow-medium);
+  /* Keep buttons inside the swiper track on small screens */
+  --swiper-nav-padding: var(--swiper-nav-offset);
+}
+
+.online-testimonials-swiper .swiper-button-next {
+  right: var(--swiper-nav-padding);
+}
+
+.online-testimonials-swiper .swiper-button-prev {
+  left: var(--swiper-nav-padding);
 }
 
 .online-testimonials-swiper .swiper-button-next:after,
@@ -1493,19 +1659,64 @@ textarea:focus {
   background: var(--primary-color);
 }
 
+/* Section heading and body text: always dark on the light panels,
+   even when the OS is in dark mode (prefers-color-scheme: dark). */
+.online-testimonials-section {
+  color: #1e293b !important;
+}
+
+.online-testimonials-section h1,
+.online-testimonials-section h2,
+.online-testimonials-section h3,
+.online-testimonials-section h4,
+.online-testimonials-section h5,
+.online-testimonials-section h6,
+.online-testimonials-section .display-5,
+.online-testimonials-section .display-4,
+.online-testimonials-section .display-3,
+.online-testimonials-section .display-2,
+.online-testimonials-section .display-1 {
+  color: #1e293b !important;
+}
+
+.online-testimonials-section p,
+.online-testimonials-section .lead,
+.online-testimonials-section .text-muted,
+.online-testimonials-section .testimonial-content p {
+  color: #4b5563 !important;
+}
+
 @media (max-width: 768px) {
   .testimonials-slider {
-    padding: 0 2.5rem 2.5rem;
+    padding: 0 1.5rem 2rem;
   }
 
   .online-testimonials-swiper {
-    padding: 1rem 2.5rem 3rem;
+    padding: 1rem 1rem 2rem;
+    /* On narrow screens allow the wrapper to scroll horizontally if needed,
+       but clip the navigation buttons so they never bleed past the section edge. */
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
   }
 
-    .service-icon {
+  .online-testimonials-swiper .swiper-button-next {
+    right: 8px;
+  }
+
+  .online-testimonials-swiper .swiper-button-prev {
+    left: 8px;
+  }
+
+  .service-icon {
     width: 96px;
     height: 96px;
     font-size: 2.5rem;
+  }
+
+  .online-testimonials-section {
+    padding-top: 2.5rem !important;
+    padding-bottom: 2.5rem !important;
   }
 }
 /* ==========================================================================
