@@ -21,13 +21,13 @@ $totalSubmissions = 0;
 $avgScore = 0;
 if (!empty($courseIds)) {
     $ph = implode(',', array_fill(0, count($courseIds), '?'));
-    $stmt = $db->prepare("SELECT COUNT(DISTINCT user_id) FROM enrollments WHERE course_id IN ($ph)");
+    $stmt = $db->prepare("SELECT COUNT(DISTINCT student_id) FROM enrollments WHERE course_id IN ($ph)");
     $stmt->execute($courseIds);
     $totalStudents = (int)$stmt->fetchColumn();
-    $stmt = $db->prepare("SELECT AVG(progress_percent) FROM enrollments WHERE course_id IN ($ph)");
+    $stmt = $db->prepare("SELECT AVG(progress) FROM enrollments WHERE course_id IN ($ph)");
     $stmt->execute($courseIds);
     $avgProgress = round((float)$stmt->fetchColumn());
-    $stmt = $db->prepare("SELECT COUNT(*), AVG(score) FROM assignment_submissions s JOIN assignments a ON a.id = s.assignment_id WHERE a.course_id IN ($ph)");
+    $stmt = $db->prepare("SELECT COUNT(*), AVG(score) FROM submissions s JOIN assignments a ON a.id = s.assignment_id WHERE a.course_id IN ($ph)");
     $stmt->execute($courseIds);
     $row = $stmt->fetch(PDO::FETCH_NUM);
     $totalSubmissions = (int)$row[0];
@@ -55,7 +55,7 @@ if (!empty($courseIds)) {
             <table class="admin-table"><thead><tr><th>Course</th><th>Students</th><th>Avg Progress</th></tr></thead><tbody>
                 <?php foreach($courseList as $c): ?>
                 <?php
-                $stmt = $db->prepare('SELECT AVG(progress_percent) FROM enrollments WHERE course_id = :cid');
+                $stmt = $db->prepare('SELECT AVG(progress) FROM enrollments WHERE course_id = :cid');
                 $stmt->execute([':cid' => $c['id']]);
                 $prog = round((float)$stmt->fetchColumn());
                 $stmt = $db->prepare('SELECT COUNT(*) FROM enrollments WHERE course_id = :cid');

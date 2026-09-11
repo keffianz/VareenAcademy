@@ -92,7 +92,7 @@ $apiBase = appBasePath() . '/src/api/live_classes.php';
         var tbody = table.querySelector('tbody');
         var fd = new FormData();
         fd.append('live_class_id', classId);
-        fetch(apiBase + '?action=attendance_view', {
+        fetch(apiBase + '?action=teacher_attendance_list', {
             method: 'POST',
             headers: { 'X-CSRF-Token': csrf() },
             body: fd
@@ -120,7 +120,7 @@ $apiBase = appBasePath() . '/src/api/live_classes.php';
                     fd2.append('live_class_id', classId);
                     fd2.append('student_id', sid);
                     fd2.append('present', present);
-                    fetch(apiBase + '?action=attendance_mark', {
+                    fetch(apiBase + '?action=teacher_attendance_mark', {
                         method: 'POST',
                         headers: { 'X-CSRF-Token': csrf() },
                         body: fd2

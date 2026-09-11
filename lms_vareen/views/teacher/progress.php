@@ -18,7 +18,7 @@ $courseIds = array_column($courseList, 'id');
 $studentProgress = [];
 if (!empty($courseIds)) {
     $ph = implode(',', array_fill(0, count($courseIds), '?'));
-    $stmt = $db->prepare("SELECT u.id, CONCAT(u.first_name, ' ', u.last_name) AS student_name, c.title AS course_title, e.progress_percent, e.last_accessed FROM enrollments e JOIN users u ON u.id = e.user_id JOIN courses c ON c.id = e.course_id WHERE e.course_id IN ($ph) ORDER BY e.progress_percent DESC LIMIT 50");
+    $stmt = $db->prepare("SELECT u.id, CONCAT(u.first_name, ' ', u.last_name) AS student_name, c.title AS course_title, e.progress, e.enrolled_at FROM enrollments e JOIN users u ON u.id = e.student_id JOIN courses c ON c.id = e.course_id WHERE e.course_id IN ($ph) ORDER BY e.progress DESC LIMIT 50");
     $stmt->execute($courseIds);
     $studentProgress = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -33,13 +33,13 @@ if (!empty($courseIds)) {
         </div>
         <?php if(empty($studentProgress)): ?><div class="empty-state"><i class="fas fa-chart-line"></i><p>No student data yet</p></div>
         <?php else: ?>
-        <table class="admin-table"><thead><tr><th>Student</th><th>Course</th><th>Progress</th><th>Last Active</th></tr></thead><tbody>
+        <table class="admin-table"><thead><tr><th>Student</th><th>Course</th><th>Progress</th><th>Enrolled</th></tr></thead><tbody>
             <?php foreach($studentProgress as $sp): ?>
             <tr>
                 <td><?php echo htmlspecialchars($sp['student_name']); ?></td>
                 <td><?php echo htmlspecialchars($sp['course_title']); ?></td>
-                <td><div class="progress-bar" style="width:100%"><div class="progress-fill" style="width:<?php echo $sp['progress_percent']; ?>%"></div></div> <?php echo $sp['progress_percent']; ?>%</td>
-                <td><?php echo $sp['last_accessed']?date('M j, g:i A', strtotime($sp['last_accessed'])):'—'; ?></td>
+                <td><div class="progress-bar" style="width:100%"><div class="progress-fill" style="width:<?php echo $sp['progress']; ?>%"></div></div> <?php echo $sp['progress']; ?>%</td>
+                <td><?php echo $sp['enrolled_at']?date('M j, g:i A', strtotime($sp['enrolled_at'])):'—'; ?></td>
             </tr>
             <?php endforeach; ?>
         </tbody></table>

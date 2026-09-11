@@ -18,7 +18,7 @@ $courseIds = array_column($courseList, 'id');
 $grades = [];
 if (!empty($courseIds)) {
     $ph = implode(',', array_fill(0, count($courseIds), '?'));
-    $stmt = $db->prepare("SELECT s.id, s.score, s.submitted_at, a.title AS assignment_title, a.max_score, c.title AS course_title, CONCAT(u.first_name, ' ', u.last_name) AS student_name FROM assignment_submissions s JOIN assignments a ON a.id = s.assignment_id JOIN courses c ON c.id = a.course_id JOIN users u ON u.id = s.student_id WHERE a.course_id IN ($ph) AND s.score IS NOT NULL ORDER BY s.submitted_at DESC LIMIT 50");
+    $stmt = $db->prepare("SELECT s.id, s.score, s.submitted_at, a.title AS assignment_title, a.max_score, c.title AS course_title, CONCAT(u.first_name, ' ', u.last_name) AS student_name FROM submissions s JOIN assignments a ON a.id = s.assignment_id JOIN courses c ON c.id = a.course_id JOIN users u ON u.id = s.student_id WHERE a.course_id IN ($ph) AND s.score IS NOT NULL ORDER BY s.submitted_at DESC LIMIT 50");
     $stmt->execute($courseIds);
     $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }

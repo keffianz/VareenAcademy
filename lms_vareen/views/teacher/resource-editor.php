@@ -12,7 +12,7 @@ requireRoles(['teacher', 'admin']);
 
 $lesson_id = (int)($_GET['lesson_id'] ?? 0);
 if (!$lesson_id) {
-    header('Location: ' . appBasePath() . '?page=teacher-dashboard');
+    header('Location: ' . appBasePath() . '/index.php?page=teacher-dashboard');
     exit;
 }
 

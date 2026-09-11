@@ -18,7 +18,7 @@ $courseIds = array_column($courseList, 'id');
 $students = [];
 if (!empty($courseIds)) {
     $ph = implode(',', array_fill(0, count($courseIds), '?'));
-    $stmt = $db->prepare("SELECT DISTINCT u.id, u.first_name, u.last_name, u.email, u.created_at, (SELECT COUNT(*) FROM enrollments e WHERE e.user_id = u.id AND e.course_id IN ($ph)) AS course_count FROM users u JOIN enrollments e ON e.user_id = u.id WHERE e.course_id IN ($ph) AND u.role = 'student' ORDER BY u.first_name");
+    $stmt = $db->prepare("SELECT DISTINCT u.id, u.first_name, u.last_name, u.email, u.created_at, (SELECT COUNT(*) FROM enrollments e WHERE e.student_id = u.id AND e.course_id IN ($ph)) AS course_count FROM users u JOIN enrollments e ON e.student_id = u.id WHERE e.course_id IN ($ph) AND u.role = 'student' ORDER BY u.first_name");
     $stmt->execute(array_merge($courseIds, $courseIds));
     $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }

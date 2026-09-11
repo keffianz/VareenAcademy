@@ -22,7 +22,7 @@ foreach ($courseList as $c) {
     $students = (int)$stmt->fetchColumn();
     $lessons = $courseModel->getCourseLessons($cid);
     $lessonCount = is_array($lessons) ? count($lessons) : 0;
-    $stmt = $db->prepare('SELECT AVG(progress_percent) FROM enrollments WHERE course_id = :cid');
+    $stmt = $db->prepare('SELECT AVG(progress) FROM enrollments WHERE course_id = :cid');
     $stmt->execute([':cid' => $cid]);
     $progress = round((float)$stmt->fetchColumn());
     $courseData[] = array_merge($c, ['students' => $students, 'lessons' => $lessonCount, 'progress' => $progress]);

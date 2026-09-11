@@ -12,7 +12,7 @@ requireRoles(['teacher', 'admin']);
 
 $module_id = (int)($_GET['module_id'] ?? 0);
 if (!$module_id) {
-    header('Location: ' . appBasePath() . '?page=teacher-dashboard');
+    header('Location: ' . appBasePath() . '/index.php?page=teacher-dashboard');
     exit;
 }
 
@@ -149,7 +149,7 @@ $lessons = $lesson->getLessonsByModule($module_id);
     }
 
     function openResourceManager(lessonId) {
-        window.location.href = '/index.php?page=resource-editor&lesson_id=' + encodeURIComponent(lessonId);
+        window.location.href = '/index.php?page=teacher-resource-editor&lesson_id=' + encodeURIComponent(lessonId);
     }
 </script>
 

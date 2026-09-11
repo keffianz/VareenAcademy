@@ -1,5 +1,5 @@
 @echo off
-REM Part 7 — stage, commit, and push threaded-comments work to GitHub.
+REM Push all Part 1-7 fixes to GitHub (https://github.com/keffianz/VareenAcademy).
 REM Run from anywhere: just double-click this file.
 setlocal
 cd /d "%~dp0\.."
@@ -11,7 +11,7 @@ git config --unset-all user.name 2>nul
 git config --unset-all user.email 2>nul
 
 git add -A
-git commit -m "Part 7: threaded comments + E2E test (createPost/addComment/getPost/getComments, migration parent_comment_id, API parent_comment_id, student views, tools/part7_e2e.php + _run_e2e.bat)"
+git commit -m "Part 1-7 bug fixes: admin/teacher dashboard chrome (dash-shell removed, quiz-attempts wrapped); 500 fixes (enrollments.progress_percent->progress, submissions table, student_id join, attendance API actions, resource-editor route, live-classes meeting_url); verified contact/apply -> admin inbox + email, admin create-account (bcrypt) login flow, AI Control Center key manager, threaded community comments + E2E test"
 echo.
 echo ---- staged/working tree ----
 git status --short

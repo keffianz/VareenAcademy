@@ -58,8 +58,8 @@ $recordings = $stmt2->fetchAll(PDO::FETCH_ASSOC);
                                 <p><i class="fas fa-clock"></i> <?php echo date('g:i A', strtotime($l['scheduled_at'])); ?></p>
                             </div>
                             <div class="class-action">
-                                <?php if ($l['status'] === 'active' && !empty($l['room_url'])): ?>
-                                    <a href="<?php echo htmlspecialchars($l['room_url']); ?>" target="_blank" class="btn btn-primary btn-sm">Join Now</a>
+                                <?php if (!empty($l['meeting_url'])): ?>
+                                    <a href="<?php echo htmlspecialchars($l['meeting_url']); ?>" target="_blank" class="btn btn-primary btn-sm">Join Now</a>
                                 <?php else: ?>
                                     <span class="badge">Scheduled</span>
                                 <?php endif; ?>
