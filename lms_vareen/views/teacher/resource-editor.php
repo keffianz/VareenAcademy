@@ -12,7 +12,7 @@ requireRoles(['teacher', 'admin']);
 
 $lesson_id = (int)($_GET['lesson_id'] ?? 0);
 if (!$lesson_id) {
-    header('Location: ' . BASE_URL . '?page=teacher-dashboard');
+    header('Location: ' . appBasePath() . '?page=teacher-dashboard');
     exit;
 }
 
@@ -38,14 +38,19 @@ if (getCurrentUserRole() === 'teacher') {
 $resources = $resource->getResourcesByLesson($lesson_id);
 ?>
 
-<div class="container">
-    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div>
-            <h1>Manage Resources</h1>
-            <p>Lesson: <?php echo htmlspecialchars($lesson_data['title'] ?? ''); ?></p>
+<div class="dashboard-wrapper">
+    <?php $teacher_active = 'lessons'; include __DIR__ . '/_sidebar.php'; ?>
+    <main class="dashboard-content">
+        <div class="dashboard-topbar">
+            <button class="sidebar-toggle" id="sidebarToggle" type="button">☰ Menu</button>
+            <div class="topbar-title">
+                <h1>Manage Resources</h1>
+                <p>Lesson: <?php echo htmlspecialchars($lesson_data['title'] ?? ''); ?></p>
+            </div>
+            <button class="btn-logout" id="teacherLogoutBtnTop" type="button"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
-        <button class="btn btn-logout" id="teacherLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
-    </div>
+        <div class="dashboard-section">
+            <div class="container">
 
     <div class="card">
         <h2>Upload Resource</h2>
@@ -137,4 +142,12 @@ $resources = $resource->getResourcesByLesson($lesson_id);
     .muted{color:#777;font-size:13px;}
     .resource-actions{display:flex;gap:10px;}
 </style>
+            </div>
+        </div>
+    </main>
+</div>
+<script src="/lms_vareen/public/js/auth.js"></script>
+<script>
+(function(){var s=document.getElementById('teacherSidebar'),t=document.getElementById('sidebarToggle'),c=document.getElementById('sidebarClose');if(t&&s)t.addEventListener('click',function(){s.classList.add('active')});if(c&&s)c.addEventListener('click',function(){s.classList.remove('active')});})();
+</script>
 

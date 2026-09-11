@@ -8,11 +8,11 @@ $admin_active = 'applications';
 $page_title = 'Instructor Applications';
 $additional_css = [appBasePath() . '/public/css/dashboard.css'];
 ?>
-<div class="dash-shell">
+<div class="dashboard-wrapper">
 <?php include __DIR__ . '/_sidebar.php'; ?>
-<main class="dash-main">
-  <div class="dash-topbar"><div><h1>Instructor Applications</h1><p class="dash-sub">Review "Become an Instructor" submissions.</p></div></div>
-  <div class="dash-content">
+<main class="dashboard-content">
+  <div class="dashboard-topbar"><div><h1>Instructor Applications</h1><p class="dash-sub">Review "Become an Instructor" submissions.</p></div></div>
+  <div class="dashboard-section">
     <div class="admin-toolbar">
       <select id="fStatus"><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="">All</option></select>
     </div>

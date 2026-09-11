@@ -131,9 +131,10 @@ try {
             if (!in_array($role, ['student','teacher','admin'])) { http_response_code(403); echo json_encode(['success' => false, 'message' => 'Access denied']); break; }
             $pid = (int)($_POST['post_id'] ?? 0);
             $content = trim($_POST['content'] ?? '');
+            $parent = isset($_POST['parent_comment_id']) && $_POST['parent_comment_id'] !== '' ? (int)$_POST['parent_comment_id'] : null;
             if (!$pid || $content === '') { http_response_code(400); echo json_encode(['success' => false, 'message' => 'Content required']); break; }
-            $id = $community->addComment($pid, $userId, $content);
-            echo json_encode(['success' => true, 'id' => $id, 'message' => 'Comment added']);
+            $id = $community->addComment($pid, $userId, $content, $parent);
+            echo json_encode(['success' => true, 'id' => $id, 'parent_comment_id' => $parent, 'message' => 'Comment added']);
             break;
         }
 

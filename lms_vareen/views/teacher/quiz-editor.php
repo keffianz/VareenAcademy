@@ -66,15 +66,20 @@ if (!empty($_GET['quiz_id'])) {
 $selectedQuizId = (int)($_GET['quiz_id'] ?? 0);
 ?>
 
-<div class="quiz-editor-page">
-    <div class="container">
-        <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
-            <div>
+<div class="dashboard-wrapper">
+    <?php $teacher_active = 'quizzes'; include __DIR__ . '/_sidebar.php'; ?>
+    <main class="dashboard-content">
+        <div class="dashboard-topbar">
+            <button class="sidebar-toggle" id="sidebarToggle" type="button">☰ Menu</button>
+            <div class="topbar-title">
                 <h1>Quiz Builder</h1>
                 <p>Create quizzes, add questions and options.</p>
             </div>
-            <button class="btn btn-logout" id="teacherLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            <button class="btn-logout" id="teacherLogoutBtnTop" type="button"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
+        <div class="dashboard-section">
+            <div class="quiz-editor-page">
+                <div class="container">
 
         <div class="grid-2">
             <div class="card">
@@ -310,5 +315,13 @@ $selectedQuizId = (int)($_GET['quiz_id'] ?? 0);
             }
         });
     });
+</script>
+            </div>
+        </div>
+    </main>
+</div>
+<script src="/lms_vareen/public/js/auth.js"></script>
+<script>
+(function(){var s=document.getElementById('teacherSidebar'),t=document.getElementById('sidebarToggle'),c=document.getElementById('sidebarClose');if(t&&s)t.addEventListener('click',function(){s.classList.add('active')});if(c&&s)c.addEventListener('click',function(){s.classList.remove('active')});})();
 </script>
 

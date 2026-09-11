@@ -24,7 +24,8 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $apiBase = appBasePath() . '/src/api/live_classes.php';
 ?>
 <div class="dashboard-wrapper">
-    <div class="dashboard-content" style="margin-left:0;">
+    <?php $teacher_active = 'attendance'; include __DIR__ . '/_sidebar.php'; ?>
+    <div class="dashboard-content">
         <div class="dashboard-topbar">
             <div class="topbar-title">
                 <h1>Attendance</h1>

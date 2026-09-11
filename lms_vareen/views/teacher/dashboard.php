@@ -118,7 +118,7 @@ if (!empty($courseIds)) {
         <div class="dashboard-section">
             <div class="section-header"><h2>Quick Actions</h2></div>
             <div class="quick-action-grid">
-                <a href="/index.php?page=teacher-lesson-editor" class="quick-action-card"><i class="fas fa-plus-circle"></i><span>Add Lesson</span></a>
+                <a href="/index.php?page=teacher-courses" class="quick-action-card"><i class="fas fa-plus-circle"></i><span>Add Lesson</span></a>
                 <a href="/index.php?page=teacher-assignments-editor" class="quick-action-card"><i class="fas fa-tasks"></i><span>Create Assignment</span></a>
                 <a href="/index.php?page=teacher-quiz-editor" class="quick-action-card"><i class="fas fa-question-circle"></i><span>Create Quiz</span></a>
                 <a href="/index.php?page=teacher-live-classes" class="quick-action-card"><i class="fas fa-video"></i><span>Schedule Class</span></a>

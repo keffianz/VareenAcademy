@@ -136,11 +136,31 @@ class Community {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function addComment($postId, $userId, $content) {
-        $stmt = $this->db->prepare('INSERT INTO community_comments (post_id, user_id, content) VALUES (:p, :u, :c)');
-        $stmt->execute([':p' => (int)$postId, ':u' => (int)$userId, ':c' => $content]);
+    public function addComment($postId, $userId, $content, $parentCommentId = null) {
+        // Validate parent comment belongs to the same post (prevents cross-post replies)
+        if ($parentCommentId !== null) {
+            $chk = $this->db->prepare('SELECT id FROM community_comments WHERE id = :pc AND post_id = :p AND is_deleted = 0');
+            $chk->execute([':pc' => (int)$parentCommentId, ':p' => (int)$postId]);
+            if (!$chk->fetch()) {
+                $parentCommentId = null; // fall back to top-level comment
+            }
+        }
+
+        $stmt = $this->db->prepare(
+            'INSERT INTO community_comments (post_id, parent_comment_id, user_id, content) VALUES (:p, :pc, :u, :c)'
+        );
+        $stmt->execute([
+            ':p' => (int)$postId,
+            ':pc' => $parentCommentId !== null ? (int)$parentCommentId : null,
+            ':u' => (int)$userId,
+            ':c' => $content
+        ]);
+        // Capture the new comment id BEFORE the UPDATE query below — on this
+        // PDO/mysqlnd setup a native query() between INSERT and lastInsertId()
+        // resets mysql_insert_id and makes lastInsertId() return 0.
+        $newId = (int)$this->db->lastInsertId();
         $this->db->query('UPDATE community_posts SET comments_count = comments_count + 1 WHERE id = ' . (int)$postId);
-        return (int)$this->db->lastInsertId();
+        return $newId;
     }
 
     public function toggleLike($postId, $userId) {

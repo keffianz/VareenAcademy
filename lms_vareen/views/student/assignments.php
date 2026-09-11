@@ -12,14 +12,14 @@ $db = (new Database())->connect();
 $user_id = getCurrentUserId();
 
 $stmt = $db->prepare("SELECT a.*, c.title as course_title,
-    (SELECT status FROM submissions s WHERE s.assignment_id = a.id AND s.student_id = :student_id ORDER BY submitted_at DESC LIMIT 1) as submission_status,
-    (SELECT file_path FROM submissions s WHERE s.assignment_id = a.id AND s.student_id = :student_id ORDER BY submitted_at DESC LIMIT 1) as submission_file
+    (SELECT status FROM submissions s WHERE s.assignment_id = a.id AND s.student_id = :sid2 ORDER BY submitted_at DESC LIMIT 1) as submission_status,
+    (SELECT file_path FROM submissions s WHERE s.assignment_id = a.id AND s.student_id = :sid3 ORDER BY submitted_at DESC LIMIT 1) as submission_file
     FROM assignments a
     JOIN courses c ON a.course_id = c.id
     JOIN enrollments e ON e.course_id = c.id
     WHERE e.student_id = :student_id AND a.is_active = 1
     ORDER BY a.due_date ASC, a.created_at DESC");
-$stmt->execute([':student_id' => (int)$user_id]);
+$stmt->execute([':student_id' => (int)$user_id, ':sid2' => (int)$user_id, ':sid3' => (int)$user_id]);
 $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 

@@ -62,6 +62,7 @@ $admin_groups = [
         'items' => [
             'ai'         => ['fa-robot',     'AI Control Center', '/index.php?page=admin-ai'],
             'notifications' => ['fa-bell',   'Notifications',     '/index.php?page=admin-notifications'],
+            'inbox'      => ['fa-inbox',     'Form Inbox',        '/index.php?page=admin-messages'],
             'settings'   => ['fa-cog',       'Settings',          '/index.php?page=admin-settings'],
         ],
     ],

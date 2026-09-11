@@ -9,15 +9,15 @@ $user_id = getCurrentUserId();
 $stmt = $db->prepare(
     'SELECT q.*, c.title as course_title,
             (SELECT COUNT(*) FROM quiz_questions qq WHERE qq.quiz_id = q.id) as question_count,
-            (SELECT score FROM quiz_attempts qa WHERE qa.quiz_id = q.id AND qa.student_id = :sid ORDER BY qa.completed_at DESC LIMIT 1) as last_score,
-            (SELECT completed_at FROM quiz_attempts qa WHERE qa.quiz_id = q.id AND qa.student_id = :sid ORDER BY qa.completed_at DESC LIMIT 1) as last_attempt
+            (SELECT score FROM quiz_attempts qa WHERE qa.quiz_id = q.id AND qa.student_id = :sid2 ORDER BY qa.submitted_at DESC LIMIT 1) as last_score,
+            (SELECT submitted_at FROM quiz_attempts qa WHERE qa.quiz_id = q.id AND qa.student_id = :sid3 ORDER BY qa.submitted_at DESC LIMIT 1) as last_attempt
      FROM quizzes q
      JOIN courses c ON c.id = q.course_id
      JOIN enrollments e ON e.course_id = c.id
      WHERE e.student_id = :sid AND q.is_active = 1
      ORDER BY q.created_at DESC'
 );
-$stmt->execute([':sid' => $user_id]);
+$stmt->execute([':sid' => $user_id, ':sid2' => $user_id, ':sid3' => $user_id]);
 $quizzes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <div class="dashboard-wrapper">

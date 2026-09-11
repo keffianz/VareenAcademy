@@ -95,11 +95,11 @@ try {
                 echo json_encode(['success' => false, 'message' => 'Password must be at least 8 characters']);
                 break;
             }
-            $dup = $db->prepare('SELECT id FROM users WHERE email = :email AND role = :role');
-            $dup->execute([':email' => $email, ':role' => $role]);
+            $dup = $db->prepare('SELECT id FROM users WHERE email = :email');
+            $dup->execute([':email' => $email]);
             if ($dup->fetchColumn()) {
                 http_response_code(409);
-                echo json_encode(['success' => false, 'message' => 'A ' . $role . ' account with this email already exists']);
+                echo json_encode(['success' => false, 'message' => 'An account with this email already exists']);
                 break;
             }
             $stmt = $db->prepare('INSERT INTO users (first_name, last_name, email, password, role, is_active, email_verified)
@@ -357,6 +357,113 @@ try {
                 'message'  => 'Application ' . $decision . ($promoted ? ", {$promoted} account(s) promoted to teacher" : ''),
                 'promoted' => $promoted,
             ]);
+            break;
+        }
+
+        /* =====================
+         * Public form inbox (marketing-site contact messages + training applications)
+         * ===================== */
+        case 'messages_list': {
+            $status = in_array($_GET['status'] ?? '', ['unread', 'read', 'replied'], true) ? $_GET['status'] : null;
+            $sql = 'SELECT id, name, email, phone, subject, message, status, created_at FROM contact_messages';
+            $params = [];
+            if ($status) {
+                $sql .= ' WHERE status = :status';
+                $params[':status'] = $status;
+            }
+            $sql .= ' ORDER BY created_at DESC LIMIT 300';
+            $stmt = $db->prepare($sql);
+            $stmt->execute($params);
+            echo json_encode(['success' => true, 'messages' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+            break;
+        }
+
+        case 'message_set_status': {
+            $id = (int)($_POST['message_id'] ?? 0);
+            $status = $_POST['status'] ?? '';
+            if (!$id || !in_array($status, ['unread', 'read', 'replied'], true)) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'message_id and a valid status are required']);
+                break;
+            }
+            $stmt = $db->prepare('UPDATE contact_messages SET status = :s WHERE id = :id');
+            $stmt->execute([':s' => $status, ':id' => $id]);
+            echo json_encode(['success' => true, 'message' => 'Message marked as ' . $status]);
+            break;
+        }
+
+        case 'training_apps_list': {
+            $status = in_array($_GET['status'] ?? '', ['pending', 'approved', 'rejected', 'completed'], true) ? $_GET['status'] : null;
+            $sql = 'SELECT id, first_name, last_name, email, phone, program, start_date, status, created_at FROM applications';
+            $params = [];
+            if ($status) {
+                $sql .= ' WHERE status = :status';
+                $params[':status'] = $status;
+            }
+            $sql .= ' ORDER BY created_at DESC LIMIT 300';
+            $stmt = $db->prepare($sql);
+            $stmt->execute($params);
+            echo json_encode(['success' => true, 'applications' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+            break;
+        }
+
+        case 'training_app_set_status': {
+            $id = (int)($_POST['application_id'] ?? 0);
+            $status = $_POST['status'] ?? '';
+            if (!$id || !in_array($status, ['pending', 'approved', 'rejected', 'completed'], true)) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'application_id and a valid status are required']);
+                break;
+            }
+            $stmt = $db->prepare('UPDATE applications SET status = :s WHERE id = :id');
+            $stmt->execute([':s' => $status, ':id' => $id]);
+            echo json_encode(['success' => true, 'message' => 'Application marked as ' . $status]);
+            break;
+        }
+
+        /* =====================
+         * AI Control Center
+         * ===================== */
+        case 'ai_key_status': {
+            require_once '../config/ai_config.php';
+            $source = 'none';
+            if (getenv('ANTHROPIC_API_KEY')) {
+                $source = 'environment';
+            } elseif (is_file(__DIR__ . '/../config/ai_local_key.php')) {
+                $source = 'admin_ui';
+            }
+            echo json_encode([
+                'success' => true,
+                'configured' => ai_key_configured(),
+                'masked_key' => ai_masked_key(),
+                'source' => $source,
+            ]);
+            break;
+        }
+
+        case 'ai_save_key': {
+            $key = trim($_POST['api_key'] ?? '');
+            if ($key === '') {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'API key is required']);
+                break;
+            }
+            if (strlen($key) < 20 || !preg_match('/^sk-ant-/', $key)) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'That does not look like an Anthropic API key (expected to start with "sk-ant-")']);
+                break;
+            }
+            // Strip any trailing newline/CR characters defensively.
+            $key = rtrim($key, "\r\n");
+
+            $keyFile = __DIR__ . '/../config/ai_local_key.php';
+            $payload = "<?php\n/**\n * Anthropic API key managed from the Admin AI Control Center.\n * Git-ignored and web-blocked (root .htaccess denies /src/).\n * Do NOT commit this file.\n */\nreturn '" . addslashes($key) . "';\n";
+            if (@file_put_contents($keyFile, $payload, LOCK_EX) === false) {
+                http_response_code(500);
+                echo json_encode(['success' => false, 'message' => 'Could not write the key file (check folder permissions on src/config/)']);
+                break;
+            }
+            echo json_encode(['success' => true, 'message' => 'API key saved', 'masked_key' => substr($key, 0, 7) . '…' . substr($key, -4)]);
             break;
         }
 

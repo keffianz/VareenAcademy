@@ -10,13 +10,13 @@ $user_id = getCurrentUserId();
 $stmt = $db->prepare(
     'SELECT c.*, e.progress, e.enrolled_at,
             (SELECT COUNT(*) FROM lessons l WHERE l.course_id = c.id) AS lesson_count,
-            (SELECT COUNT(*) FROM lessons l JOIN lesson_progress lp ON lp.lesson_id = l.id WHERE l.course_id = c.id AND lp.student_id = :sid AND lp.completed = 1) AS completed_lessons
+            (SELECT COUNT(*) FROM lessons l JOIN lesson_progress lp ON lp.lesson_id = l.id WHERE l.course_id = c.id AND lp.student_id = :sid2 AND lp.is_completed = 1) AS completed_lessons
      FROM enrollments e
      JOIN courses c ON c.id = e.course_id
      WHERE e.student_id = :sid
      ORDER BY e.enrolled_at DESC'
 );
-$stmt->execute([':sid' => $user_id]);
+$stmt->execute([':sid' => $user_id, ':sid2' => $user_id]);
 $enrolled = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <div class="dashboard-wrapper">

@@ -11,6 +11,13 @@ function appBasePath(): string {
     return '';
 }
 
+// BASE_URL is used across views for redirects and hrefs. It was never defined
+// as a constant, which throws a fatal Error on PHP 8 (undefined constant).
+// Define it here so it is available as soon as the middleware is loaded.
+if (!defined('BASE_URL')) {
+    define('BASE_URL', appBasePath());
+}
+
 function redirectTo(string $pathAndQuery): void {
     $base = rtrim(appBasePath(), '/');
     $pathAndQuery = '/' . ltrim($pathAndQuery, '/');
@@ -120,14 +127,17 @@ function csrfToken(): string {
 
 /**
  * Reject state-changing requests that do not carry a valid CSRF token.
- * The token must be sent in the X-CSRF-Token header.
+ * The token may be sent either in the X-CSRF-Token header (JS/fetch flows,
+ * which public/js/main.js attaches automatically) or as a csrf_token POST
+ * field (native form POST flows). Both are session-bound and equally
+ * CSRF-resistant, so accepting either is standard practice.
  */
 function requireCsrf(): void {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
-    $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
-    if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token)) {
+    $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ($_POST['csrf_token'] ?? '');
+    if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], (string)$token)) {
         http_response_code(403);
         header('Content-Type: application/json');
         echo json_encode(['success' => false, 'message' => 'Invalid or missing security token. Please refresh the page and try again.']);

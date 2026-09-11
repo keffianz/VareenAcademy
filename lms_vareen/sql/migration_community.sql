@@ -58,14 +58,32 @@ CREATE TABLE IF NOT EXISTS community_posts (
 CREATE TABLE IF NOT EXISTS community_comments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     post_id INT NOT NULL,
+    parent_comment_id INT NULL,
     user_id INT UNSIGNED NOT NULL,
     content TEXT NOT NULL,
     is_deleted TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (post_id) REFERENCES community_posts(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_comments_post (post_id)
+    INDEX idx_comments_post (post_id),
+    INDEX idx_comments_parent (parent_comment_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Threaded replies: ensure parent_comment_id exists on pre-migration installs
+-- (ADD COLUMN IF NOT EXISTS is MariaDB-only, so guard via INFORMATION_SCHEMA).
+SET @add_parent_col = (
+    SELECT IF(
+        (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'community_comments'
+           AND COLUMN_NAME = 'parent_comment_id') = 0,
+        'ALTER TABLE community_comments ADD COLUMN parent_comment_id INT NULL AFTER post_id, ADD INDEX idx_comments_parent (parent_comment_id)',
+        'SELECT 1'
+    )
+);
+PREPARE _p7 FROM @add_parent_col;
+EXECUTE _p7;
+DEALLOCATE PREPARE _p7;
 
 CREATE TABLE IF NOT EXISTS community_likes (
     id INT AUTO_INCREMENT PRIMARY KEY,

@@ -33,14 +33,19 @@ if ($selectedCourseId) {
 
 ?>
 
-<div class="container">
-    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div>
-            <h1>Assignments</h1>
-            <p>Create assignments and grade submissions.</p>
+<div class="dashboard-wrapper">
+    <?php $teacher_active = 'assignments'; include __DIR__ . '/_sidebar.php'; ?>
+    <main class="dashboard-content">
+        <div class="dashboard-topbar">
+            <button class="sidebar-toggle" id="sidebarToggle" type="button">☰ Menu</button>
+            <div class="topbar-title">
+                <h1>Assignments</h1>
+                <p>Create assignments and grade submissions.</p>
+            </div>
+            <button class="btn-logout" id="teacherLogoutBtnTop" type="button"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
-        <button class="btn btn-logout" id="teacherLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
-    </div>
+        <div class="dashboard-section">
+            <div class="container">
 
     <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 18px;">
         <div class="card">
@@ -230,4 +235,12 @@ if ($selectedCourseId) {
     .assignments-list{display:flex;flex-direction:column;gap:12px;}
     .assignment-item{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid #eee;border-radius:10px;padding:12px 14px;}
 </style>
+            </div>
+        </div>
+    </main>
+</div>
+<script src="/lms_vareen/public/js/auth.js"></script>
+<script>
+(function(){var s=document.getElementById('teacherSidebar'),t=document.getElementById('sidebarToggle'),c=document.getElementById('sidebarClose');if(t&&s)t.addEventListener('click',function(){s.classList.add('active')});if(c&&s)c.addEventListener('click',function(){s.classList.remove('active')});})();
+</script>
 

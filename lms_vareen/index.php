@@ -75,7 +75,7 @@ $knownPages = [
     'admin-quizzes', 'admin-live', 'admin-reports', 'admin-settings', 'admin-applications',
     'admin-certificates', 'admin-verify', 'admin-payments', 'admin-coupons',
     'admin-community', 'admin-discussions', 'admin-moderation', 'admin-analytics',
-    'admin-activity', 'admin-ai', 'admin-notifications',
+    'admin-activity', 'admin-ai', 'admin-notifications', 'admin-messages',
 ];
 if ($page !== null && !in_array($page, $knownPages, true)) {
     http_response_code(404);
@@ -319,6 +319,11 @@ switch ($page) {
     case 'admin-applications':
         requireRole('admin');
         render_page('views/admin/applications.php', 'Instructor Applications');
+        break;
+
+    case 'admin-messages':
+        requireRole('admin');
+        render_page('views/admin/messages.php', 'Contact & Training Inbox');
         break;
 
     case 'admin-certificates':

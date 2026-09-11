@@ -8,11 +8,11 @@ $admin_active = 'settings';
 $page_title = 'Settings';
 $additional_css = [appBasePath() . '/public/css/dashboard.css'];
 ?>
-<div class="dash-shell">
+<div class="dashboard-wrapper">
 <?php include __DIR__ . '/_sidebar.php'; ?>
-<main class="dash-main">
-  <div class="dash-topbar"><div><h1>Settings</h1><p class="dash-sub">Site-wide configuration.</p></div><button class="btn btn-logout" id="adminLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
-  <div class="dash-content">
+<main class="dashboard-content">
+  <div class="dashboard-topbar"><div><h1>Settings</h1><p class="dash-sub">Site-wide configuration.</p></div><button class="btn btn-logout" id="adminLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
+  <div class="dashboard-section">
     <div id="msg" class="admin-msg" hidden></div>
     <form id="frm" class="card admin-form">
       <h2>General</h2>
