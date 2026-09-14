@@ -689,11 +689,11 @@ body {
                     <svg class="btn-signin__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
                 </button>
 
-                <div class="alert alert--error" id="loginError" role="alert">
+                <div class="alert" id="loginError" role="alert">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
                     <span id="loginErrorText"></span>
                 </div>
-                <div class="alert alert--success" id="loginSuccess" role="status">
+                <div class="alert" id="loginSuccess" role="status">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
                     <span id="loginSuccessText"></span>
                 </div>

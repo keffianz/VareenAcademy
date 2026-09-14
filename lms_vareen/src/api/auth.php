@@ -24,6 +24,7 @@ try {
 } catch (Throwable $e) {
     error_log('Authentication database initialization failed: ' . $e->getMessage());
     http_response_code(503);
+    header('Retry-After: 30');
     echo json_encode([
         'success' => false,
         'message' => 'The authentication service is temporarily unavailable.'

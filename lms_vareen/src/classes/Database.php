@@ -23,8 +23,10 @@ class Database {
     }
 
     public function connect() {
-        if ($this->user === '' || $this->pass === '' || $this->db_name === '') {
-            error_log('LMS database connection blocked: incomplete database configuration.');
+        // DB_USER/DB_NAME must be configured (env vars or src/config/local_db.php).
+        // An empty DB_PASS is legitimate for some setups, so it is NOT required here.
+        if ($this->user === '' || $this->db_name === '') {
+            error_log('LMS database connection blocked: DB_USER/DB_NAME not configured. Set env vars (DB_USER, DB_NAME, DB_PASS) or create src/config/local_db.php from local_db.example.php.');
             throw new RuntimeException('Database configuration is incomplete.');
         }
 
@@ -37,6 +39,9 @@ class Database {
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                     PDO::ATTR_EMULATE_PREPARES => false,
+                    // Fail fast on an unreachable/slow server instead of hanging
+                    // until PHP's max execution time kills the request.
+                    PDO::ATTR_TIMEOUT => 5,
                 )
             );
             return $this->pdo;
