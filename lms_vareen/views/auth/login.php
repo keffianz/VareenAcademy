@@ -155,10 +155,17 @@ body {
     animation: fadeSlideUp .7s .18s var(--ease-out) both;
 }
 
-/* Floating educational chips */
-.hero__floats { position: relative; margin-top: clamp(22px, 3vh, 34px); height: 108px; }
+/* Floating educational chips — flex layout so chips can never overlap */
+.hero__floats {
+    position: relative;
+    margin-top: clamp(22px, 3vh, 34px);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 14px;
+}
 .float-chip {
-    position: absolute;
+    position: static;
     display: inline-flex; align-items: center; gap: 9px;
     padding: 10px 16px;
     border-radius: 999px;
@@ -170,11 +177,11 @@ body {
     white-space: nowrap;
     will-change: transform;
 }
-.float-chip svg { width: 17px; height: 17px; }
-.float-chip--1 { top: 4px; left: 0; animation: bob1 7s ease-in-out infinite; }
-.float-chip--2 { top: 58px; left: clamp(0px, 22%, 210px); animation: bob2 9s ease-in-out infinite; }
-.float-chip--3 { top: 8px; left: clamp(190px, 46%, 400px); animation: bob1 8.5s .8s ease-in-out infinite; }
-.float-chip--4 { top: 62px; left: clamp(90px, 34%, 260px); animation: bob2 10s .4s ease-in-out infinite; }
+.float-chip svg { width: 17px; height: 17px; flex: none; }
+.float-chip--1 { animation: bob1 7s ease-in-out infinite; }
+.float-chip--2 { margin-left: clamp(0px, 8%, 80px); animation: bob2 9s ease-in-out infinite; }
+.float-chip--3 { animation: bob1 8.5s .8s ease-in-out infinite; }
+.float-chip--4 { margin-left: clamp(0px, 5%, 50px); animation: bob2 10s .4s ease-in-out infinite; }
 
 @keyframes bob1 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
 @keyframes bob2 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
