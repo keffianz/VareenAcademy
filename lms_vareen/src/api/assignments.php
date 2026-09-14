@@ -39,7 +39,7 @@ try {
             $title = trim($_POST['title'] ?? '');
             $description = trim($_POST['description'] ?? '');
             $instructions = trim($_POST['instructions'] ?? '');
-            $due_date = $_POST['due_date'] ?? null; // allow null/empty
+            $due_date = $_POST['due_date'] ?? null;
             $max_score = (int)($_POST['max_score'] ?? 100);
 
             if (!$course_id) throw new Exception('course_id required');
@@ -67,6 +67,96 @@ try {
             ]);
 
             echo json_encode(['success' => true, 'id' => $db->lastInsertId()]);
+            break;
+
+        // Teacher/Admin: update assignment
+        case 'teacher_update':
+            require_in(['teacher', 'admin']);
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') throw new Exception('Invalid request method');
+
+            $assignment_id = (int)($_POST['assignment_id'] ?? 0);
+            $title = trim($_POST['title'] ?? '');
+            $description = trim($_POST['description'] ?? '');
+            $instructions = trim($_POST['instructions'] ?? '');
+            $due_date = $_POST['due_date'] ?? null;
+            $max_score = (int)($_POST['max_score'] ?? 100);
+
+            if (!$assignment_id) throw new Exception('assignment_id required');
+            if ($title === '') throw new Exception('title required');
+
+            // verify ownership
+            $stmt = $db->prepare("SELECT a.*, c.teacher_id as course_teacher_id
+                FROM assignments a
+                JOIN courses c ON c.id = a.course_id
+                WHERE a.id = :id AND a.is_active = 1");
+            $stmt->execute([':id' => $assignment_id]);
+            $a = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$a) throw new Exception('Assignment not found');
+
+            if ($role === 'teacher' && (int)$a['course_teacher_id'] !== (int)$user['id']) throw new Exception('Access denied');
+
+            $stmt = $db->prepare("UPDATE assignments
+                SET title = :title, description = :description, instructions = :instructions,
+                    due_date = :due_date, max_score = :max_score
+                WHERE id = :id");
+            $stmt->execute([
+                ':title' => $title,
+                ':description' => $description,
+                ':instructions' => $instructions,
+                ':due_date' => ($due_date ? $due_date : null),
+                ':max_score' => $max_score,
+                ':id' => $assignment_id
+            ]);
+
+            echo json_encode(['success' => true, 'message' => 'Assignment updated']);
+            break;
+
+        // Teacher/Admin: delete assignment
+        case 'teacher_delete':
+            require_in(['teacher', 'admin']);
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') throw new Exception('Invalid request method');
+
+            $assignment_id = (int)($_POST['assignment_id'] ?? 0);
+            if (!$assignment_id) throw new Exception('assignment_id required');
+
+            // verify ownership
+            $stmt = $db->prepare("SELECT a.id, a.course_id, c.teacher_id as course_teacher_id
+                FROM assignments a
+                JOIN courses c ON c.id = a.course_id
+                WHERE a.id = :id AND a.is_active = 1");
+            $stmt->execute([':id' => $assignment_id]);
+            $a = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$a) throw new Exception('Assignment not found');
+
+            if ($role === 'teacher' && (int)$a['course_teacher_id'] !== (int)$user['id']) throw new Exception('Access denied');
+
+            // Soft delete by setting is_active = 0
+            $stmt = $db->prepare("UPDATE assignments SET is_active = 0 WHERE id = :id");
+            $stmt->execute([':id' => $assignment_id]);
+
+            echo json_encode(['success' => true, 'message' => 'Assignment deleted']);
+            break;
+
+        // Teacher/Admin: get single assignment for editing
+        case 'teacher_get':
+            require_in(['teacher', 'admin']);
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') throw new Exception('Invalid request method');
+
+            $assignment_id = (int)($_POST['assignment_id'] ?? 0);
+            if (!$assignment_id) throw new Exception('assignment_id required');
+
+            // verify ownership
+            $stmt = $db->prepare("SELECT a.*, c.teacher_id as course_teacher_id
+                FROM assignments a
+                JOIN courses c ON c.id = a.course_id
+                WHERE a.id = :id AND a.is_active = 1");
+            $stmt->execute([':id' => $assignment_id]);
+            $a = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$a) throw new Exception('Assignment not found');
+
+            if ($role === 'teacher' && (int)$a['course_teacher_id'] !== (int)$user['id']) throw new Exception('Access denied');
+
+            echo json_encode(['success' => true, 'data' => $a]);
             break;
 
         // Teacher/Admin: list assignments for a course

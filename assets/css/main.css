@@ -429,6 +429,10 @@ a:focus, button:focus, input:focus, textarea:focus, .nav-link:focus, .btn:focus 
 
 .feature-item {
   background: #ffffff; /* Always light — never follows theme variable */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
   padding: 2rem;
   border-radius: 1rem;
   box-shadow: 0 4px 6px var(--shadow-light);
@@ -455,6 +459,13 @@ a:focus, button:focus, input:focus, textarea:focus, .nav-link:focus, .btn:focus 
 
 .feature-item p {
   color: #4b5563 !important; /* Always dark — white panel */
+  flex: 1;
+  width: 100%;
+}
+
+/* Keep CTA buttons visible and bottom-aligned on all cards in a row */
+.feature-item .btn {
+  margin-top: auto;
 }
 
 /* Services Section */

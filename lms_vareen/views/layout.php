@@ -23,7 +23,12 @@
     <link rel="preload" href="<?php echo appBasePath() . '/public/css/dashboard.css?v=1.0.1'; ?>" as="style">
     <link rel="stylesheet" href="<?php echo appBasePath() . '/public/css/dashboard.css?v=1.0.1'; ?>">
     <?php endif; ?>
-    <link rel="stylesheet" href="<?php echo appBasePath() . '/public/css/responsive.css?v=1.0.1'; ?>">
+        <link rel="stylesheet" href="<?php echo appBasePath() . '/public/css/responsive.css?v=1.0.1'; ?>">
+
+    <!-- Responsive dashboard styles for admin & teacher pages -->
+    <?php if (isset($_SESSION['role'])): ?>
+    <link rel="stylesheet" href="<?php echo appBasePath() . '/public/css/dashboard-responsive.css?v=1.0.1'; ?>">
+    <?php endif; ?>
 
     <!-- Font Awesome 7.3.1 (self-hosted only — CDN blocked by CSP font-src policy) -->
     <link rel="stylesheet" href="<?php echo appBasePath() . '/public/css/font-awesome-local.css?v=7.3.2'; ?>">

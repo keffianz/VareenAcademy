@@ -13,12 +13,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// Sanitize input
-$name = trim(filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING));
-$email = trim(filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL));
-$phone = trim(filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_STRING));
-$subject = trim(filter_input(INPUT_POST, 'subject', FILTER_SANITIZE_STRING));
-$message = trim(filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING));
+// Sanitize input (JSON-safe: works for form posts AND fetch/JSON bodies)
+$__in = $_POST + (function () { $j = json_decode(file_get_contents('php://input'), true); return is_array($j) ? $j : []; })();
+$name = trim((string)($__in['name'] ?? ''));
+$email = trim((string)($__in['email'] ?? ''));
+$email = filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : '';
+$phone = trim((string)($__in['phone'] ?? ''));
+$subject = trim((string)($__in['subject'] ?? ''));
+$message = trim((string)($__in['message'] ?? ''));
 
 $errors = [];
 if (empty($name) || mb_strlen($name) < 2) $errors[] = 'Name must be at least 2 characters long';
@@ -46,13 +48,32 @@ try {
 
     $message_id = $pdo->lastInsertId();
 
-    // Optional email notification
+    // Email notification to admin (best-effort; failures are logged, never block UX)
     if (!empty(ADMIN_EMAIL)) {
+        $domain = $_SERVER['SERVER_NAME'] ?? 'vereenacademy.com';
+        $siteName = 'VAREEN Academy';
         $to = ADMIN_EMAIL;
-        $email_subject = 'New Contact Form Submission';
-        $email_body = "Name: " . htmlspecialchars($name) . "\nEmail: " . htmlspecialchars($email) . "\nMessage:\n" . htmlspecialchars($message);
-        $headers = "From: noreply@" . ($_SERVER['SERVER_NAME'] ?? 'example.com') . "\r\n";
-        @mail($to, $email_subject, $email_body, $headers);
+        $email_subject = 'New Contact Message from ' . $name;
+        $esc = static function ($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); };
+        $email_body = "<h3>New Contact Form Submission</h3>
+            <table cellpadding='6' style='font-family:Arial,sans-serif;font-size:14px;border-collapse:collapse'>
+              <tr><td><strong>Name:</strong></td><td>{$esc($name)}</td></tr>
+              <tr><td><strong>Email:</strong></td><td>{$esc($email)}</td></tr>
+              <tr><td><strong>Phone:</strong></td><td>" . ($phone !== '' ? $esc($phone) : '—') . "</td></tr>
+              <tr><td><strong>Subject:</strong></td><td>" . ($subject !== '' ? $esc($subject) : '—') . "</td></tr>
+              <tr><td><strong>Message:</strong></td><td>" . nl2br($esc($message)) . "</td></tr>
+              <tr><td><strong>Received:</strong></td><td>" . date('M j, Y g:i a') . "</td></tr>
+            </table>
+            <p style='font-size:12px;color:#888'>View in the admin dashboard: " . $esc($domain . '/lms_vareen/index.php?page=admin-messages') . "</p>";
+        $headers = "From: VAREEN Academy <noreply@{$domain}>\r\n"
+                 . "Reply-To: {$email}\r\n"
+                 . "MIME-Version: 1.0\r\n"
+                 . "Content-Type: text/html; charset=UTF-8\r\n"
+                 . "X-Mailer: PHP/" . phpversion();
+        $ok = @mail($to, $email_subject, $email_body, $headers);
+        if (!$ok) {
+            error_log('[contact.php] Admin email notification failed to ' . $to);
+        }
     }
 
     echo json_encode(['success' => true, 'message' => 'Thank you for your message.', 'id' => $message_id]);

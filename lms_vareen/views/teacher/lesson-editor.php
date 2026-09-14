@@ -11,9 +11,27 @@ require_once 'src/classes/Resource.php';
 requireRoles(['teacher', 'admin']);
 
 $module_id = (int)($_GET['module_id'] ?? 0);
+
+$userId = getCurrentUserId();
+$role = getCurrentUserRole();
+$teacherCourses = [];
+$courseModules = [];
+
 if (!$module_id) {
-    header('Location: ' . appBasePath() . '/index.php?page=teacher-dashboard');
-    exit;
+    // No module selected — show a picker instead of bouncing to the dashboard.
+    $db = (new Database())->connect();
+    $allCourses = $db->query('SELECT id, title, teacher_id FROM courses WHERE is_active = 1 ORDER BY title LIMIT 500')->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($allCourses as $c) {
+        if ($role === 'admin' || (int)($c['teacher_id'] ?? 0) === (int)$userId) {
+            $teacherCourses[] = $c;
+        }
+    }
+    $moduleModel = new Module();
+    foreach ($teacherCourses as &$c) {
+        $c['modules'] = $moduleModel->getModulesByCourse((int)$c['id']) ?: [];
+    }
+    unset($c);
+    $courseModules = $teacherCourses;
 }
 
 $lesson = new Lesson();
@@ -21,38 +39,75 @@ $resource = new Resource();
 
 // Determine course ownership via module
 $module = new Module();
-$module_data = $module->getModuleWithLessons($module_id);
-if (!$module_data) {
-    http_response_code(404);
-    exit('Module not found');
-}
-
-if (getCurrentUserRole() === 'teacher') {
-    // Course ownership check
-    $course = new Course();
-    $course_data = $course->getCourseById((int)$module_data['course_id']);
-    if (!$course_data || (int)($course_data['teacher_id'] ?? 0) !== (int)getCurrentUserId()) {
-        http_response_code(403);
-        exit('Access denied');
+$module_data = [];
+$lessons = [];
+if ($module_id) {
+    $module_data = $module->getModuleWithLessons($module_id);
+    if (!$module_data) {
+        http_response_code(404);
+        exit('Module not found');
     }
-}
 
-$lessons = $lesson->getLessonsByModule($module_id);
+    if ($role === 'teacher') {
+        // Course ownership check
+        $course = new Course();
+        $course_data = $course->getCourseById((int)$module_data['course_id']);
+        if (!$course_data || (int)($course_data['teacher_id'] ?? 0) !== (int)getCurrentUserId()) {
+            http_response_code(403);
+            exit('Access denied');
+        }
+    }
+
+    $lessons = $lesson->getLessonsByModule($module_id);
+}
 ?>
 
 <div class="dashboard-wrapper">
     <?php $teacher_active = 'lessons'; include __DIR__ . '/_sidebar.php'; ?>
     <main class="dashboard-content">
         <div class="dashboard-topbar">
-            <button class="sidebar-toggle" id="sidebarToggle" type="button">☰ Menu</button>
+            <button class="sidebar-toggle" id="sidebarToggle" type="button"><i class="fas fa-bars"></i></button>
             <div class="topbar-title">
-                <h1>Manage Lessons</h1>
-                <p>Module: <?php echo htmlspecialchars($module_data['title'] ?? ''); ?></p>
+                <h1><?php echo $module_id ? 'Manage Lessons' : 'Lessons — Select a Module'; ?></h1>
+                <p><?php echo $module_id ? ('Module: ' . htmlspecialchars($module_data['title'] ?? '')) : 'Choose a module below to manage its lessons.'; ?></p>
             </div>
             <button class="btn-logout" id="teacherLogoutBtnTop" type="button"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
         <div class="dashboard-section">
             <div class="container">
+
+    <?php if (!$module_id): ?>
+        <?php if (empty($courseModules)): ?>
+            <div class="card">
+                <h2>No Courses Available</h2>
+                <p>You do not have any assigned courses yet. Please contact an administrator to assign you a course before managing lessons.</p>
+                <a class="btn btn-primary" href="<?php echo appBasePath(); ?>/index.php?page=teacher-courses">Go to My Courses</a>
+            </div>
+        <?php else: ?>
+            <?php foreach ($courseModules as $c): ?>
+                <div class="card">
+                    <h2><?php echo htmlspecialchars($c['title']); ?></h2>
+                    <?php if (empty($c['modules'])): ?>
+                        <p class="muted">No modules yet in this course.</p>
+                    <?php else: ?>
+                        <div class="lessons-list">
+                            <?php foreach ($c['modules'] as $m): ?>
+                                <div class="lesson-item">
+                                    <div>
+                                        <strong><?php echo htmlspecialchars($m['title']); ?></strong>
+                                        <div class="muted">Manage lessons in this module</div>
+                                    </div>
+                                    <div class="lesson-actions">
+                                        <a class="btn btn-outline" href="<?php echo appBasePath(); ?>/index.php?page=teacher-lesson-editor&module_id=<?php echo (int)$m['id']; ?>">Manage Lessons</a>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    <?php else: ?>
 
     <div class="card">
         <h2>Add Lesson</h2>
@@ -102,6 +157,7 @@ $lessons = $lesson->getLessonsByModule($module_id);
         <?php endif; ?>
     </div>
 </div>
+<?php endif; ?>
 
 <script>
     async function postForm(actionUrl, payload) {

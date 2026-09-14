@@ -11,7 +11,7 @@ $additional_css = [appBasePath() . '/public/css/dashboard.css'];
 <div class="dashboard-wrapper">
 <?php include __DIR__ . '/_sidebar.php'; ?>
 <main class="dashboard-content">
-  <div class="dashboard-topbar"><div><h1>Instructor Applications</h1><p class="dash-sub">Review "Become an Instructor" submissions.</p></div></div>
+  <div class="dashboard-topbar"><button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button><div><h1>Instructor Applications</h1><p class="dash-sub">Review "Become an Instructor" submissions.</p></div></div>
   <div class="dashboard-section">
     <div class="admin-toolbar">
       <select id="fStatus"><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="">All</option></select>

@@ -11,7 +11,7 @@ $additional_css = [appBasePath() . '/public/css/dashboard.css'];
 <div class="dashboard-wrapper">
 <?php include __DIR__ . '/_sidebar.php'; ?>
 <main class="dashboard-content">
-  <div class="dashboard-topbar"><div><h1>Certificates</h1><p class="dash-sub">Issued certificates and verification management.</p></div><button class="btn btn-logout" id="adminLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
+  <div class="dashboard-topbar"><button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button><div><h1>Certificates</h1><p class="dash-sub">Issued certificates and verification management.</p></div><button class="btn btn-logout" id="adminLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
   <div class="dashboard-section">
     <div id="msg" class="admin-msg" hidden></div>
     <div class="card table-wrap"><table class="table"><thead><tr><th>Certificate ID</th><th>Student</th><th>Course</th><th>Issued</th><th>Status</th><th>Actions</th></tr></thead><tbody id="rows"></tbody></table></div>

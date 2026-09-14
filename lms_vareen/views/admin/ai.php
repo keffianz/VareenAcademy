@@ -1,12 +1,12 @@
 <?php
 requireRole('admin');
-require_once '../src/config/ai_config.php';
+require_once __DIR__ . '/../../src/config/ai_config.php';
 $aiConfigured = ai_key_configured();
 $maskedKey = ai_masked_key();
 $keySource = 'none';
 if (getenv('ANTHROPIC_API_KEY')) {
     $keySource = 'environment';
-} elseif (is_file(__DIR__ . '/../src/config/ai_local_key.php')) {
+} elseif (is_file(__DIR__ . '/../../src/config/ai_local_key.php')) {
     $keySource = 'admin_ui';
 }
 $conversations = []; // Would be fetched from AI conversation log table

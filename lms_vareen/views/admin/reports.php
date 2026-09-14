@@ -10,7 +10,7 @@ $admin_active = 'reports';
     <?php include __DIR__ . '/_sidebar.php'; ?>
     <main class="dashboard-content">
         <div class="dashboard-topbar">
-            <button class="sidebar-toggle" id="sidebarToggle" type="button">☰ Menu</button>
+                        <button class="sidebar-toggle" id="sidebarToggle" type="button"><i class="fas fa-bars"></i></button>
             <div class="topbar-title">
                 <h1>Reports</h1>
                 <p>Platform totals and per-course academic performance.</p>

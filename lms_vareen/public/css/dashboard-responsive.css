@@ -1,0 +1,77 @@
+/* VAREEN Academy - Dashboard Mobile Responsiveness */
+
+@media (max-width: 768px) {
+    .dashboard-sidebar { position: fixed !important; top: 0; bottom: 0; width: 280px !important; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease; box-shadow: 2px 0 15px rgba(0,0,0,0.2); margin: 0; }
+    .dashboard-sidebar.active { transform: translateX(0) !important; }
+    .sidebar-close { display: block !important; }
+    .dashboard-content { margin-left: 0 !important; padding: 16px !important; }
+    .dashboard-wrapper { display: flex; min-height: 100vh; }
+    .dashboard-topbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .sidebar-toggle { display: inline-flex !important; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 8px 12px; background: transparent; border: 1px solid #ddd; border-radius: 8px; font-size: 18px; cursor: pointer; color: #333; }
+    .sidebar-toggle .menu-text { display: none; }
+    .sidebar-toggle i.fa-bars, .sidebar-toggle i.fa-times { font-size: 20px; }
+    .topbar-title h1 { font-size: 18px; margin: 0; }
+    .topbar-title p { font-size: 12px; margin: 0; }
+    .btn-logout { margin-left: auto; padding: 6px 10px; font-size: 12px; }
+    .grid { grid-template-columns: 1fr !important; gap: 16px; }
+    .kpi-grid { grid-template-columns: 1fr !important; }
+    .quick-grid, .quick-action-grid, .stats-cards { grid-template-columns: 1fr !important; }
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .admin-table { font-size: 13px; width: 100%; min-width: 600px; border-collapse: collapse; }
+    .admin-filters { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+    .admin-filters input[type="search"] { flex: 1; min-width: 150px; padding: 8px 10px; border: 1px solid #d5daea; border-radius: 8px; font-size: 14px; }
+    .admin-filters select { padding: 8px 10px; border: 1px solid #d5daea; border-radius: 8px; font-size: 14px; background: #fff; cursor: pointer; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
+    .modal-backdrop[hidden] { display: none !important; }
+    .modal-card { background: #fff; border-radius: 14px; padding: 20px; width: 100%; max-width: 500px; max-height: 90vh; overflow: auto; }
+    .drawer-scrim { display: none; }
+    .drawer-open .drawer-scrim { display: block; }
+}
+@media (max-width: 560px) { .form-grid { grid-template-columns: 1fr !important; } }
+
+/* Teacher pages: stack cards & wrap list items on small screens */
+@media (max-width: 768px) {
+    .grid-2 { grid-template-columns: 1fr !important; }
+    .dashboard-section .card { padding: 14px; }
+    .assignment-item,
+    .live-class-item,
+    .attendance-card,
+    .attendance-header,
+    .quiz-item,
+    .lesson-item,
+    .resource-item {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .assignment-item .actions,
+    .live-class-item .actions,
+    .resource-item .resource-actions,
+    .lesson-item .lesson-actions,
+    .quiz-item .actions {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .assignment-item .actions button,
+    .live-class-item .actions button,
+    .quiz-item .actions button {
+        flex: 1 1 auto;
+        min-width: 90px;
+    }
+    .attendance-table-wrap,
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+
+@media (max-width: 480px) {
+    .dashboard-content { padding: 12px !important; }
+    .dashboard-topbar { flex-direction: column; align-items: stretch; }
+    .sidebar-toggle { order: 1; align-self: flex-end; }
+    .topbar-title { order: 2; }
+    .btn-logout { order: 3; margin-left: 0; width: 100%; justify-content: center; }
+    .th-actions { width: auto; text-align: center; }
+    .form-grid { grid-template-columns: 1fr !important; }
+}
+@media (hover: none) and (pointer: coarse) {
+    .sidebar-toggle, .btn, .btn-xs { min-height: 44px; min-width: 44px; }
+}

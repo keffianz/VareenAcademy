@@ -26,7 +26,8 @@ $apiBase = appBasePath() . '/src/api/live_classes.php';
 <div class="dashboard-wrapper">
     <?php $teacher_active = 'attendance'; include __DIR__ . '/_sidebar.php'; ?>
     <div class="dashboard-content">
-        <div class="dashboard-topbar">
+                <div class="dashboard-topbar">
+            <button class="sidebar-toggle" id="sidebarToggle" type="button"><i class="fas fa-bars"></i></button>
             <div class="topbar-title">
                 <h1>Attendance</h1>
                 <p>Mark which students attended each live class</p>

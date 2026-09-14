@@ -132,6 +132,7 @@ $apiBase = appBasePath() . '/src/api/admin.php';
     .status-dot.inactive{background:#fdeaea;color:#d9534f}
     @media(max-width:768px){.admin-filters{flex-direction:column}.th-actions{width:auto;text-align:center}}
     .modal-backdrop{position:fixed;inset:0;background:rgba(20,22,40,.55);display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px}
+    .modal-backdrop[hidden]{display:none!important}
     .modal-card{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:520px;max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
     .modal-card h2{margin:0 0 6px;font-size:20px}
     .modal-card .muted{color:#777;font-size:13px;margin:0 0 14px}

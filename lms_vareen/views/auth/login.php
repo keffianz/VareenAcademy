@@ -96,9 +96,11 @@ body {
 .page {
     position: relative; z-index: 1;
     min-height: 100vh;
+    min-height: 100svh;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 460px);
     align-items: center;
+    align-items: safe center;
     gap: clamp(32px, 5vw, 80px);
     max-width: 1440px;
     margin: 0 auto;

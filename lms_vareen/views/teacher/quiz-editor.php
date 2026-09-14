@@ -70,7 +70,7 @@ $selectedQuizId = (int)($_GET['quiz_id'] ?? 0);
     <?php $teacher_active = 'quizzes'; include __DIR__ . '/_sidebar.php'; ?>
     <main class="dashboard-content">
         <div class="dashboard-topbar">
-            <button class="sidebar-toggle" id="sidebarToggle" type="button">☰ Menu</button>
+                        <button class="sidebar-toggle" id="sidebarToggle" type="button"><i class="fas fa-bars"></i></button>
             <div class="topbar-title">
                 <h1>Quiz Builder</h1>
                 <p>Create quizzes, add questions and options.</p>

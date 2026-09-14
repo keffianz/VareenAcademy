@@ -47,7 +47,7 @@ if (!empty($courseIds)) {
     <?php $teacher_active = 'live'; include __DIR__ . '/_sidebar.php'; ?>
     <main class="dashboard-content">
         <div class="dashboard-topbar">
-            <button class="sidebar-toggle" id="sidebarToggle" type="button">☰ Menu</button>
+                        <button class="sidebar-toggle" id="sidebarToggle" type="button"><i class="fas fa-bars"></i></button>
             <div class="topbar-title">
                 <h1>Live Class Management</h1>
                 <p>Create, update and manage your scheduled live classes.</p>

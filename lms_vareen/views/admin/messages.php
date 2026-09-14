@@ -12,7 +12,7 @@ $additional_css = [appBasePath() . '/public/css/dashboard.css'];
 <div class="dashboard-wrapper">
 <?php include __DIR__ . '/_sidebar.php'; ?>
 <main class="dashboard-content">
-  <div class="dashboard-topbar"><div><h1>Contact &amp; Training Inbox</h1><p class="dash-sub">Submissions from the website contact form and Training Application form.</p></div></div>
+  <div class="dashboard-topbar"><button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button><div><h1>Contact &amp; Training Inbox</h1><p class="dash-sub">Submissions from the website contact form and Training Application form.</p></div></div>
   <div class="dashboard-section">
     <div class="admin-toolbar">
       <div class="tabs">

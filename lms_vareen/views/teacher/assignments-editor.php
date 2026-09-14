@@ -37,7 +37,7 @@ if ($selectedCourseId) {
     <?php $teacher_active = 'assignments'; include __DIR__ . '/_sidebar.php'; ?>
     <main class="dashboard-content">
         <div class="dashboard-topbar">
-            <button class="sidebar-toggle" id="sidebarToggle" type="button">☰ Menu</button>
+                        <button class="sidebar-toggle" id="sidebarToggle" type="button"><i class="fas fa-bars"></i></button>
             <div class="topbar-title">
                 <h1>Assignments</h1>
                 <p>Create assignments and grade submissions.</p>
@@ -75,7 +75,8 @@ if ($selectedCourseId) {
                 <label>Max score</label>
                 <input type="number" name="max_score" value="100" />
 
-                <button class="btn btn-primary" type="submit">Create</button>
+                <button class="btn btn-primary" type="submit" id="assignmentSubmitBtn">Create</button>
+                <button class="btn btn-outline" type="button" id="assignmentCancelBtn" style="display:none;margin-left:8px" onclick="cancelEdit()">Cancel</button>
             </form>
         </div>
 
@@ -90,9 +91,12 @@ if ($selectedCourseId) {
                             <div>
                                 <strong><?php echo htmlspecialchars($a['title']); ?></strong>
                                 <div class="muted">Due: <?php echo $a['due_date'] ? htmlspecialchars($a['due_date']) : '—'; ?></div>
+                                <div class="muted" style="margin-top:4px">Score: <?php echo (int)$a['max_score']; ?>pts</div>
                             </div>
-                            <div class="actions">
-                                <button class="btn btn-outline" onclick="viewSubmissions(<?php echo (int)$a['id']; ?>)">View Submissions</button>
+                            <div class="actions" style="display:flex;gap:8px;flex-wrap:wrap">
+                                <button class="btn btn-outline btn-xs" onclick="viewSubmissions(<?php echo (int)$a['id']; ?>)">View Submissions</button>
+                                <button class="btn btn-outline btn-xs" onclick="editAssignment(<?php echo (int)$a['id']; ?>)">Edit</button>
+                                <button class="btn btn-outline btn-xs" style="color:#d9534f;border-color:#d9534f" onclick="deleteAssignment(<?php echo (int)$a['id']; ?>, '<?php echo addslashes($a['title']); ?>')">Delete</button>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -129,16 +133,51 @@ if ($selectedCourseId) {
         const form = e.target;
         const payload = formToPayload(form);
 
-        const res = await fetch('<?php echo appBasePath(); ?>/src/api/assignments.php?action=teacher_create', {
+        const submitBtn = document.getElementById('assignmentSubmitBtn');
+        const originalText = submitBtn.textContent;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Saving...';
+
+        // Check if we're editing (have a course_id that's being edited)
+        const isEdit = window._editingAssignmentId !== undefined;
+
+        const action = isEdit ? 'teacher_update' : 'teacher_create';
+        if (isEdit) {
+            payload.assignment_id = window._editingAssignmentId;
+        }
+
+        const res = await fetch('<?php echo appBasePath(); ?>/src/api/assignments.php?action=' + action, {
             method: 'POST',
             headers: {'Content-Type':'application/x-www-form-urlencoded'},
             body: new URLSearchParams(payload)
         });
 
         const data = await res.json();
-        if (data.success) location.reload();
-        else showToast(data.message || 'Create failed', 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+
+        if (data.success) {
+            showToast(isEdit ? 'Assignment updated' : 'Assignment created', 'success');
+            window._editingAssignmentId = undefined;
+            document.getElementById('assignmentCancelBtn').style.display = 'none';
+            submitBtn.textContent = 'Create';
+            location.reload();
+        } else {
+            showToast(data.message || (isEdit ? 'Update failed' : 'Create failed'), 'error');
+        }
     });
+
+    function cancelEdit() {
+        window._editingAssignmentId = undefined;
+        document.getElementById('assignmentCreateForm').reset();
+        document.getElementById('assignmentCancelBtn').style.display = 'none';
+        document.getElementById('assignmentSubmitBtn').textContent = 'Create';
+        // Reset course dropdown to selected course
+        const select = document.getElementById('assignmentCreateForm').querySelector('[name="course_id"]');
+        select.value = '<?php echo $selectedCourseId; ?>';
+        window.scrollTo(0, 0);
+    }
 
     async function viewSubmissions(assignmentId) {
         const res = await fetch('<?php echo appBasePath(); ?>/src/api/assignments.php?action=teacher_list_submissions', {
@@ -218,6 +257,50 @@ if ($selectedCourseId) {
             .replaceAll('"','"')
             .replaceAll("'",'&#039;');
     }
+
+    // Edit assignment - populate form for editing
+    async function editAssignment(assignmentId) {
+        const res = await fetch('<?php echo appBasePath(); ?>/src/api/assignments.php?action=teacher_get', {
+            method: 'POST',
+            headers: {'Content-Type':'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({ assignment_id: assignmentId })
+        });
+        const data = await res.json();
+        if (!data.success) {
+            showToast(data.message || 'Failed to load assignment', 'error');
+            return;
+        }
+        const a = data.data;
+        window._editingAssignmentId = assignmentId;
+        document.getElementById('assignmentCreateForm').querySelector('[name="course_id"]').value = a.course_id;
+        document.getElementById('assignmentCreateForm').querySelector('[name="title"]').value = a.title;
+        document.getElementById('assignmentCreateForm').querySelector('[name="description"]').value = a.description || '';
+        document.getElementById('assignmentCreateForm').querySelector('[name="instructions"]').value = a.instructions || '';
+        document.getElementById('assignmentCreateForm').querySelector('[name="due_date"]').value = a.due_date ? a.due_date.replace(' ', 'T').substring(0,16) : '';
+        document.getElementById('assignmentCreateForm').querySelector('[name="max_score"]').value = a.max_score;
+        document.getElementById('assignmentSubmitBtn').textContent = 'Update';
+        document.getElementById('assignmentCancelBtn').style.display = 'inline-block';
+        window.scrollTo(0, 0);
+        showToast('Edit the assignment and click Update', 'success');
+    }
+
+    // Delete assignment with confirmation
+    async function deleteAssignment(assignmentId, title) {
+        if (!confirm('Delete "' + title + '"? This cannot be undone.')) return;
+        const res = await fetch('<?php echo appBasePath(); ?>/src/api/assignments.php?action=teacher_delete', {
+            method: 'POST',
+            headers: {'Content-Type':'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({ assignment_id: assignmentId })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast('Assignment deleted', 'success');
+            location.reload();
+        } else {
+            showToast(data.message || 'Delete failed', 'error');
+        }
+    }
+
 </script>
 
 <style>
