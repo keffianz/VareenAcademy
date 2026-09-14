@@ -11,10 +11,8 @@ require_once '../middleware/auth.php';
 $request_method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 
-// Start session if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Start session via the unified bootstrap (same cookie attributes as the router)
+vaBootSession();
 
 // CSRF protection for all state-changing POST requests
 if ($request_method === 'POST') {

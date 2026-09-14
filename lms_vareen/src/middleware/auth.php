@@ -92,9 +92,7 @@ function checkSessionTimeout() {
 
 
 function checkAuth() {
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
+    vaBootSession();
     
     if (!isLoggedIn()) {
         http_response_code(401);
@@ -113,12 +111,39 @@ function checkAuth() {
 }
 
 /**
+ * Unified, safe session bootstrap used by EVERY entry point (router,
+ * API endpoints, auth pages). Ensures identical session cookie
+ * attributes everywhere so the browser never silently drops the
+ * session cookie between the page load and the API POST — the root
+ * cause of "Invalid or missing security token" (403) on login.
+ */
+function vaBootSession(): void {
+    if (session_status() !== PHP_SESSION_NONE) {
+        return;
+    }
+    if (PHP_SAPI !== 'cli' && !headers_sent()) {
+        $isHttps = (
+            (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
+            || (($_SERVER['SERVER_PORT'] ?? '') === '443')
+        );
+        session_set_cookie_params([
+            'lifetime' => 0,
+            'path'     => '/',
+            'domain'   => '',
+            'secure'   => $isHttps,
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+    }
+    session_start();
+}
+
+/**
  * Get or create the CSRF token for the current session.
  */
 function csrfToken(): string {
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
+    vaBootSession();
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
@@ -133,9 +158,7 @@ function csrfToken(): string {
  * CSRF-resistant, so accepting either is standard practice.
  */
 function requireCsrf(): void {
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
+    vaBootSession();
     $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ($_POST['csrf_token'] ?? '');
     if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], (string)$token)) {
         http_response_code(403);

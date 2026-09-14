@@ -10,10 +10,8 @@ require_once '../classes/Course.php';
 require_once '../classes/Notification.php';
 require_once '../middleware/auth.php';
 
-// Start session
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Start session via the unified bootstrap (same cookie attributes as the router)
+vaBootSession();
 
 $response = ['success' => false, 'message' => ''];
 $action = $_GET['action'] ?? '';

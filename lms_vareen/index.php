@@ -5,13 +5,9 @@
  * Wraps all views in a shared HTML page layout
  */
 
-// Start session BEFORE including middleware
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Include auth middleware FIRST so requireRole(), getCurrentUserId(), etc. exist
+// Start session BEFORE including middleware (unified cookie attributes)
 require_once __DIR__ . '/src/middleware/auth.php';
+vaBootSession();
 
 // Helper function to render a view wrapped in layout
 function render_page($view_path, $page_title = 'Dashboard') {

@@ -13,6 +13,11 @@
  *     email + password + role server-side and the redirect uses the
  *     SERVER-VERIFIED role (data.user.role), never the selected tab.
  */
+
+// Never cache this page — a cached copy would embed a stale CSRF token
+// and every login would be rejected with 403 until a hard refresh.
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -833,6 +838,7 @@ body {
 
         fetch('/lms_vareen/src/api/auth.php?action=login', {
             method: 'POST',
+            credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': window.CSRF_TOKEN
@@ -840,12 +846,35 @@ body {
             body: JSON.stringify({ email: email, password: password, intended_role: selectedRole })
         })
         .then(function (r) {
-            if (!r.ok) throw new Error('Server returned ' + r.status);
-            return r.json();
+            // Read the JSON body even for error statuses (e.g. 403 CSRF
+            // rejection) so the REAL reason reaches the user instead of a
+            // generic "An error occurred".
+            return r.json().then(function (data) {
+                data.__status = r.status;
+                return data;
+            }).catch(function () {
+                return { success: false, __status: r.status, message: 'Unexpected server response (' + r.status + ').' };
+            });
         })
         .then(function (data) {
             signinBtn.classList.remove('is-loading');
             signinBtn.disabled = false;
+
+            if (data.__status === 403 && !data.success) {
+                // CSRF token rejected — usually a stale cached page or an
+                // expired session. Reload ONCE to obtain a fresh token, but
+                // guard against reload loops.
+                if (!sessionStorage.getItem('va_csrf_reloaded')) {
+                    sessionStorage.setItem('va_csrf_reloaded', '1');
+                    window.location.reload();
+                    return;
+                }
+                sessionStorage.removeItem('va_csrf_reloaded');
+                loginErrorText.textContent = data.message || 'Your session expired. Please try again.';
+                loginError.classList.add('alert--error');
+                return;
+            }
+            sessionStorage.removeItem('va_csrf_reloaded');
 
             if (data.success) {
                 signinBtn.classList.add('is-success');
