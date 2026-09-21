@@ -63,6 +63,7 @@ $admin_groups = [
             'ai'         => ['fa-robot',     'AI Control Center', '/index.php?page=admin-ai'],
             'notifications' => ['fa-bell',   'Notifications',     '/index.php?page=admin-notifications'],
             'inbox'      => ['fa-inbox',     'Form Inbox',        '/index.php?page=admin-messages'],
+            'profile'    => ['fa-user-circle',  'My Profile',          '/index.php?page=admin-profile'],
             'settings'   => ['fa-cog',       'Settings',          '/index.php?page=admin-settings'],
         ],
     ],
@@ -84,7 +85,7 @@ $admin_active = $admin_active ?? 'dashboard';
                 <ul>
                     <?php foreach ($group['items'] as $key => $item): ?>
                         <li>
-                            <a href="<?php echo $item[2]; ?>"<?php echo $key === $admin_active ? ' class="active" aria-current="page"' : ''; ?>>
+                            <a href="<?php echo appBasePath() . $item[2]; ?>"<?php echo $key === $admin_active ? ' class="active" aria-current="page"' : ''; ?>>
                                 <i class="fas <?php echo $item[0]; ?>"></i>
                                 <span><?php echo $item[1]; ?></span>
                             </a>

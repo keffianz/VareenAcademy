@@ -13,13 +13,29 @@ function getCsrfToken() {
     return meta ? meta.getAttribute('content') : '';
 }
 
+/**
+ * Resolve the application base path (deployment-path independent).
+ * layout.php renders data-basepath from appBasePath(); the fallback keeps
+ * legacy behaviour for standalone auth views that do not use the layout.
+ */
+function authBasePath() {
+    const fromHtml = document.documentElement.getAttribute('data-basepath');
+    if (fromHtml) return fromHtml.replace(/\/+$/, '');
+    return '/lms_vareen';
+}
+
+/** Build a full API URL for an auth action. */
+function authApiUrl(action) {
+    return authBasePath() + '/src/api/auth.php?action=' + encodeURIComponent(action);
+}
+
 const Auth = {
     /**
      * Perform login
      */
     login: async (email, password) => {
         try {
-const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
+                const response = await fetch(authApiUrl('login'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -41,7 +57,7 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
      */
     signup: async (first_name, last_name, email, password, role = 'student') => {
         try {
-            const response = await fetch('/lms_vareen/src/api/auth.php?action=signup', {
+            const response = await fetch(authApiUrl('signup'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -63,7 +79,7 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
      */
     logout: async () => {
         try {
-            const response = await fetch('/lms_vareen/src/api/auth.php?action=logout', {
+            const response = await fetch(authApiUrl('logout'), {
                 method: 'POST',
                 headers: {
                     'X-CSRF-Token': getCsrfToken()
@@ -72,7 +88,7 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
 
             const data = await response.json();
             if (data.success) {
-                window.location.href = '/lms_vareen/index.php?page=login';
+                window.location.href = authBasePath() + '/index.php?page=login';
             }
             return data;
         } catch (error) {
@@ -86,7 +102,7 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
      */
     checkEmail: async (email) => {
         try {
-            const response = await fetch('/lms_vareen/src/api/auth.php?action=check_email', {
+            const response = await fetch(authApiUrl('check_email'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -108,7 +124,7 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
      */
     requestPasswordReset: async (email) => {
         try {
-            const response = await fetch('/lms_vareen/src/api/auth.php?action=request_reset', {
+            const response = await fetch(authApiUrl('request_reset'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -130,7 +146,7 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
      */
     resetPassword: async (token, new_password) => {
         try {
-            const response = await fetch('/lms_vareen/src/api/auth.php?action=reset_password', {
+            const response = await fetch(authApiUrl('reset_password'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -152,7 +168,7 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
      */
     changePassword: async (old_password, new_password) => {
         try {
-            const response = await fetch('/lms_vareen/src/api/auth.php?action=change_password', {
+            const response = await fetch(authApiUrl('change_password'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -166,6 +182,52 @@ const response = await fetch('/lms_vareen/src/api/auth.php?action=login', {
         } catch (error) {
             console.error('Change password error:', error);
             return { success: false, message: 'Password change failed' };
+        }
+    },
+
+    /**
+     * Update the signed-in user's profile (VX-009)
+     * @param {Object} fields - first_name, last_name, phone, city, country, specialization, bio
+     */
+    updateProfile: async (fields) => {
+        try {
+            const response = await fetch(authApiUrl('update_profile'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': getCsrfToken()
+                },
+                body: JSON.stringify(fields || {})
+            });
+
+            return await response.json();
+        } catch (error) {
+            console.error('Update profile error:', error);
+            return { success: false, message: 'Profile update failed' };
+        }
+    },
+
+    /**
+     * Upload a profile photo (VX-009). Returns the stored relative path on success.
+     * @param {File} file
+     */
+    uploadAvatar: async (file) => {
+        try {
+            const formData = new FormData();
+            formData.append('avatar', file);
+
+            const response = await fetch(authApiUrl('upload_avatar'), {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-Token': getCsrfToken()
+                },
+                body: formData
+            });
+
+            return await response.json();
+        } catch (error) {
+            console.error('Avatar upload error:', error);
+            return { success: false, message: 'Photo upload failed' };
         }
     },
 

@@ -174,6 +174,14 @@ class Lesson {
                 $updates[] = "video_duration = :video_duration";
                 $params[':video_duration'] = $data['video_duration'];
             }
+            if (isset($data['position'])) {
+                $updates[] = "position = :position";
+                $params[':position'] = (int)$data['position'];
+            }
+            if (isset($data['is_active'])) {
+                $updates[] = "is_active = :is_active";
+                $params[':is_active'] = !empty($data['is_active']) ? 1 : 0;
+            }
 
             if (empty($updates)) {
                 return ['success' => false, 'message' => 'No data to update'];
@@ -201,6 +209,24 @@ class Lesson {
             return ['success' => true, 'message' => 'Lesson deleted'];
         } catch (PDOException $e) {
             return ['success' => false, 'message' => 'Delete failed'];
+        }
+    }
+
+    /**
+     * Get the owning course_id of a resource (resources → lessons → course_id).
+     * Used for teacher-ownership authorization on resource delete.
+     */
+    public function getResourceOwnerCourseId($resource_id) {
+        try {
+            $sql = "SELECT l.course_id
+                    FROM resources r
+                    JOIN lessons l ON r.lesson_id = l.id
+                    WHERE r.id = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':id' => (int)$resource_id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        } catch (PDOException $e) {
+            return null;
         }
     }
 

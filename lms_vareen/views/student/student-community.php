@@ -25,7 +25,7 @@ $posts = $selectedCommunity ? $community->getPosts($selectedCommunity, null, 20)
                 <h3>Communities</h3>
                 <ul class="community-nav">
                     <?php foreach ($communities as $c): ?>
-                        <li><a href="/index.php?page=student-community&community_id=<?php echo $c['id']; ?>" class="<?php echo $selectedCommunity == $c['id'] ? 'active' : ''; ?>"><i class="fas <?php echo htmlspecialchars($c['icon']); ?>"></i> <?php echo htmlspecialchars($c['name']); ?></a></li>
+                        <li><a href="<?php echo appBasePath(); ?>/index.php?page=student-community&community_id=<?php echo $c['id']; ?>" class="<?php echo $selectedCommunity == $c['id'] ? 'active' : ''; ?>"><i class="fas <?php echo htmlspecialchars($c['icon']); ?>"></i> <?php echo htmlspecialchars($c['name']); ?></a></li>
                     <?php endforeach; ?>
                 </ul>
             </div>
@@ -55,7 +55,7 @@ $posts = $selectedCommunity ? $community->getPosts($selectedCommunity, null, 20)
                                 <p class="post-content"><?php echo nl2br(htmlspecialchars(substr($p['content'], 0, 200))); ?></p>
                                 <div class="post-actions">
                                     <button class="btn btn-sm btn-outline" onclick="toggleLike(<?php echo $p['id']; ?>)"><i class="fas fa-heart"></i> <?php echo $p['likes_count']; ?></button>
-                                    <a href="/index.php?page=post-detail&id=<?php echo $p['id']; ?>" class="btn btn-sm btn-outline"><i class="fas fa-comment"></i> <?php echo $p['comments_count']; ?></a>
+                                    <a href="<?php echo appBasePath(); ?>/index.php?page=post-detail&id=<?php echo $p['id']; ?>" class="btn btn-sm btn-outline"><i class="fas fa-comment"></i> <?php echo $p['comments_count']; ?></a>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -79,9 +79,9 @@ $posts = $selectedCommunity ? $community->getPosts($selectedCommunity, null, 20)
     </div>
 </div>
 
-<script src="/lms_vareen/public/js/auth.js"></script>
+<script src="<?php echo appBasePath(); ?>/public/js/auth.js"></script>
 <script>
 (function(){var s=document.getElementById('studentSidebar'),t=document.getElementById('sidebarToggle'),c=document.getElementById('sidebarClose');if(t&&s)t.addEventListener('click',function(){s.classList.add('active')});if(c&&s)c.addEventListener('click',function(){s.classList.remove('active')});})();
-document.getElementById('newPostForm').addEventListener('submit',async function(e){e.preventDefault();const fd=new FormData(this);const res=await fetch('/lms_vareen/src/api/community.php?action=post_create',{method:'POST',body:fd});const data=await res.json();if(data.success){location.reload();}else{alert(data.message||'Error');}});
-async function toggleLike(postId){const fd=new FormData();fd.append('post_id',postId);const res=await fetch('/lms_vareen/src/api/community.php?action=like_toggle',{method:'POST',body:fd});const data=await res.json();if(data.success){location.reload();}}
+document.getElementById('newPostForm').addEventListener('submit',async function(e){e.preventDefault();const fd=new FormData(this);const res=await fetch('<?php echo appBasePath(); ?>/src/api/community.php?action=post_create',{method:'POST',body:fd});const data=await res.json();if(data.success){location.reload();}else{alert(data.message||'Error');}});
+async function toggleLike(postId){const fd=new FormData();fd.append('post_id',postId);const res=await fetch('<?php echo appBasePath(); ?>/src/api/community.php?action=like_toggle',{method:'POST',body:fd});const data=await res.json();if(data.success){location.reload();}}
 </script>

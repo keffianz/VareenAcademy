@@ -49,7 +49,7 @@ $quizzes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <span class="muted">Not attempted</span>
                                     <?php endif; ?>
                                 </td>
-                                <td><a href="/index.php?page=quiz-attempt&id=<?php echo $q['id']; ?>" class="btn btn-sm btn-primary">Start Quiz</a></td>
+                                <td><a href="<?php echo appBasePath(); ?>/index.php?page=quiz-attempt&id=<?php echo $q['id']; ?>" class="btn btn-sm btn-primary">Start Quiz</a></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -58,7 +58,7 @@ $quizzes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 </div>
-<script src="/lms_vareen/public/js/auth.js"></script>
+<script src="<?php echo appBasePath(); ?>/public/js/auth.js"></script>
 <script>
 (function(){var s=document.getElementById('studentSidebar'),t=document.getElementById('sidebarToggle'),c=document.getElementById('sidebarClose');if(t&&s)t.addEventListener('click',function(){s.classList.add('active')});if(c&&s)c.addEventListener('click',function(){s.classList.remove('active')});})();
 </script>

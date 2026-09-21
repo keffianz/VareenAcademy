@@ -141,16 +141,62 @@ if ($module_id) {
         <?php else: ?>
             <div class="lessons-list">
                 <?php foreach ($lessons as $l): ?>
-                    <div class="lesson-item" data-lesson-id="<?php echo (int)$l['id']; ?>">
-                        <div>
+                    <?php $lid = (int)$l['id']; $vurl = trim((string)($l['video_url'] ?? '')); $isUpload = (strpos($vurl, 'assets/uploads/videos/') === 0); $isActive = !empty($l['is_active']); ?>
+                    <div class="lesson-item" data-lesson-id="<?php echo $lid; ?>">
+                        <div class="lesson-item-main">
                             <strong><?php echo htmlspecialchars($l['title']); ?></strong>
-                            <div class="muted">Position: <?php echo (int)($l['position'] ?? 0); ?></div>
+                            <div class="muted">
+                                Position: <?php echo (int)($l['position'] ?? 0); ?> ·
+                                <span class="lesson-status <?php echo $isActive ? 'status-published' : 'status-draft'; ?>">
+                                    <?php echo $isActive ? 'Published' : 'Draft'; ?>
+                                </span>
+                                <?php if ($l['video_duration']): ?> · <?php echo Lesson::formatDuration((int)$l['video_duration']); ?><?php endif; ?>
+                            </div>
+                            <?php if ($vurl !== '' && $isUpload): ?>
+                                <video class="lesson-video-preview" controls preload="metadata"
+                                    src="<?php echo htmlspecialchars(appBasePath() . '/' . $vurl); ?>"></video>
+                            <?php elseif ($vurl !== ''): ?>
+                                <div class="muted"><i class="fas fa-link"></i> External video link set</div>
+                            <?php else: ?>
+                                <div class="muted"><i class="fas fa-video-slash"></i> No video yet</div>
+                            <?php endif; ?>
                         </div>
 
                         <div class="lesson-actions">
-                            <button class="btn btn-outline" onclick="openResourceManager(<?php echo (int)$l['id']; ?>)">Resources</button>
-                            <button class="btn btn-danger" onclick="deleteLesson(<?php echo (int)$l['id']; ?>)">Delete</button>
+                            <input type="file" id="videoInput<?php echo $lid; ?>" accept=".mp4,.webm,.mov,.avi,video/mp4,video/webm,video/quicktime" hidden
+                                data-max-size="<?php echo 500 * 1024 * 1024; ?>">
+                            <button class="btn btn-primary" onclick="document.getElementById('videoInput<?php echo $lid; ?>').click()">
+                                <i class="fas fa-upload"></i> <?php echo $vurl !== '' ? 'Replace Video' : 'Upload Video'; ?>
+                            </button>
+                            <button class="btn btn-outline" onclick="togglePublish(<?php echo $lid; ?>, <?php echo $isActive ? 0 : 1; ?>, this)">
+                                <?php echo $isActive ? '<i class="fas fa-eye-slash"></i> Unpublish' : '<i class="fas fa-check"></i> Publish'; ?>
+                            </button>
+                            <button class="btn btn-outline" onclick="toggleEditPanel(<?php echo $lid; ?>)"><i class="fas fa-pen"></i> Edit</button>
+                            <button class="btn btn-outline" onclick="openResourceManager(<?php echo $lid; ?>)">Resources</button>
+                            <button class="btn btn-danger" onclick="deleteLesson(<?php echo $lid; ?>)">Delete</button>
                         </div>
+
+                        <div class="upload-progress" id="videoProgWrap<?php echo $lid; ?>" hidden>
+                            <div class="upload-progress-track"><div class="upload-progress-bar" id="videoProg<?php echo $lid; ?>"></div></div>
+                            <span id="videoPct<?php echo $lid; ?>">0%</span>
+                        </div>
+
+                        <form class="lesson-edit-panel" id="editPanel<?php echo $lid; ?>" hidden
+                            data-title="<?php echo htmlspecialchars($l['title']); ?>"
+                            data-description="<?php echo htmlspecialchars($l['description'] ?? ''); ?>"
+                            data-video-duration="<?php echo (int)($l['video_duration'] ?? 0); ?>"
+                            data-position="<?php echo (int)($l['position'] ?? 0); ?>">
+                            <label>Title</label>
+                            <input type="text" name="title" required value="<?php echo htmlspecialchars($l['title']); ?>">
+                            <label>Description</label>
+                            <textarea name="description"><?php echo htmlspecialchars($l['description'] ?? ''); ?></textarea>
+                            <label>Estimated Duration (seconds)</label>
+                            <input type="number" name="video_duration" min="0" value="<?php echo (int)($l['video_duration'] ?? 0); ?>">
+                            <label>Position</label>
+                            <input type="number" name="position" min="0" value="<?php echo (int)($l['position'] ?? 0); ?>">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="button" class="btn btn-outline" onclick="toggleEditPanel(<?php echo $lid; ?>)">Cancel</button>
+                        </form>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -205,8 +251,104 @@ if ($module_id) {
     }
 
     function openResourceManager(lessonId) {
-        window.location.href = '/index.php?page=teacher-resource-editor&lesson_id=' + encodeURIComponent(lessonId);
+        window.location.href = '<?php echo appBasePath(); ?>/index.php?page=teacher-resource-editor&lesson_id=' + encodeURIComponent(lessonId);
     }
+
+    function toggleEditPanel(lessonId) {
+        const p = document.getElementById('editPanel' + lessonId);
+        if (p) p.hidden = !p.hidden;
+    }
+
+    async function togglePublish(lessonId, newState, btn) {
+        const old = btn.innerHTML;
+        btn.disabled = true;
+        try {
+            const data = await postForm('<?php echo appBasePath(); ?>/src/api/lessons.php?action=update', {
+                lesson_id: lessonId,
+                is_active: newState
+            });
+            if (data.success) location.reload();
+            else { showToast(data.message || 'Failed to update status', 'error'); btn.disabled = false; btn.innerHTML = old; }
+        } catch (_) {
+            showToast('Failed to update status', 'error');
+            btn.disabled = false; btn.innerHTML = old;
+        }
+    }
+
+    // Lesson edit panels
+    document.querySelectorAll('.lesson-edit-panel').forEach(panel => {
+        panel.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const lessonId = panel.id.replace('editPanel', '');
+            const fd = new FormData(panel);
+            const payload = { lesson_id: lessonId };
+            ['title', 'description', 'video_duration', 'position'].forEach(k => payload[k] = fd.get(k));
+            const data = await postForm('<?php echo appBasePath(); ?>/src/api/lessons.php?action=update', payload);
+            if (data.success) location.reload();
+            else showToast(data.message || 'Save failed', 'error');
+        });
+    });
+
+    // Video uploads — XHR for real progress, CSRF via meta token
+    (function () {
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        const apiBase = '<?php echo appBasePath(); ?>/src/api/lessons.php?action=upload_video';
+
+        document.querySelectorAll('input[id^="videoInput"]').forEach(inp => {
+            inp.addEventListener('change', () => {
+                const lessonId = inp.id.replace('videoInput', '');
+                const file = inp.files[0];
+                if (!file) return;
+
+                const max = parseInt(inp.dataset.maxSize || '0', 10);
+                if (max && file.size > max) {
+                    showToast('File too large (max 500MB)', 'error');
+                    inp.value = '';
+                    return;
+                }
+
+                const wrap = document.getElementById('videoProgWrap' + lessonId);
+                const bar = document.getElementById('videoProg' + lessonId);
+                const pct = document.getElementById('videoPct' + lessonId);
+                wrap.hidden = false;
+                bar.style.width = '0%';
+                pct.textContent = '0%';
+
+                const fd = new FormData();
+                fd.append('lesson_id', lessonId);
+                fd.append('video', file);
+                if (csrfMeta) fd.append('csrf_token', csrfMeta.content);
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', apiBase);
+                if (csrfMeta) xhr.setRequestHeader('X-CSRF-Token', csrfMeta.content);
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const p = Math.round((e.loaded / e.total) * 100);
+                        bar.style.width = p + '%';
+                        pct.textContent = p + '%';
+                    }
+                });
+                xhr.addEventListener('load', () => {
+                    wrap.hidden = true;
+                    let data = {};
+                    try { data = JSON.parse(xhr.responseText); } catch (_) {}
+                    if (data.success) {
+                        showToast(data.message || 'Video uploaded', 'success');
+                        setTimeout(() => location.reload(), 700);
+                    } else {
+                        showToast(data.message || 'Upload failed', 'error');
+                    }
+                });
+                xhr.addEventListener('error', () => {
+                    wrap.hidden = true;
+                    showToast('Upload failed — network error', 'error');
+                });
+                xhr.send(fd);
+            });
+        });
+    })();
+
 </script>
 
 <style>
@@ -222,15 +364,25 @@ if ($module_id) {
     .btn-outline{background:transparent;border-color:#667eea;color:#667eea;}
     .btn-danger{background:#dc3545;color:#fff;}
     .lessons-list{display:flex;flex-direction:column;gap:10px;}
-    .lesson-item{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border:1px solid #eee;border-radius:10px;}
+    .lesson-item{display:flex;flex-direction:column;gap:10px;padding:12px 14px;border:1px solid #eee;border-radius:10px;}
+    .lesson-item-main .muted{margin-top:4px;}
+    .lesson-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+    .lesson-status{font-weight:600;}
+    .status-published{color:#1a7f37;}
+    .status-draft{color:#b45309;}
+    .lesson-video-preview{width:100%;max-width:480px;border-radius:8px;margin-top:8px;background:#000;}
+    .upload-progress{display:flex;align-items:center;gap:10px;}
+    .upload-progress-track{flex:1;height:10px;background:#e5e7eb;border-radius:6px;overflow:hidden;}
+    .upload-progress-bar{height:100%;width:0;background:linear-gradient(90deg,#667eea,#764ba2);transition:width .2s;}
+    .lesson-edit-panel{border-top:1px dashed #e5e7eb;padding-top:12px;}
+    .lesson-edit-panel button{margin-top:12px;margin-right:8px;}
     .muted{color:#777;font-size:13px;}
-    .lesson-actions{display:flex;gap:10px;}
 </style>
             </div>
         </div>
     </main>
 </div>
-<script src="/lms_vareen/public/js/auth.js"></script>
+<script src="<?php echo appBasePath(); ?>/public/js/auth.js"></script>
 <script>
 (function(){var s=document.getElementById('teacherSidebar'),t=document.getElementById('sidebarToggle'),c=document.getElementById('sidebarClose');if(t&&s)t.addEventListener('click',function(){s.classList.add('active')});if(c&&s)c.addEventListener('click',function(){s.classList.remove('active')});})();
 </script>

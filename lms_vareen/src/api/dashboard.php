@@ -37,12 +37,23 @@ switch ($action) {
     case 'enroll':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = json_decode(file_get_contents('php://input'), true);
-            $course_id = $data['course_id'] ?? null;
-            
+            $course_id = (int)($data['course_id'] ?? 0);
+
             if (!$course_id) {
                 $response = ['success' => false, 'message' => 'Course ID required'];
+            } elseif (($_SESSION['user_role'] ?? '') !== 'student') {
+                // Only students hold enrollments (VX-009) — teachers/admins read courses, they don't join them
+                http_response_code(403);
+                $response = ['success' => false, 'message' => 'Only student accounts can enroll in courses'];
             } else {
-                $response = $enrollment->enrollStudent($user_id, $course_id);
+                // Only published courses accept enrollments (VX-009)
+                $course_data = $course->getCourseById($course_id);
+                if (!$course_data || empty($course_data['is_active'])) {
+                    http_response_code(404);
+                    $response = ['success' => false, 'message' => 'This course is not available for enrollment'];
+                } else {
+                    $response = $enrollment->enrollStudent($user_id, $course_id);
+                }
             }
         }
         break;
@@ -74,7 +85,8 @@ switch ($action) {
             if (!$notification_id) {
                 $response = ['success' => false, 'message' => 'Notification ID required'];
             } else {
-                $response = $notification->markAsRead($notification_id);
+                // Ownership-scoped: users may only mark their own notifications (VX-012 IDOR fix)
+                $response = $notification->markAsRead($notification_id, $user_id);
             }
         }
         break;

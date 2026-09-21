@@ -251,29 +251,49 @@ class User {
             $updates = [];
             $params = [':id' => $user_id];
 
-            if (isset($data['first_name'])) {
-                $updates[] = "first_name = :first_name";
-                $params[':first_name'] = $data['first_name'];
+            // Text fields with per-field limits (mirrors the users table definition)
+            $textFields = [
+                'first_name'    => 100,
+                'last_name'     => 100,
+                'phone'         => 20,
+                'city'          => 100,
+                'country'       => 100,
+                'specialization'=> 255,
+            ];
+            foreach ($textFields as $field => $maxLen) {
+                if (!array_key_exists($field, $data)) continue;
+                $value = trim((string)$data[$field]);
+                if (mb_strlen($value) > $maxLen) {
+                    return ['success' => false, 'message' => 'Invalid value for ' . str_replace('_', ' ', $field)];
+                }
+                $updates[] = "$field = :$field";
+                $params[":$field"] = $value === '' ? null : $value;
             }
-            if (isset($data['last_name'])) {
-                $updates[] = "last_name = :last_name";
-                $params[':last_name'] = $data['last_name'];
+
+            if (array_key_exists('bio', $data)) {
+                $bio = trim((string)$data['bio']);
+                if (mb_strlen($bio) > 2000) {
+                    return ['success' => false, 'message' => 'Bio is too long (max 2000 characters)'];
+                }
+                $updates[] = 'bio = :bio';
+                $params[':bio'] = $bio === '' ? null : $bio;
             }
-            if (isset($data['bio'])) {
-                $updates[] = "bio = :bio";
-                $params[':bio'] = $data['bio'];
+
+            if (array_key_exists('profile_image', $data)) {
+                $img = trim((string)$data['profile_image']);
+                if (mb_strlen($img) > 255) {
+                    return ['success' => false, 'message' => 'Invalid profile image path'];
+                }
+                $updates[] = 'profile_image = :profile_image';
+                $params[':profile_image'] = $img === '' ? null : $img;
             }
-            if (isset($data['phone'])) {
-                $updates[] = "phone = :phone";
-                $params[':phone'] = $data['phone'];
+
+            // Names must never become empty when edited
+            if (array_key_exists('first_name', $data) && trim((string)$data['first_name']) === '') {
+                return ['success' => false, 'message' => 'First name cannot be empty'];
             }
-            if (isset($data['city'])) {
-                $updates[] = "city = :city";
-                $params[':city'] = $data['city'];
-            }
-            if (isset($data['country'])) {
-                $updates[] = "country = :country";
-                $params[':country'] = $data['country'];
+            if (array_key_exists('last_name', $data) && trim((string)$data['last_name']) === '') {
+                return ['success' => false, 'message' => 'Last name cannot be empty'];
             }
 
             if (empty($updates)) {
@@ -286,7 +306,8 @@ class User {
 
             return ['success' => true, 'message' => 'Profile updated successfully'];
         } catch (PDOException $e) {
-            return ['success' => false, 'message' => 'Update failed: ' . $e->getMessage()];
+            error_log('updateProfile failed: ' . $e->getMessage());
+            return ['success' => false, 'message' => 'Update failed'];
         }
     }
 

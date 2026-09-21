@@ -105,7 +105,7 @@ $selectedQuizId = (int)($_GET['quiz_id'] ?? 0);
                                     <div class="quiz-title"><?php echo htmlspecialchars($q['title']); ?></div>
                                     <div class="muted">Pass: <?php echo (int)$q['pass_score']; ?> • Timed: <?php echo !empty($q['is_timed']) ? 'Yes' : 'No'; ?></div>
                                 </div>
-                                <a class="btn btn-small" href="/index.php?page=teacher-quiz-editor&course_id=<?php echo (int)$course_id; ?>&quiz_id=<?php echo (int)$q['id']; ?>">Edit</a>
+                                <a class="btn btn-small" href="<?php echo appBasePath(); ?>/index.php?page=teacher-quiz-editor&course_id=<?php echo (int)$course_id; ?>&quiz_id=<?php echo (int)$q['id']; ?>">Edit</a>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -251,7 +251,7 @@ $selectedQuizId = (int)($_GET['quiz_id'] ?? 0);
     if(courseSelect){
         courseSelect.addEventListener('change', ()=>{
             const cid = courseSelect.value;
-            window.location.href = '/index.php?page=teacher-quiz-editor&course_id=' + cid;
+            window.location.href = '<?php echo appBasePath(); ?>/index.php?page=teacher-quiz-editor&course_id=' + cid;
         });
     }
 
@@ -271,7 +271,7 @@ $selectedQuizId = (int)($_GET['quiz_id'] ?? 0);
         if(data.success){
             showToast(data.message || 'Quiz created', 'success');
             setTimeout(()=>{
-                window.location.href = '/index.php?page=teacher-quiz-editor&course_id=' + fd.get('course_id') + '&quiz_id=' + data.quiz_id;
+                window.location.href = '<?php echo appBasePath(); ?>/index.php?page=teacher-quiz-editor&course_id=' + fd.get('course_id') + '&quiz_id=' + data.quiz_id;
             }, 700);
         }else{
             showToast(data.message || 'Failed', 'error');
@@ -287,7 +287,7 @@ $selectedQuizId = (int)($_GET['quiz_id'] ?? 0);
         if(data.success){
             showToast(data.message || 'Question added', 'success');
             setTimeout(()=>{
-                window.location.href = '/index.php?page=teacher-quiz-editor&course_id=<?php echo (int)$course_id; ?>&quiz_id=' + quiz_id;
+                window.location.href = '<?php echo appBasePath(); ?>/index.php?page=teacher-quiz-editor&course_id=<?php echo (int)$course_id; ?>&quiz_id=' + quiz_id;
             }, 600);
         }else{
             showToast(data.message || 'Failed', 'error');
@@ -308,7 +308,7 @@ $selectedQuizId = (int)($_GET['quiz_id'] ?? 0);
             if(data.success){
                 showToast(data.message || 'Option added', 'success');
                 setTimeout(()=>{
-                    window.location.href = '/index.php?page=teacher-quiz-editor&course_id=<?php echo (int)$course_id; ?>&quiz_id=<?php echo (int)$selectedQuizId; ?>';
+                    window.location.href = '<?php echo appBasePath(); ?>/index.php?page=teacher-quiz-editor&course_id=<?php echo (int)$course_id; ?>&quiz_id=<?php echo (int)$selectedQuizId; ?>';
                 }, 600);
             }else{
                 showToast(data.message || 'Failed', 'error');
@@ -320,7 +320,7 @@ $selectedQuizId = (int)($_GET['quiz_id'] ?? 0);
         </div>
     </main>
 </div>
-<script src="/lms_vareen/public/js/auth.js"></script>
+<script src="<?php echo appBasePath(); ?>/public/js/auth.js"></script>
 <script>
 (function(){var s=document.getElementById('teacherSidebar'),t=document.getElementById('sidebarToggle'),c=document.getElementById('sidebarClose');if(t&&s)t.addEventListener('click',function(){s.classList.add('active')});if(c&&s)c.addEventListener('click',function(){s.classList.remove('active')});})();
 </script>

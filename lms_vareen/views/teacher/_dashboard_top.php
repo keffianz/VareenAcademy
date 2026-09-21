@@ -15,8 +15,8 @@
                 <p><?php echo htmlspecialchars($page_subtitle ?? ''); ?></p>
             </div>
             <div class="topbar-actions">
-                <a href="/index.php?page=teacher-ai" class="btn btn-ai" title="AI Assistant"><i class="fas fa-robot"></i></a>
-                <a href="/index.php?page=teacher-profile" class="btn btn-icon"><i class="fas fa-user-circle"></i></a>
+                <a href="<?php echo appBasePath(); ?>/index.php?page=teacher-ai" class="btn btn-ai" title="AI Assistant"><i class="fas fa-robot"></i></a>
+                <a href="<?php echo appBasePath(); ?>/index.php?page=teacher-profile" class="btn btn-icon"><i class="fas fa-user-circle"></i></a>
             </div>
         </div>
         <?php if (!empty($success_message)): ?><div class="alert alert-success"><?php echo htmlspecialchars($success_message); ?></div><?php endif; ?>

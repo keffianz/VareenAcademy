@@ -167,3 +167,21 @@ function requireCsrf(): void {
         exit;
     }
 }
+
+/**
+ * Global relative-time formatter ("just now", "5m ago", "3h ago", "2d ago", date).
+ * Single shared helper (VX-012) — previously duplicated per-view or JS-only,
+ * which caused a fatal error on the notifications page.
+ */
+if (!function_exists('timeAgo')) {
+    function timeAgo($datetime): string {
+        $ts = strtotime((string)$datetime);
+        if ($ts === false) { return ''; }
+        $diff = time() - $ts;
+        if ($diff < 60)     return 'just now';
+        if ($diff < 3600)   return floor($diff / 60) . 'm ago';
+        if ($diff < 86400)  return floor($diff / 3600) . 'h ago';
+        if ($diff < 604800) return floor($diff / 86400) . 'd ago';
+        return date('M j, Y', $ts);
+    }
+}

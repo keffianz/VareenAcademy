@@ -42,6 +42,7 @@ $student_groups = [
         'label' => 'ACCOUNT',
         'items' => [
             'certificates' => ['fa-certificate', 'Certificates', '/index.php?page=certificates'],
+            'notifications' => ['fa-bell', 'Notifications', '/index.php?page=notifications'],
             'my-payments' => ['fa-credit-card', 'My Payments', '/index.php?page=my-payments'],
             'profile' => ['fa-user', 'Profile', '/index.php?page=profile'],
         ],
@@ -64,7 +65,7 @@ $student_active = $student_active ?? 'student-dashboard';
                 <ul>
                     <?php foreach ($group['items'] as $key => $item): ?>
                         <li>
-                            <a href="<?php echo $item[2]; ?>"<?php echo $key === $student_active ? ' class="active" aria-current="page"' : ''; ?>>
+                            <a href="<?php echo appBasePath() . $item[2]; ?>"<?php echo $key === $student_active ? ' class="active" aria-current="page"' : ''; ?>>
                                 <i class="fas <?php echo $item[0]; ?>"></i>
                                 <span><?php echo $item[1]; ?></span>
                             </a>

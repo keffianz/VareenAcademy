@@ -83,18 +83,24 @@ class Notification {
     }
 
     /**
-     * Mark as read
+     * Mark as read — ownership-scoped: a user can only mark their own
+     * notifications (VX-012 IDOR fix). $user_id is enforced when provided.
      */
-    public function markAsRead($notification_id) {
+    public function markAsRead($notification_id, $user_id = null) {
         try {
             $sql = "UPDATE notifications 
                     SET is_read = 1, read_at = NOW()
                     WHERE id = :id";
+            $params = [':id' => $notification_id];
+            if ($user_id !== null) {
+                $sql .= " AND user_id = :user_id";
+                $params[':user_id'] = $user_id;
+            }
             
             $stmt = $this->db->prepare($sql);
-            $stmt->execute([':id' => $notification_id]);
+            $stmt->execute($params);
 
-            return ['success' => true];
+            return ['success' => true, 'updated' => $stmt->rowCount() > 0];
         } catch (PDOException $e) {
             return ['success' => false];
         }
@@ -137,16 +143,21 @@ class Notification {
     }
 
     /**
-     * Delete notification
+     * Delete notification — ownership-scoped (VX-012 IDOR fix).
      */
-    public function delete($notification_id) {
+    public function delete($notification_id, $user_id = null) {
         try {
             $sql = "DELETE FROM notifications WHERE id = :id";
+            $params = [':id' => $notification_id];
+            if ($user_id !== null) {
+                $sql .= " AND user_id = :user_id";
+                $params[':user_id'] = $user_id;
+            }
             
             $stmt = $this->db->prepare($sql);
-            $stmt->execute([':id' => $notification_id]);
+            $stmt->execute($params);
 
-            return ['success' => true];
+            return ['success' => true, 'deleted' => $stmt->rowCount() > 0];
         } catch (PDOException $e) {
             return ['success' => false];
         }

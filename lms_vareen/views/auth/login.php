@@ -843,7 +843,7 @@ body {
         signinBtn.classList.add('is-loading');
         signinBtn.disabled = true;
 
-        fetch('/lms_vareen/src/api/auth.php?action=login', {
+        fetch('<?php echo appBasePath(); ?>/src/api/auth.php?action=login', {
             method: 'POST',
             credentials: 'same-origin',
             headers: {

@@ -34,7 +34,7 @@ requireRoles(['teacher', 'admin']);
         </div>
     </div>
 </div>
-<script src="/lms_vareen/public/js/auth.js"></script>
+<script src="<?php echo appBasePath(); ?>/public/js/auth.js"></script>
 <script>
 (function(){
     var s=document.getElementById('teacherSidebar'),t=document.getElementById('sidebarToggle'),c=document.getElementById('sidebarClose');
@@ -91,7 +91,7 @@ requireRoles(['teacher', 'admin']);
         formData.append('prompt',prompt);
         formData.append('context','teacher');
         formData.append('csrf_token',csrfToken);
-        fetch('/lms_vareen/src/api/teacher.php?action=ai_chat',{method:'POST',body:formData})
+        fetch('<?php echo appBasePath(); ?>/src/api/teacher.php?action=ai_chat',{method:'POST',body:formData})
             .then(function(r){return r.json()})
             .then(function(data){
                 lastMsg.textContent=data.success?(data.response||'No response from AI.'):'Error: '+(data.message||'Failed');

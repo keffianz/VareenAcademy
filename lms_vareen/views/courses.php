@@ -29,7 +29,7 @@ foreach ($courses as &$c) {
     <div class="container">
         <h1>Browse Courses</h1>
         
-        <form action="/index.php?page=courses" method="GET" class="search-form" style="margin-bottom: 30px;">
+        <form action="<?php echo appBasePath(); ?>/index.php?page=courses" method="GET" class="search-form" style="margin-bottom: 30px;">
             <input type="hidden" name="page" value="courses">
             <input type="text" name="q" placeholder="Search courses..." value="<?php echo htmlspecialchars($keyword); ?>">
             <button type="submit" class="btn btn-primary">Search</button>
@@ -53,13 +53,13 @@ foreach ($courses as &$c) {
                                 <?php echo htmlspecialchars($c['first_name'] . ' ' . $c['last_name']); ?>
                             </p>
                             <?php if ($c['is_enrolled']): ?>
-                                <a href="/index.php?page=course-detail&id=<?php echo $c['id']; ?>" class="btn btn-primary btn-small btn-block">
+                                <a href="<?php echo appBasePath(); ?>/index.php?page=course-detail&id=<?php echo $c['id']; ?>" class="btn btn-primary btn-small btn-block">
                                     <i class="fas fa-play-circle"></i> Continue Learning
                                 </a>
                             <?php elseif (isLoggedIn() && getCurrentUserRole() === 'student'): ?>
                                 <?php if ((float)($c['price'] ?? 0) > 0): ?>
-                                    <a href="/index.php?page=checkout&id=<?php echo $c['id']; ?>" class="btn btn-primary btn-small btn-block">
-                                        <i class="fas fa-shopping-cart"></i> Enroll — ₦<?php echo number_format((float)$c['price'], 2); ?>
+                                    <a href="<?php echo appBasePath(); ?>/index.php?page=checkout&id=<?php echo $c['id']; ?>" class="btn btn-primary btn-small btn-block">
+                                        <i class="fas fa-shopping-cart"></i> Enroll — ₦<?php echo number_format((float)$c['price']); ?>
                                     </a>
                                 <?php else: ?>
                                     <button class="btn btn-primary btn-small btn-block" onclick="enrollCourse(<?php echo $c['id']; ?>)">
@@ -67,7 +67,7 @@ foreach ($courses as &$c) {
                                     </button>
                                 <?php endif; ?>
                             <?php else: ?>
-                                <a href="/index.php?page=login" class="btn btn-primary btn-small btn-block">
+                                <a href="<?php echo appBasePath(); ?>/index.php?page=login" class="btn btn-primary btn-small btn-block">
                                     Sign in to Enroll
                                 </a>
                             <?php endif; ?>
@@ -79,11 +79,11 @@ foreach ($courses as &$c) {
             <!-- Pagination -->
             <div class="pagination" style="margin-top: 40px;">
                 <?php if ($page > 1): ?>
-                    <a href="/index.php?page=courses&pg=<?php echo $page - 1; ?>&q=<?php echo urlencode($keyword); ?>" class="btn">Previous</a>
+                    <a href="<?php echo appBasePath(); ?>/index.php?page=courses&pg=<?php echo $page - 1; ?>&q=<?php echo urlencode($keyword); ?>" class="btn">Previous</a>
                 <?php endif; ?>
                 <span>Page <?php echo $page; ?> of <?php echo $total_pages; ?></span>
                 <?php if ($page < $total_pages): ?>
-                    <a href="/index.php?page=courses&pg=<?php echo $page + 1; ?>&q=<?php echo urlencode($keyword); ?>" class="btn">Next</a>
+                    <a href="<?php echo appBasePath(); ?>/index.php?page=courses&pg=<?php echo $page + 1; ?>&q=<?php echo urlencode($keyword); ?>" class="btn">Next</a>
                 <?php endif; ?>
             </div>
         <?php endif; ?>
@@ -144,7 +144,7 @@ function enrollCourse(courseId) {
         if (data.success) {
             VereenaUtils.showToast('Enrolled successfully!', 'success');
             setTimeout(() => {
-                window.location.href = '/index.php?page=student-dashboard';
+                window.location.href = '<?php echo appBasePath(); ?>/index.php?page=student-dashboard';
             }, 1000);
         } else {
             VereenaUtils.showToast(data.message, 'error');

@@ -55,24 +55,41 @@ const msg=(t,ok=true)=>{const m=$('#msg');m.textContent=t;m.hidden=false;m.class
 async function jget(q){const r=await fetch(`${API}?${q}`,{headers:{'X-CSRF-Token':window.CSRF_TOKEN}});return r.json();}
 async function jpost(action,fields){const fd=new FormData();Object.entries(fields).forEach(([k,v])=>fd.append(k,v));const r=await fetch(`${API}?action=${encodeURIComponent(action)}`,{method:'POST',headers:{'X-CSRF-Token':window.CSRF_TOKEN},body:fd});return r.json();}
 let courses=[];
+const fmtPrice=(c)=>{const p=+c.price;return p>0?((c.currency==='NGN'?'₦':esc(c.currency)+' ')+p.toLocaleString('en-NG')):'Free';};
 async function load(){
   const d=await jget(new URLSearchParams({action:'courses_list'}));
   const tb=$('#rows');tb.innerHTML='';
   if(!d.success){msg(d.message||'Failed to load courses',false);return;}
-  courses=d.courses||[];
+  courses=d.data||[];
   courses.forEach(c=>{
     const tr=document.createElement('tr');
     tr.innerHTML=`<td>${esc(c.id)}</td>
       <td>${esc(c.title)}</td>
       <td>${esc(c.teacher_name??'—')}</td>
       <td>${esc(c.category??'—')}</td>
-      <td>${(+c.price>0)?esc(c.price):'Free'}</td>
+      <td>${fmtPrice(c)}</td>
       <td>${+c.is_active?'<span class="badge-ok">Active</span>':'<span class="badge-off">Inactive</span>'}</td>
       <td><div class="row-actions">
         <button class="btn btn-sm ${+c.is_active?'':'btn-primary'}" type="button" data-active="${esc(c.id)}" data-next="${+c.is_active?'0':'1'}">${+c.is_active?'Deactivate':'Activate'}</button>
         <select data-assign="${esc(c.id)}"><option value="">Assign teacher…</option>${(window._teachers||[]).map(t=>`<option value="${esc(t.id)}"${+c.teacher_id===+t.id?' selected':''}>${esc(((t.first_name||'')+' '+(t.last_name||'')).trim())}</option>`).join('')}</select>
         <button class="btn btn-sm" type="button" data-assign-save="${esc(c.id)}">Save</button>
-      </div></td>`;
+        <button class="btn btn-sm" type="button" data-price-edit="${esc(c.id)}"><i class="fas fa-pen"></i> Price</button>
+      </div></td>
+      <tr class="price-edit-row" id="priceRow${esc(c.id)}" hidden><td colspan="7">
+        <form class="price-form" data-course="${esc(c.id)}">
+          <label>Price (₦)<input type="number" step="0.01" min="0" name="price" value="${esc(+c.price||0)}"></label>
+          <label>Duration (weeks)<input type="number" min="0" name="duration_weeks" value="${esc(c.duration_weeks??'')}"></label>
+          <label>Delivery mode<select name="delivery_mode">
+            ${['on_campus','online','hybrid'].map(m=>`<option value="${m}"${c.delivery_mode===m?' selected':''}>${{on_campus:'On-Campus',online:'Online',hybrid:'Hybrid'}[m]}</option>`).join('')}
+          </select></label>
+          <label>Level<select name="level">
+            ${['beginner','intermediate','advanced'].map(l=>`<option value="${l}"${c.level===l?' selected':''}>${l.charAt(0).toUpperCase()+l.slice(1)}</option>`).join('')}
+          </select></label>
+          <label>Next cohort<input type="date" name="next_cohort" value="${esc(c.next_cohort??'')}"></label>
+          <button class="btn btn-primary btn-sm" type="submit">Save Pricing</button>
+          <button class="btn btn-sm" type="button" data-price-cancel="${esc(c.id)}">Cancel</button>
+        </form>
+      </td></tr>`;
     tb.appendChild(tr);
   });
   if(!courses.length)tb.innerHTML='<tr><td colspan="7">No courses yet.</td></tr>';
@@ -80,14 +97,15 @@ async function load(){
   sel.innerHTML='<option value="">Choose course…</option>'+courses.map(c=>`<option value="${esc(c.id)}">${esc(c.title)}</option>`).join('');
 }
 async function loadPeople(){
-  const t=await jget(new URLSearchParams({action:'list_users',role:'teacher'}));
-  window._teachers=t.users||[];
-  const s=await jget(new URLSearchParams({action:'list_users',role:'student'}));
-  $('#selStudent').innerHTML='<option value="">Choose student…</option>'+(s.users||[]).map(u=>`<option value="${esc(u.id)}">${esc(((u.first_name||'')+' '+(u.last_name||'')).trim())} (${esc(u.email)})</option>`).join('');
+  const t=await jget(new URLSearchParams({action:'users_list',role:'teacher'}));
+  window._teachers=t.data||[];
+  const s=await jget(new URLSearchParams({action:'users_list',role:'student'}));
+  $('#selStudent').innerHTML='<option value="">Choose student…</option>'+(s.data||[]).map(u=>`<option value="${esc(u.id)}">${esc(((u.first_name||'')+' '+(u.last_name||'')).trim())} (${esc(u.email)})</option>`).join('');
   await load();
 }
 $('#rows').addEventListener('click',async e=>{
   const act=e.target.closest('[data-active]'),asg=e.target.closest('[data-assign-save]');
+  const pe=e.target.closest('[data-price-edit]'),pc=e.target.closest('[data-price-cancel]');
   let d;
   if(act){
     d=await jpost('course_set_active',{course_id:act.dataset.active,is_active:act.dataset.next});
@@ -95,9 +113,28 @@ $('#rows').addEventListener('click',async e=>{
     const sel=document.querySelector(`[data-assign="${asg.dataset.assignSave}"]`);
     if(!sel.value){msg('Choose a teacher first',false);return;}
     d=await jpost('course_assign_teacher',{course_id:asg.dataset.assignSave,teacher_id:sel.value});
+  }else if(pe){
+    const row=document.getElementById('priceRow'+pe.dataset.priceEdit);
+    if(row)row.hidden=!row.hidden;
+    return;
+  }else if(pc){
+    const row=document.getElementById('priceRow'+pc.dataset.priceCancel);
+    if(row)row.hidden=true;
+    return;
   }else return;
   msg(d.message||'Saved',!!d.success);
   await load();
+});
+$('#rows').addEventListener('submit',async e=>{
+  const f=e.target.closest('.price-form');
+  if(!f)return;
+  e.preventDefault();
+  const fd=new FormData(f);
+  const fields={course_id:f.dataset.course};
+  ['price','duration_weeks','delivery_mode','level','next_cohort'].forEach(k=>{const v=fd.get(k);if(v!==null)fields[k]=v;});
+  const d=await jpost('course_update',fields);
+  msg(d.message||'Pricing saved',!!d.success);
+  if(d.success)await load();
 });
 $('#frmEnroll').addEventListener('submit',async e=>{
   e.preventDefault();

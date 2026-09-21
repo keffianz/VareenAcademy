@@ -72,7 +72,7 @@ function renderCommentThread(array $cm, int $depth = 0): void {
     <div class="dashboard-content">
         <div class="dashboard-topbar">
             <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
-            <div class="topbar-title"><h1>Discussion</h1><p><a href="/index.php?page=student-community">&larr; Back to Community Hub</a></p></div>
+            <div class="topbar-title"><h1>Discussion</h1><p><a href="<?php echo appBasePath(); ?>/index.php?page=student-community">&larr; Back to Community Hub</a></p></div>
             <button class="btn btn-logout" id="studentLogoutBtnTop"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
 
@@ -122,7 +122,7 @@ function renderCommentThread(array $cm, int $depth = 0): void {
         <?php endif; ?>
     </div>
 </div>
-<script src="/lms_vareen/public/js/auth.js"></script>
+<script src="<?php echo appBasePath(); ?>/public/js/auth.js"></script>
 <script>
 (function(){var s=document.getElementById('studentSidebar'),t=document.getElementById('sidebarToggle'),c=document.getElementById('sidebarClose');if(t&&s)t.addEventListener('click',function(){s.classList.add('active')});if(c&&s)c.addEventListener('click',function(){s.classList.remove('active')});})();
 

@@ -6,6 +6,16 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /sql/
 
+# LMS (lms_vareen): block internal / private paths, keep public assets crawlable
+Disallow: /lms_vareen/src/
+Disallow: /lms_vareen/database/
+Disallow: /lms_vareen/storage/
+Disallow: /lms_vareen/uploads/
+Disallow: /lms_vareen/assets/uploads/
+Disallow: /lms_vareen/tools/
+Allow: /lms_vareen/public/
+Allow: /lms_vareen/index.php
+
 # Allow access to CSS and JS
 Allow: /assets/css/
 Allow: /assets/js/

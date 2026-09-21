@@ -30,12 +30,16 @@ if (!$course_data) {
     exit;
 }
 
-// Check if student is enrolled
+// Check enrollment state (VX-009): non-enrolled students get a preview + Enroll CTA
+// instead of being bounced into a redirect loop; teachers/admins always get full access.
+// NOTE: the canonical session key is $_SESSION['role'] (set by User::login());
+// the legacy $_SESSION['user_role'] key is never assigned, so role checks must
+// never read it (that silently disabled this whole guard).
 $enrollment = new Enrollment();
-if (!$enrollment->isEnrolled($_SESSION['user_id'], $course_id) && $_SESSION['user_role'] === 'student') {
-    header('Location: ' . BASE_URL . '?page=courses');
-    exit;
-}
+$is_enrolled = $enrollment->isEnrolled($_SESSION['user_id'], $course_id);
+$current_role = $_SESSION['role'] ?? null;
+$can_manage = in_array($current_role, ['admin', 'teacher'], true);
+$lessons_open = $is_enrolled || $can_manage;
 
 // Get course modules and lessons
 $module = new Module();
@@ -87,6 +91,43 @@ $last_lesson = $lesson_progress->getLastWatchedLesson($_SESSION['user_id'], $cou
                     <h3>About This Course</h3>
                     <p><?php echo nl2br(htmlspecialchars($course_data['description'] ?? '')); ?></p>
                 </div>
+
+                <?php if (!$is_enrolled && !$can_manage): ?>
+                    <!-- Enroll CTA (VX-009) with pricing (VX-045) -->
+                    <?php
+                    $cPrice = (float)($course_data['price'] ?? 0);
+                    $cCurrency = strtoupper(trim((string)($course_data['currency'] ?? 'NGN')));
+                    $cSymbol = $cCurrency === 'NGN' ? '₦' : $cCurrency . ' ';
+                    $modeLabels = ['on_campus' => 'On-Campus', 'online' => 'Online', 'hybrid' => 'Hybrid'];
+                    ?>
+                    <div class="sidebar-card cta-card enroll-cta">
+                        <h4><i class="fas fa-graduation-cap"></i> Ready to start?</h4>
+                        <p class="enroll-price">
+                            <?php if ($cPrice > 0): ?>
+                                <strong><?php echo $cSymbol . number_format($cPrice); ?></strong>
+                            <?php else: ?>
+                                <strong>Free</strong>
+                            <?php endif; ?>
+                            <?php if (!empty($course_data['duration_weeks'])): ?>
+                                · <?php echo (int)$course_data['duration_weeks']; ?> weeks
+                            <?php endif; ?>
+                            <?php if (!empty($course_data['delivery_mode']) && isset($modeLabels[$course_data['delivery_mode']])): ?>
+                                · <?php echo $modeLabels[$course_data['delivery_mode']]; ?>
+                            <?php endif; ?>
+                            <?php if (!empty($course_data['level'])): ?>
+                                · <?php echo ucfirst(htmlspecialchars($course_data['level'])); ?>
+                            <?php endif; ?>
+                            <?php if (!empty($course_data['next_cohort'])): ?>
+                                · Next cohort: <?php echo htmlspecialchars($course_data['next_cohort']); ?>
+                            <?php endif; ?>
+                        </p>
+                        <p>Enroll now to unlock all lessons, downloadable resources and assignments.</p>
+                        <button type="button" id="enrollBtn" class="btn btn-primary btn-small btn-block"
+                            data-course-id="<?php echo (int)$course_id; ?>">
+                            Enroll Now <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                <?php endif; ?>
 
                 <?php if ($last_lesson): ?>
                     <div class="sidebar-card cta-card">
@@ -163,10 +204,12 @@ $last_lesson = $lesson_progress->getLastWatchedLesson($_SESSION['user_id'], $cou
                                                 $is_completed = in_array($l['id'], $completed_ids);
                                                 ?>
                                                 <li class="lesson-item <?php echo $is_completed ? 'completed' : ''; ?>">
-                                                    <a href="<?php echo BASE_URL; ?>?page=lesson&id=<?php echo $l['id']; ?>" class="lesson-link">
+                                                    <a <?php if ($lessons_open): ?>href="<?php echo BASE_URL; ?>?page=lesson&id=<?php echo $l['id']; ?>"<?php endif; ?> class="lesson-link<?php echo $lessons_open ? '' : ' lesson-locked'; ?>">
                                                         <div class="lesson-icon">
                                                             <?php if ($is_completed): ?>
                                                                 <i class="fas fa-check-circle"></i>
+                                                            <?php elseif (!$lessons_open): ?>
+                                                                <i class="fas fa-lock"></i>
                                                             <?php else: ?>
                                                                 <i class="fas fa-play-circle"></i>
                                                             <?php endif; ?>
@@ -546,6 +589,33 @@ $last_lesson = $lesson_progress->getLastWatchedLesson($_SESSION['user_id'], $cou
     margin: 15px 0;
 }
 
+/* Locked (preview) lessons for non-enrolled visitors (VX-009) */
+.lesson-link.lesson-locked {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.enroll-cta h4 {
+    margin-bottom: 8px;
+    color: #1a202c;
+}
+
+.enroll-cta p {
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    color: #4a5568;
+}
+
+.enroll-price {
+    font-size: 1rem;
+    color: #1a202c;
+}
+
+.enroll-price strong {
+    font-size: 1.3rem;
+    color: #667eea;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
     .course-layout {
@@ -614,4 +684,42 @@ document.querySelectorAll('.module-accordion-item').forEach(item => {
         item.classList.add('open');
     }
 });
+
+// Enroll flow (VX-009)
+const enrollBtn = document.getElementById('enrollBtn');
+if (enrollBtn) {
+    enrollBtn.addEventListener('click', async () => {
+        const courseId = enrollBtn.dataset.courseId;
+        const csrf = document.querySelector('meta[name="csrf-token"]');
+        const original = enrollBtn.innerHTML;
+        enrollBtn.disabled = true;
+        enrollBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enrolling...';
+        try {
+            const res = await fetch('<?php echo BASE_URL; ?>src/api/dashboard.php?action=enroll', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(csrf ? { 'X-CSRF-Token': csrf.content } : {})
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({ course_id: courseId })
+            });
+            const data = await res.json().catch(() => ({}));
+            if (data.success) {
+                window.showToast && window.showToast('Enrolled successfully! Welcome aboard.', 'success');
+                setTimeout(() => location.reload(), 600);
+            } else if (res.status === 401) {
+                window.location.href = '<?php echo BASE_URL; ?>?page=login';
+            } else {
+                window.showToast && window.showToast(data.message || 'Enrollment failed. Please try again.', 'error');
+                enrollBtn.disabled = false;
+                enrollBtn.innerHTML = original;
+            }
+        } catch (e) {
+            window.showToast && window.showToast('Network error. Please try again.', 'error');
+            enrollBtn.disabled = false;
+            enrollBtn.innerHTML = original;
+        }
+    });
+}
 </script>

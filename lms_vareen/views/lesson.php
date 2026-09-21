@@ -34,10 +34,15 @@ if (!$lesson_data) {
 $course = new Course();
 $course_data = $course->getCourseById($lesson_data['course_id']);
 
-// Check enrollment
+// Check enrollment (VX-009 + VX-044): teachers/admins may preview any lesson;
+// students must be enrolled. Uses the canonical $_SESSION['role'] key — the legacy
+// $_SESSION['user_role'] key is never set, which previously disabled this guard.
+$current_role = $_SESSION['role'] ?? null;
 $enrollment = new Enrollment();
-if (!$enrollment->isEnrolled($_SESSION['user_id'], $lesson_data['course_id']) && $_SESSION['user_role'] === 'student') {
-    header('Location: ' . BASE_URL . '?page=courses');
+if ($current_role === 'student'
+    && !$enrollment->isEnrolled($_SESSION['user_id'], $lesson_data['course_id'])) {
+    // Send them to the course page, which now offers an Enroll CTA.
+    header('Location: ' . BASE_URL . '?page=course-detail&id=' . (int)$lesson_data['course_id']);
     exit;
 }
 
@@ -90,9 +95,19 @@ $is_completed = $lesson_progress && $lesson_progress['is_completed'] == 1;
                                     allowfullscreen>
                                 </iframe>
                             <?php else: ?>
-                                <!-- HTML5 Video -->
-                                <video id="lessonVideo" width="100%" height="600" controls>
-                                    <source src="<?php echo htmlspecialchars($lesson_data['video_url']); ?>" type="video/mp4">
+                                <!-- HTML5 Video (uploaded MP4/WEBM/MOV) -->
+                                <?php
+                                $vExt = strtolower(pathinfo(parse_url($lesson_data['video_url'], PHP_URL_PATH) ?? '', PATHINFO_EXTENSION));
+                                $vTypeMap = ['mp4' => 'video/mp4', 'webm' => 'video/webm', 'mov' => 'video/quicktime', 'avi' => 'video/x-msvideo'];
+                                $vType = $vTypeMap[$vExt] ?? 'video/mp4';
+                                $vSrc = $lesson_data['video_url'];
+                                // Internal (uploaded) paths are stored relative to lms_vareen/ — resolve against BASE_URL
+                                if (preg_match('#^(assets/|/assets/)#i', $vSrc)) {
+                                    $vSrc = BASE_URL . ltrim($vSrc, '/');
+                                }
+                                ?>
+                                <video id="lessonVideo" width="100%" height="600" controls playsinline>
+                                    <source src="<?php echo htmlspecialchars($vSrc); ?>" type="<?php echo $vType; ?>">
                                     Your browser does not support the video tag.
                                 </video>
                             <?php endif; ?>

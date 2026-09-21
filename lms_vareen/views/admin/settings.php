@@ -41,10 +41,10 @@ const API='<?php echo appBasePath(); ?>/src/api/admin.php';
 const $=s=>document.querySelector(s);
 const msg=(t,ok=true)=>{const m=$('#msg');m.textContent=t;m.hidden=false;m.className='admin-msg '+(ok?'ok':'err');};
 async function load(){
-  const r=await fetch(`${API}?action=settings`,{headers:{'X-CSRF-Token':window.CSRF_TOKEN}});
+  const r=await fetch(`${API}?action=settings_get`,{headers:{'X-CSRF-Token':window.CSRF_TOKEN}});
   const d=await r.json();
   if(!d.success){msg(d.message||'Failed to load settings',false);return;}
-  let s=d.settings||{};
+  let s=d.data||{};
   if(Array.isArray(s))s=Object.fromEntries(s.map(x=>[x.setting_key??x.key,x.setting_value??x.value]));
   $('#siteName').value=s.site_name??'';
   $('#supportEmail').value=s.support_email??'';

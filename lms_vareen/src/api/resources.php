@@ -77,9 +77,14 @@ try {
             $resource_id = (int)($_POST['resource_id'] ?? 0);
             if (!$resource_id) throw new Exception('Resource ID required');
 
-            // Only allow deletion for admins; for teachers keep it safe until we add a getResourceOwnership check.
-            if ($role !== 'admin') {
-                throw new Exception('Access denied');
+            // Teachers may delete resources on their own courses; admins may delete any.
+            if ($role === 'teacher') {
+                $own = $lesson->getResourceOwnerCourseId($resource_id);
+                if (!$own) throw new Exception('Resource not found');
+                $course_data = $course->getCourseById((int)$own['course_id']);
+                if (!$course_data || (int)($course_data['teacher_id'] ?? 0) !== (int)$user['id']) {
+                    throw new Exception('Access denied');
+                }
             }
 
             $result = $resource->deleteResource($resource_id);

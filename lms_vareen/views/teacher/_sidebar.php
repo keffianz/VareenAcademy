@@ -60,6 +60,7 @@ $teacher_groups = [
         'label' => 'ACCOUNT',
         'items' => [
             'profile'     => ['fa-user-circle','Profile',       '/index.php?page=teacher-profile'],
+            'notifications' => ['fa-bell',    'Notifications',  '/index.php?page=notifications'],
             'settings'    => ['fa-cog',        'Settings',      '/index.php?page=teacher-settings'],
         ],
     ],
@@ -81,7 +82,7 @@ $teacher_active = $teacher_active ?? 'dashboard';
                 <ul>
                     <?php foreach ($group['items'] as $key => $item): ?>
                         <li>
-                            <a href="<?php echo $item[2]; ?>"<?php echo $key === $teacher_active ? ' class="active" aria-current="page"' : ''; ?>>
+                            <a href="<?php echo appBasePath() . $item[2]; ?>"<?php echo $key === $teacher_active ? ' class="active" aria-current="page"' : ''; ?>>
                                 <i class="fas <?php echo $item[0]; ?>"></i>
                                 <span><?php echo $item[1]; ?></span>
                             </a>

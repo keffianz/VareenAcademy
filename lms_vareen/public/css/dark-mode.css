@@ -1,0 +1,115 @@
+/*
+ * VAREEN LMS — Automatic Dark Mode (Phase 5).
+ * Follows the OS setting via `prefers-color-scheme` (same strategy as the
+ * marketing site). No toggle: the LMS follows the user's device preference.
+ *
+ * Layering: loaded AFTER styles.css / dashboard.css / responsive.css so these
+ * overrides always win the cascade for equal-specificity rules.
+ *
+ * 1) Token overrides — dashboard.css derives nearly everything from --va-*,
+ *    so re-mapping the tokens re-themes all dashboards.
+ * 2) Component overrides — styles.css and a few dashboard rules hardcode
+ *    light surfaces (#fff, white, #f9fafb...); those are overridden here.
+ */
+
+@media (prefers-color-scheme: dark) {
+
+    html { color-scheme: dark; }
+
+    /* ---- 1. Design-token re-mapping (dashboard.css) ---- */
+    :root {
+        --va-bg: #0f1117;
+        --va-surface: #1a1d29;
+        --va-border: #2a2e3d;
+        --va-border-light: #232735;
+        --va-text-primary: #e5e7eb;
+        --va-text-secondary: #9ca3af;
+        --va-text-muted: #6b7280;
+        --va-box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+    }
+
+    /* ---- 2. Global surface + text (styles.css driven pages) ---- */
+    body {
+        background: #0f1117;
+        color: #e5e7eb;
+    }
+
+    h1, h2, h3, h4, h5, h6 { color: #f3f4f6; }
+
+    /* Navbar (styles.css hardcodes background: white) */
+    .navbar {
+        background: #1a1d29;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+    }
+    .navbar a, .navbar .nav-link { color: #e5e7eb; }
+    .navbar-toggler-icon {
+        filter: invert(1);
+    }
+
+    /* Cards, panels, tables */
+    .card, .panel, section.card {
+        background: #1a1d29;
+        border-color: #2a2e3d;
+        color: #e5e7eb;
+    }
+    .table { color: #e5e7eb; }
+    .admin-table tr:hover td { background: #232735; }
+
+    /* Forms */
+    input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+    select, textarea, .form-control, .form-select {
+        background: #1a1d29;
+        border-color: #2a2e3d;
+        color: #e5e7eb;
+    }
+    /* Browser autofill would otherwise repaint white in dark mode */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus {
+        -webkit-box-shadow: 0 0 0 30px #1a1d29 inset !important;
+        -webkit-text-fill-color: #e5e7eb !important;
+        caret-color: #e5e7eb;
+    }
+
+    /* Dashboard hardcoded light surfaces */
+    .showcase-card, #newPostModal .modal-content {
+        background: #1a1d29;
+        border-color: #2a2e3d;
+    }
+    #newPostModal .modal-content { color: #e5e7eb; }
+    .course-thumb, .progress-bar {
+        background: #232735;
+    }
+    .course-thumb { color: #6b7280; }
+    .progress-text, .course-progress > span { color: #9ca3af; }
+    .dashboard-input, .admin-table td, .admin-table th {
+        color: #e5e7eb;
+    }
+    .dashboard-input { background: #1a1d29; border-color: #2a2e3d; }
+
+    /* Status/role chips: keep semantic hue, darken the pastel ground */
+    .role-admin, [class*="role-"] { filter: saturate(0.9) brightness(0.85); }
+
+    /* AI assistant widget */
+    .ai-chat-widget, .ai-chat-messages { background: #1a1d29; }
+    .ai-chat-header, .ai-send-btn { color: #fff; }
+
+    /* Alerts keep their hue but lose the bright pastel ground */
+    .alert { filter: brightness(0.82); }
+
+    /* Modals & overlays */
+    .modal-content {
+        background: #1a1d29;
+        color: #e5e7eb;
+        border-color: #2a2e3d;
+    }
+
+    /* Login/signup hero gradients stay, but soften the white panels */
+    .auth-card, .auth-panel {
+        background: #1a1d29;
+        color: #e5e7eb;
+    }
+
+    /* Footers and muted sections */
+    footer, .footer { background: #12141c; color: #9ca3af; }
+}

@@ -33,20 +33,7 @@ $courses = $dashboard['courses'] ?? [];
 $upcoming_classes = $dashboard['upcoming_classes'] ?? [];
 $recent_recordings = $dashboard['recent_recordings'] ?? [];
 $pending_assignments = $dashboard['pending_assignments'] ?? [];
-// Relative-time helper used by the notifications list (line ~278).
-// Previously this only existed in JS and never ran — PHP fatalled.
-if (!function_exists('timeAgo')) {
-    function timeAgo($datetime) {
-        $ts = strtotime((string)$datetime);
-        if ($ts === false) { return ''; }
-        $diff = time() - $ts;
-        if ($diff < 60)     return 'just now';
-        if ($diff < 3600)   return floor($diff / 60) . 'm ago';
-        if ($diff < 86400)  return floor($diff / 3600) . 'h ago';
-        if ($diff < 604800) return floor($diff / 86400) . 'd ago';
-        return date('M j, Y', $ts);
-    }
-}
+// timeAgo() now lives globally in src/middleware/auth.php (VX-012) — no local copy needed.
 ?>
 
 <div class="dashboard-wrapper">
@@ -117,7 +104,7 @@ if (!function_exists('timeAgo')) {
                 <section class="dashboard-section">
                     <div class="section-header">
                         <h2><i class="fas fa-book"></i> Enrolled Courses</h2>
-                        <a href="/index.php?page=courses" class="btn btn-small btn-outline-primary">
+                        <a href="<?php echo appBasePath(); ?>/index.php?page=courses" class="btn btn-small btn-outline-primary">
                             Browse More
                         </a>
                     </div>
@@ -126,7 +113,7 @@ if (!function_exists('timeAgo')) {
                         <div class="empty-state">
                             <i class="fas fa-book"></i>
                             <p>No courses yet. Start learning today!</p>
-                            <a href="/index.php?page=courses" class="btn btn-primary btn-small">
+                            <a href="<?php echo appBasePath(); ?>/index.php?page=courses" class="btn btn-primary btn-small">
                                 Browse Courses
                             </a>
                         </div>
@@ -153,7 +140,7 @@ if (!function_exists('timeAgo')) {
                                             <?php echo $c['completed_lessons'] . '/' . $c['total_lessons']; ?> lessons
                                         </span>
                                     </div>
-                                    <a href="/index.php?page=course-detail&id=<?php echo $c['id']; ?>" class="btn btn-primary btn-small btn-block">
+                                    <a href="<?php echo appBasePath(); ?>/index.php?page=course-detail&id=<?php echo $c['id']; ?>" class="btn btn-primary btn-small btn-block">
                                         Continue Learning
                                     </a>
                                 </div>
@@ -190,7 +177,7 @@ if (!function_exists('timeAgo')) {
                                                 Due: <?php echo date('M d, Y', strtotime($a['due_date'])); ?>
                                             </p>
                                         <?php endif; ?>
-                                        <a href="/index.php?page=assignments&id=<?php echo $a['id']; ?>" class="btn btn-small">
+                                        <a href="<?php echo appBasePath(); ?>/index.php?page=assignments&id=<?php echo $a['id']; ?>" class="btn btn-small">
                                             <?php echo ($a['submitted'] > 0) ? 'Resubmit' : 'Submit'; ?>
                                         </a>
                                     </div>
@@ -226,7 +213,7 @@ if (!function_exists('timeAgo')) {
                                         <h4><?php echo htmlspecialchars($lc['title']); ?></h4>
                                         <p><?php echo htmlspecialchars($lc['course_title']); ?></p>
                                     </div>
-                                    <a href="/index.php?page=live-classes&id=<?php echo $lc['id']; ?>" class="btn btn-small btn-primary">
+                                    <a href="<?php echo appBasePath(); ?>/index.php?page=live-classes&id=<?php echo $lc['id']; ?>" class="btn btn-small btn-primary">
                                         Join Class
                                     </a>
                                 </div>
@@ -270,7 +257,7 @@ if (!function_exists('timeAgo')) {
                 <section class="dashboard-section">
                     <div class="section-header">
                         <h2><i class="fas fa-bell"></i> Notifications</h2>
-                        <a href="/index.php?page=notifications" class="btn btn-small btn-outline-primary">
+                        <a href="<?php echo appBasePath(); ?>/index.php?page=notifications" class="btn btn-small btn-outline-primary">
                             View All
                         </a>
                     </div>

@@ -1,0 +1,18 @@
+# VAREEN LMS — uploads storage (Uploader class writes videos/resources/images here).
+# NEVER serve this directory directly: files are streamed through
+# src/api/download.php which enforces authentication + ownership.
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^ - [F,L]
+</IfModule>
+
+# Apache 2.4+ and 2.2 fallback deny
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>

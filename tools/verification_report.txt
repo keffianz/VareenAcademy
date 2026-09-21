@@ -1,0 +1,318 @@
+============================================================================
+VAREEN-X CONSOLIDATED VERIFICATION REPORT
+Generated: 2026-09-21 20:17:28   PHP 8.0.30
+============================================================================
+
+----------------------------------------------------------------------------
+### PHP lint (all files)   (lint_all.php)
+    Syntax check every .php file in the repo
+----------------------------------------------------------------------------
+PHP 8.0.30
+Files found: 247
+Files checked: 247
+Files with syntax errors: 0
+============================================================
+
+----------------------------------------------------------------------------
+### Router integrity   (router_integrity.php)
+    Routes vs allowlist vs view files
+----------------------------------------------------------------------------
+VAREEN-X ROUTER INTEGRITY
+============================================================
+Allowlist entries : 65
+Switch cases      : 65
+Standalone routes : login, signup, password-reset, verify, instructors, become-instructor, legal-privacy, legal-terms, legal-refund
+
+A. ALLOWLISTED BUT NO ROUTE (silent 404): 0
+
+B. ROUTED BUT NOT ALLOWLISTED (blocked before switch): 0
+
+C. ROUTE VIEW FILES MISSING ON DISK: 0
+
+D. LINKS TO NON-ROUTED PAGES (dead links): 0
+
+E. INTERNAL REDIRECT TARGETS NOT ROUTED: 0
+
+============================================================
+PASS: router is consistent
+
+----------------------------------------------------------------------------
+### Admin API contracts   (verify_admin_contracts.php)
+    Admin view action -> API case wiring
+----------------------------------------------------------------------------
+admin.php cases (24)
+payments.php cases (13)
+auth.php cases (9)
+
+PASS  lms_vareen/views/admin/applications.php -> action 'application_review' exists in admin.php
+PASS  lms_vareen/views/admin/applications.php -> action 'applications_list' exists in admin.php
+PASS  lms_vareen/views/admin/certificates.php -> action 'certificate_revoke' exists in admin.php
+PASS  lms_vareen/views/admin/certificates.php -> action 'certificates_list' exists in admin.php
+PASS  lms_vareen/views/admin/courses.php -> action 'course_set_active' exists in admin.php
+PASS  lms_vareen/views/admin/courses.php -> action 'course_assign_teacher' exists in admin.php
+PASS  lms_vareen/views/admin/courses.php -> action 'course_update' exists in admin.php
+PASS  lms_vareen/views/admin/courses.php -> action 'enroll_student' exists in admin.php
+PASS  lms_vareen/views/admin/courses.php -> action 'courses_list' exists in admin.php
+PASS  lms_vareen/views/admin/courses.php -> action 'users_list' exists in admin.php
+PASS  lms_vareen/views/admin/messages.php -> action 'messages_list' exists in admin.php
+PASS  lms_vareen/views/admin/messages.php -> action 'training_apps_list' exists in admin.php
+PASS  lms_vareen/views/admin/messages.php -> action 'message_set_status' exists in admin.php
+PASS  lms_vareen/views/admin/messages.php -> action 'training_app_set_status' exists in admin.php
+PASS  lms_vareen/views/admin/payments.php -> action 'admin_stats' exists in payments.php
+PASS  lms_vareen/views/admin/payments.php -> action 'admin_list' exists in payments.php
+PASS  lms_vareen/views/admin/payments.php -> action 'admin_pending_transfers' exists in payments.php
+PASS  lms_vareen/views/admin/payments.php -> action 'admin_pending_refunds' exists in payments.php
+PASS  lms_vareen/views/admin/payments.php -> action 'admin_approve' exists in payments.php
+PASS  lms_vareen/views/admin/payments.php -> action 'admin_reject' exists in payments.php
+PASS  lms_vareen/views/admin/payments.php -> action 'admin_refund_process' exists in payments.php
+PASS  lms_vareen/views/admin/profile.php -> action 'admin_profile_update' exists in admin.php
+PASS  lms_vareen/views/admin/profile.php -> action 'change_password' exists in auth.php
+PASS  lms_vareen/views/admin/profile.php -> action 'upload_avatar' exists in auth.php
+PASS  lms_vareen/views/admin/reports.php -> action 'reports' exists in admin.php
+PASS  lms_vareen/views/admin/reports.php -> action 'logout' exists in auth.php
+PASS  lms_vareen/views/admin/settings.php -> action 'settings_get' exists in admin.php
+PASS  lms_vareen/views/admin/settings.php -> action 'settings_update' exists in admin.php
+PASS  lms_vareen/views/admin/users.php -> action 'user_set_active' exists in admin.php
+PASS  lms_vareen/views/admin/users.php -> action 'user_create' exists in admin.php
+=== Server-rendered POST handlers ===
+PASS  views/admin/teachers.php handles POST 'toggle_active'
+PASS  views/admin/coupons.php handles POST 'create_coupon'
+PASS  views/admin/coupons.php handles POST 'delete_coupon'
+
+=== Result: 33 passed, 0 failed ===
+
+----------------------------------------------------------------------------
+### Student journey   (verify_student_journey.php)
+    VX-009 end-to-end student flow
+----------------------------------------------------------------------------
+=== VAREEN-X Student Journey Verification (VX-009) ===
+
+PASS  Register: view exists
+PASS  Register: view is non-trivial
+PASS  Register: no 'Coming Soon' placeholder
+PASS  Register: api exists
+PASS  Register: api action 'signup' implemented
+PASS  Register: class exists
+PASS  Register: method register() exists
+
+PASS  Login: view exists
+PASS  Login: view is non-trivial
+PASS  Login: no 'Coming Soon' placeholder
+PASS  Login: api exists
+PASS  Login: api action 'login' implemented
+PASS  Login: class exists
+PASS  Login: method login() exists
+
+PASS  Edit Profile: view exists
+PASS  Edit Profile: view is non-trivial
+PASS  Edit Profile: no 'Coming Soon' placeholder
+PASS  Edit Profile: api exists
+PASS  Edit Profile: api action 'update_profile' implemented
+PASS  Edit Profile: class exists
+PASS  Edit Profile: method updateProfile() exists
+
+PASS  Change Password: view exists
+PASS  Change Password: view is non-trivial
+PASS  Change Password: no 'Coming Soon' placeholder
+PASS  Change Password: api exists
+PASS  Change Password: api action 'change_password' implemented
+PASS  Change Password: class exists
+PASS  Change Password: method changePassword() exists
+
+PASS  Upload Photo: view exists
+PASS  Upload Photo: view is non-trivial
+PASS  Upload Photo: no 'Coming Soon' placeholder
+PASS  Upload Photo: api exists
+PASS  Upload Photo: api action 'upload_avatar' implemented
+PASS  Upload Photo: class exists
+PASS  Upload Photo: method upload() exists
+
+PASS  Browse Courses: view exists
+PASS  Browse Courses: view is non-trivial
+PASS  Browse Courses: no 'Coming Soon' placeholder
+PASS  Browse Courses: class exists
+PASS  Browse Courses: method getAllCourses() exists
+
+PASS  Course Detail: view exists
+PASS  Course Detail: view is non-trivial
+PASS  Course Detail: no 'Coming Soon' placeholder
+PASS  Course Detail: class exists
+PASS  Course Detail: method getCourseById() exists
+
+PASS  Enroll: view exists
+PASS  Enroll: view is non-trivial
+PASS  Enroll: no 'Coming Soon' placeholder
+PASS  Enroll: api exists
+PASS  Enroll: api action 'enroll' implemented
+PASS  Enroll: class exists
+PASS  Enroll: method enrollStudent() exists
+
+PASS  My Course List: view exists
+PASS  My Course List: view is non-trivial
+PASS  My Course List: no 'Coming Soon' placeholder
+PASS  My Course List: api exists
+PASS  My Course List: api action 'get_dashboard' implemented
+PASS  My Course List: class exists
+PASS  My Course List: method getStudentDashboard() exists
+
+PASS  Watch Videos: view exists
+PASS  Watch Videos: view is non-trivial
+PASS  Watch Videos: no 'Coming Soon' placeholder
+PASS  Watch Videos: api exists
+PASS  Watch Videos: api action 'get' implemented
+PASS  Watch Videos: class exists
+PASS  Watch Videos: method getLessonById() exists
+
+PASS  Track Progress: view exists
+PASS  Track Progress: view is non-trivial
+PASS  Track Progress: no 'Coming Soon' placeholder
+PASS  Track Progress: api exists
+PASS  Track Progress: api action 'record_progress' implemented
+PASS  Track Progress: class exists
+PASS  Track Progress: method recordWatch() exists
+
+PASS  Mark Complete: view exists
+PASS  Mark Complete: view is non-trivial
+PASS  Mark Complete: no 'Coming Soon' placeholder
+PASS  Mark Complete: api exists
+PASS  Mark Complete: api action 'mark_complete' implemented
+PASS  Mark Complete: class exists
+PASS  Mark Complete: method markCompleted() exists
+
+PASS  Download Resources: view exists
+PASS  Download Resources: view is non-trivial
+PASS  Download Resources: no 'Coming Soon' placeholder
+PASS  Download Resources: api exists
+PASS  Download Resources: class exists
+PASS  Download Resources: method resolveStoredPath() exists
+
+PASS  Assignments: view exists
+PASS  Assignments: view is non-trivial
+PASS  Assignments: no 'Coming Soon' placeholder
+PASS  Assignments: api exists
+
+PASS  Quizzes: view exists
+PASS  Quizzes: view is non-trivial
+PASS  Quizzes: no 'Coming Soon' placeholder
+PASS  Quizzes: api exists
+
+PASS  Certificates: view exists
+PASS  Certificates: view is non-trivial
+PASS  Certificates: no 'Coming Soon' placeholder
+PASS  Certificates: class exists
+
+PASS  Notifications: view exists
+PASS  Notifications: view is non-trivial
+PASS  Notifications: no 'Coming Soon' placeholder
+PASS  Notifications: api exists
+PASS  Notifications: api action 'mark_notification_read' implemented
+PASS  Notifications: class exists
+PASS  Notifications: method markAsRead() exists
+
+PASS  Discussions: view exists
+PASS  Discussions: view is non-trivial
+PASS  Discussions: no 'Coming Soon' placeholder
+PASS  Discussions: api exists
+
+PASS  Live Classes: view exists
+PASS  Live Classes: view is non-trivial
+PASS  Live Classes: no 'Coming Soon' placeholder
+PASS  Live Classes: api exists
+
+PASS  AI Assistant: view exists
+PASS  AI Assistant: view is non-trivial
+PASS  AI Assistant: no 'Coming Soon' placeholder
+PASS  AI Assistant: api exists
+
+PASS  Payments: view exists
+PASS  Payments: view is non-trivial
+PASS  Payments: no 'Coming Soon' placeholder
+PASS  Payments: api exists
+PASS  Payments: class exists
+
+=== Router Coverage ===
+PASS  route: login
+PASS  route: signup
+PASS  route: courses
+PASS  route: course-detail
+PASS  route: lesson
+PASS  route: student-dashboard
+PASS  route: courses
+PASS  route: assignments
+PASS  route: quizzes
+PASS  route: certificates
+PASS  route: student-community
+PASS  route: student-ai
+PASS  route: live-classes
+PASS  route: notifications
+PASS  route: profile
+PASS  route: verify
+PASS  route: checkout
+PASS  route: payment-callback
+
+=== Result: 140 passed, 0 failed ===
+
+----------------------------------------------------------------------------
+### Profile modules   (verify_profiles.php)
+    VX-048/049 teacher + admin profile wiring
+----------------------------------------------------------------------------
+=== views/teacher/profile.php (279 lines, 15194 bytes) ===
+  form id="pwForm"             PASS
+  input id="pwOld"             PASS
+  input id="pwNew"             PASS
+  input id="pwConfirm"         PASS
+  button id="btnPwSave"        PASS
+  pwMsg div                    PASS
+  avatar input                 PASS
+  avatar preview               PASS
+  avatar file size span        PASS
+  Auth.changePassword used     PASS
+  Auth.uploadAvatar used       PASS
+  auth.js included             PASS
+  NO dead window.CSRF_TOKEN    PASS
+  NO AUTH_API const            PASS
+  NO admin-msg class           PASS
+  NO null-id getElementById    PASS
+  script tags: 3
+  </script> tags: 3
+
+=== views/admin/profile.php (244 lines, 13048 bytes) ===
+  requireRole(admin)           PASS
+  require Database.php         PASS
+  form id="profForm"           PASS
+  form id="pwForm"             PASS
+  input id="pwOld"             PASS
+  button id="btnPwSave"        PASS
+  adminAvatarInput             PASS
+  adminAvatarPreview           PASS
+  admin_profile_update call    PASS
+  change_password call         PASS
+  upload_avatar call           PASS
+  admin_active=profile         PASS
+  script tags: 1
+  </script> tags: 1
+
+=== Sanity ===
+  teacher <script>/<\/script> balanced: PASS
+  admin   <script>/<\/script> balanced: PASS
+  teacher <style>/<\/style> balanced: PASS
+  admin   <style>/<\/style> balanced: PASS
+
+----------------------------------------------------------------------------
+### Placeholder scan   (scan_placeholders.php)
+    Stub / "Coming Soon" detection
+----------------------------------------------------------------------------
+PLACEHOLDER SCAN — 0 hit(s)
+============================================================
+
+============================================================================
+SUMMARY
+============================================================================
+  PASS   PHP lint (all files)
+  PASS   Router integrity
+  PASS   Admin API contracts
+  PASS   Student journey
+  PASS   Profile modules
+  PASS   Placeholder scan
+
+  RESULT: ALL VERIFIERS PASS

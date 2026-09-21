@@ -129,7 +129,7 @@ $modules = $module->getModulesByCourse($course_id);
     }
 
     function openLessonEditor(moduleId) {
-        window.location.href = '/index.php?page=lesson-editor&module_id=' + encodeURIComponent(moduleId);
+        window.location.href = '<?php echo appBasePath(); ?>/index.php?page=teacher-lesson-editor&module_id=' + encodeURIComponent(moduleId);
     }
 </script>
 

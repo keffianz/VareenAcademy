@@ -9,8 +9,17 @@ $user_id = getCurrentUserId();
 $user_data = $user->getUserById($user_id);
 
 if (!$user_data) {
-    header('Location: /index.php?page=login');
+    header('Location: ' . BASE_URL . '?page=login');
     exit;
+}
+
+// Resolve the avatar URL (VX-009): stored paths are relative to lms_vareen/
+$avatar_path = trim((string)($user_data['profile_image'] ?? ''));
+$avatar_url = '';
+if ($avatar_path !== '') {
+    $avatar_url = preg_match('#^https?://#i', $avatar_path)
+        ? $avatar_path
+        : BASE_URL . ltrim($avatar_path, '/');
 }
 ?>
 
@@ -20,8 +29,17 @@ if (!$user_data) {
             <div class="profile-banner"></div>
             
             <div class="profile-content">
-                <div class="profile-avatar">
-                    <i class="fas fa-user"></i>
+                <div class="profile-avatar" id="profileAvatarWrap">
+                    <?php if ($avatar_url !== ''): ?>
+                        <img src="<?php echo htmlspecialchars($avatar_url); ?>" alt="<?php echo htmlspecialchars($user_data['first_name'] . ' ' . $user_data['last_name']); ?> profile photo" id="profileAvatarImg">
+                    <?php else: ?>
+                        <img src="" alt="" id="profileAvatarImg" hidden>
+                        <i class="fas fa-user" id="profileAvatarPlaceholder"></i>
+                    <?php endif; ?>
+                    <button type="button" class="avatar-upload-btn" id="avatarUploadBtn" title="Upload profile photo">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                    <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
                 </div>
 
                 <div class="profile-info">
@@ -79,7 +97,19 @@ if (!$user_data) {
                         <label>Country</label>
                         <p><?php echo htmlspecialchars($user_data['country'] ?? 'Not set'); ?></p>
                     </div>
+
+                    <div class="info-item">
+                        <label>Specialization</label>
+                        <p><?php echo htmlspecialchars(($user_data['specialization'] ?? '') !== '' ? $user_data['specialization'] : 'Not set'); ?></p>
+                    </div>
                 </div>
+
+                <?php if (!empty($user_data['bio'])): ?>
+                    <div class="info-item info-item-full">
+                        <label>About</label>
+                        <p><?php echo nl2br(htmlspecialchars($user_data['bio'])); ?></p>
+                    </div>
+                <?php endif; ?>
 
                 <button class="btn btn-primary" onclick="editProfile()">
                     <i class="fas fa-edit"></i> Edit Profile
@@ -140,6 +170,68 @@ if (!$user_data) {
     </div>
 </div>
 
+<!-- Edit Profile Modal (VX-009) -->
+<div id="editProfileModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Profile</h2>
+            <button class="modal-close" onclick="closeEditProfileModal()">&times;</button>
+        </div>
+
+        <form id="editProfileForm" class="modal-body">
+            <div class="form-group">
+                <label>First Name *</label>
+                <input type="text" name="first_name" value="<?php echo htmlspecialchars($user_data['first_name']); ?>" required>
+            </div>
+
+            <div class="form-group">
+                <label>Last Name *</label>
+                <input type="text" name="last_name" value="<?php echo htmlspecialchars($user_data['last_name']); ?>" required>
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" value="<?php echo htmlspecialchars($user_data['email']); ?>" disabled>
+                <small>Email cannot be changed. Contact support if needed.</small>
+            </div>
+
+            <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" name="phone" value="<?php echo htmlspecialchars($user_data['phone'] ?? ''); ?>" placeholder="+234 800 000 0000">
+            </div>
+
+            <div class="form-group">
+                <label>Specialization</label>
+                <input type="text" name="specialization" value="<?php echo htmlspecialchars($user_data['specialization'] ?? ''); ?>" placeholder="e.g. Web Development">
+            </div>
+
+            <div class="form-group">
+                <label>City</label>
+                <input type="text" name="city" value="<?php echo htmlspecialchars($user_data['city'] ?? ''); ?>">
+            </div>
+
+            <div class="form-group">
+                <label>Country</label>
+                <input type="text" name="country" value="<?php echo htmlspecialchars($user_data['country'] ?? ''); ?>">
+            </div>
+
+            <div class="form-group">
+                <label>About</label>
+                <textarea name="bio" rows="3" placeholder="Tell us about yourself"><?php echo htmlspecialchars($user_data['bio'] ?? ''); ?></textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeEditProfileModal()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-primary" id="saveProfileBtn">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <style>
     .profile-page {
         padding: 40px 0;
@@ -182,6 +274,44 @@ if (!$user_data) {
         font-size: 48px;
         border: 4px solid white;
         flex-shrink: 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .avatar-upload-btn {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: 2px solid white;
+        background: #4a5568;
+        color: white;
+        cursor: pointer;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+    }
+
+    .avatar-upload-btn:hover,
+    .avatar-upload-btn:focus-visible {
+        background: #2d3748;
+        outline: 2px solid #667eea;
+        outline-offset: 2px;
+    }
+
+    .info-item-full {
+        grid-column: 1 / -1;
+        margin-bottom: 20px;
     }
 
     .profile-info h1 {
@@ -350,6 +480,8 @@ if (!$user_data) {
     }
 </style>
 
+<script src="<?php echo appBasePath(); ?>/public/js/auth.js"></script>
+
 <script>
 function changePassword() {
     document.getElementById('changePasswordModal').style.display = 'flex';
@@ -383,13 +515,109 @@ document.getElementById('changePasswordForm').addEventListener('submit', async (
 });
 
 function editProfile() {
-    VereenaUtils.showToast('Profile editing coming soon', 'info');
+    document.getElementById('editProfileModal').style.display = 'flex';
 }
+
+function closeEditProfileModal() {
+    document.getElementById('editProfileModal').style.display = 'none';
+}
+
+// Save profile edits (VX-009)
+document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const form = e.target;
+    const btn = document.getElementById('saveProfileBtn');
+    const payload = {};
+    ['first_name', 'last_name', 'phone', 'specialization', 'city', 'country', 'bio'].forEach((key) => {
+        const el = form.querySelector('[name="' + key + '"]');
+        if (el) payload[key] = el.value.trim();
+    });
+
+    if (!payload.first_name || !payload.last_name) {
+        VereenaUtils.showToast('First and last name are required', 'error');
+        return;
+    }
+
+    const original = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = 'Saving...';
+
+    const response = await Auth.updateProfile(payload);
+
+    btn.disabled = false;
+    btn.innerHTML = original;
+
+    if (response.success) {
+        VereenaUtils.showToast('Profile updated successfully', 'success');
+        closeEditProfileModal();
+        setTimeout(() => window.location.reload(), 800);
+    } else {
+        VereenaUtils.showToast(response.message || 'Update failed', 'error');
+    }
+});
+
+// Profile photo upload (VX-009)
+document.getElementById('avatarUploadBtn').addEventListener('click', () => {
+    document.getElementById('avatarInput').click();
+});
+
+document.getElementById('avatarInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+        VereenaUtils.showToast('Please choose an image file', 'error');
+        e.target.value = '';
+        return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+        VereenaUtils.showToast('Image too large (max 5MB)', 'error');
+        e.target.value = '';
+        return;
+    }
+
+    const btn = document.getElementById('avatarUploadBtn');
+    const original = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+    const response = await Auth.uploadAvatar(file);
+
+    btn.disabled = false;
+    btn.innerHTML = original;
+    e.target.value = '';
+
+    if (response.success && response.profile_image) {
+        const img = document.getElementById('profileAvatarImg');
+        const placeholder = document.getElementById('profileAvatarPlaceholder');
+        // BASE_URL is rendered by PHP; strip the leading app path from the stored relative path
+        img.src = '<?php echo BASE_URL; ?>' + String(response.profile_image).replace(/^\/+/, '');
+        img.hidden = false;
+        if (placeholder) placeholder.style.display = 'none';
+        VereenaUtils.showToast('Profile photo updated', 'success');
+    } else {
+        VereenaUtils.showToast(response.message || 'Photo upload failed', 'error');
+    }
+});
 
 // Close modal when clicking outside
 document.getElementById('changePasswordModal')?.addEventListener('click', (e) => {
     if (e.target.id === 'changePasswordModal') {
         closePasswordModal();
     }
+});
+
+document.getElementById('editProfileModal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'editProfileModal') {
+        closeEditProfileModal();
+    }
+});
+
+// Escape closes any open modal
+document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (document.getElementById('changePasswordModal').style.display === 'flex') closePasswordModal();
+    if (document.getElementById('editProfileModal').style.display === 'flex') closeEditProfileModal();
 });
 </script>

@@ -1,22 +1,23 @@
 <?php
 /**
  * Resource Class - Handle lesson resources (downloadable files)
+ *
+ * Uploads/deletes are delegated to the centralized Uploader (Phase 4 storage
+ * abstraction) — organized folders, MIME/extension validation, collision-proof
+ * filenames, absolute paths. DB stores paths relative to lms_vareen/ root.
  */
 
 require_once 'Database.php';
+require_once __DIR__ . '/Uploader.php';
 
 class Resource {
     private $db;
-    private $upload_dir = 'assets/uploads/resources/';
+    private $uploader;
 
     public function __construct() {
         $database = new Database();
         $this->db = $database->connect();
-        
-        // Ensure upload directory exists
-        if (!is_dir($this->upload_dir)) {
-            mkdir($this->upload_dir, 0755, true);
-        }
+        $this->uploader = new Uploader();
     }
 
     /**
@@ -78,44 +79,24 @@ class Resource {
     }
 
     /**
-     * Handle file upload
+     * Handle file upload — delegated to Uploader (document whitelist: PDF, DOC(X),
+     * PPT(X), XLS(X), ZIP, TXT + images; 50MB max; organized folders).
+     * Return keys kept identical to the legacy implementation so API callers
+     * (resources.php) need no changes.
      */
     public function uploadFile($file, $lesson_id = null) {
-        // Allowed file types
-        $allowed_types = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'gif', 'zip'];
-        $max_size = 50 * 1024 * 1024; // 50MB
-
-        if (!isset($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
-            return ['success' => false, 'message' => 'No file uploaded'];
+        $upload = $this->uploader->upload($file, 'document', (int)($lesson_id ?? 0));
+        if (!$upload['success']) {
+            return ['success' => false, 'message' => $upload['message']];
         }
-
-        // Check file size
-        if ($file['size'] > $max_size) {
-            return ['success' => false, 'message' => 'File too large (max 50MB)'];
-        }
-
-        // Get file extension
-        $file_ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        if (!in_array($file_ext, $allowed_types)) {
-            return ['success' => false, 'message' => 'File type not allowed'];
-        }
-
-        // Generate unique filename
-        $filename = uniqid() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $file['name']);
-        $filepath = $this->upload_dir . $filename;
-
-        if (move_uploaded_file($file['tmp_name'], $filepath)) {
-            return [
-                'success' => true,
-                'message' => 'File uploaded',
-                'filename' => $filename,
-                'filepath' => $filepath,
-                'original_name' => $file['name'],
-                'file_type' => $file_ext
-            ];
-        }
-
-        return ['success' => false, 'message' => 'Failed to upload file'];
+        return [
+            'success'       => true,
+            'message'       => 'File uploaded',
+            'filename'      => $upload['filename'],
+            'filepath'      => $upload['path'],
+            'original_name' => $upload['original'],
+            'file_type'     => $upload['ext'],
+        ];
     }
 
     /**
@@ -133,9 +114,14 @@ class Resource {
                 return ['success' => false, 'message' => 'Resource not found'];
             }
 
-            // Delete file if it exists
-            if (file_exists($resource['file_path'])) {
-                unlink($resource['file_path']);
+            // Delete file via Uploader (path-validated, cleans empty dirs);
+            // legacy rows may hold bare 'filename' — fall back to the old dir.
+            $filePath = (string)$resource['file_path'];
+            if ($filePath !== '' && strpos($filePath, 'assets/uploads/') !== 0) {
+                $filePath = 'assets/uploads/resources/' . ltrim($filePath, '/\\');
+            }
+            if ($filePath !== '' && $this->uploader->removeStoredFile($filePath) === false && is_file($filePath)) {
+                @unlink($filePath); // legacy CWD-relative row
             }
 
             // Delete database record

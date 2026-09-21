@@ -40,14 +40,14 @@ if (!empty($courseIds)) {
                 <td><?php echo htmlspecialchars($s['email']); ?></td>
                 <td><?php echo $s['course_count']; ?></td>
                 <td><?php echo date('M j, Y', strtotime($s['created_at'])); ?></td>
-                <td><a href="/index.php?page=teacher-progress&student_id=<?php echo $s['id']; ?>" class="btn btn-sm btn-primary">View Progress</a></td>
+                <td><a href="<?php echo appBasePath(); ?>/index.php?page=teacher-progress&student_id=<?php echo $s['id']; ?>" class="btn btn-sm btn-primary">View Progress</a></td>
             </tr>
             <?php endforeach; ?>
         </tbody></table>
         <?php endif; ?>
     </div>
 </div>
-<script src="/lms_vareen/public/js/auth.js"></script>
+<script src="<?php echo appBasePath(); ?>/public/js/auth.js"></script>
 <script>
 (function(){var s=document.getElementById('teacherSidebar'),t=document.getElementById('sidebarToggle'),c=document.getElementById('sidebarClose');if(t&&s)t.addEventListener('click',function(){s.classList.add('active')});if(c&&s)c.addEventListener('click',function(){s.classList.remove('active')});})();
 </script>

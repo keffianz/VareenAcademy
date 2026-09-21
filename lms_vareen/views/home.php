@@ -9,16 +9,16 @@
             
             <?php if (!isLoggedIn()): ?>
                 <div class="hero-buttons">
-                    <a href="/index.php?page=signup" class="btn btn-primary btn-large">
+                    <a href="<?php echo appBasePath(); ?>/index.php?page=signup" class="btn btn-primary btn-large">
                         <i class="fas fa-user-plus"></i> Get Started Free
                     </a>
-                    <a href="/index.php?page=courses" class="btn btn-outline-primary btn-large">
+                    <a href="<?php echo appBasePath(); ?>/index.php?page=courses" class="btn btn-outline-primary btn-large">
                         <i class="fas fa-graduation-cap"></i> Browse Courses
                     </a>
                 </div>
             <?php else: ?>
                 <div class="hero-buttons">
-                    <a href="/index.php?page=<?php echo getCurrentUserRole() === 'student' ? 'student-dashboard' : 'teacher-dashboard'; ?>" 
+                    <a href="<?php echo appBasePath(); ?>/index.php?page=<?php echo getCurrentUserRole() === 'student' ? 'student-dashboard' : 'teacher-dashboard'; ?>" 
                        class="btn btn-primary btn-large">
                         <i class="fas fa-tachometer-alt"></i> Go to Dashboard
                     </a>
@@ -115,7 +115,7 @@
         <h2>Ready to Start Learning?</h2>
         <p>Join thousands of students already learning on VAREEN Academy</p>
         <?php if (!isLoggedIn()): ?>
-            <a href="/index.php?page=signup" class="btn btn-primary btn-large">
+            <a href="<?php echo appBasePath(); ?>/index.php?page=signup" class="btn btn-primary btn-large">
                 Sign Up Now - It's Free!
             </a>
         <?php endif; ?>

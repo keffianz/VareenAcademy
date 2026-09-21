@@ -119,6 +119,60 @@ switch ($action) {
         }
         break;
 
+    case 'update_profile':
+        // Authenticated self-service profile edit (VX-009).
+        // Identity/authorization fields are never editable through this endpoint.
+        if ($request_method === 'POST') {
+            if (!isset($_SESSION['user_id'])) {
+                $response = ['success' => false, 'message' => 'Not authenticated'];
+            } else {
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!is_array($data)) {
+                    $data = [];
+                }
+                foreach (['id', 'email', 'role', 'password', 'is_active', 'created_at', 'profile_image'] as $protected) {
+                    unset($data[$protected]);
+                }
+                $response = $user->updateProfile($_SESSION['user_id'], $data);
+            }
+        }
+        break;
+
+    case 'upload_avatar':
+        // Profile photo upload (VX-009) — images only, replaces the previous photo.
+        if ($request_method === 'POST') {
+            if (!isset($_SESSION['user_id'])) {
+                $response = ['success' => false, 'message' => 'Not authenticated'];
+            } elseif (empty($_FILES['avatar'])) {
+                $response = ['success' => false, 'message' => 'No image uploaded'];
+            } else {
+                require_once '../classes/Uploader.php';
+                $uploader = new Uploader();
+                $upload = $uploader->upload($_FILES['avatar'], 'image', (int)$_SESSION['user_id']);
+
+                if (empty($upload['success'])) {
+                    $response = ['success' => false, 'message' => $upload['message']];
+                } else {
+                    // Replace: remove the previous avatar if we are the ones storing it
+                    $current = $user->getUserById($_SESSION['user_id']);
+                    $old = (string)($current['profile_image'] ?? '');
+                    if ($old !== '' && strpos($old, 'assets/uploads/images/') === 0) {
+                        $uploader->removeStoredFile($old);
+                    }
+
+                    $saved = $user->updateProfile($_SESSION['user_id'], ['profile_image' => $upload['path']]);
+                    $response = empty($saved['success'])
+                        ? $saved
+                        : [
+                            'success'       => true,
+                            'message'       => 'Profile photo updated',
+                            'profile_image' => $upload['path'],
+                        ];
+                }
+            }
+        }
+        break;
+
     default:
         $response = ['success' => false, 'message' => 'Invalid action'];
 }

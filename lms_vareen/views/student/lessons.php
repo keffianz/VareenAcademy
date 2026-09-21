@@ -30,7 +30,7 @@ $enrolled = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="dashboard-section">
             <div class="section-header"><h2>Enrolled Courses</h2></div>
             <?php if (empty($enrolled)): ?>
-                <div class="empty-state"><p>You haven't enrolled in any courses yet. <a href="/index.php?page=courses">Browse courses</a></p></div>
+                <div class="empty-state"><p>You haven't enrolled in any courses yet. <a href="<?php echo appBasePath(); ?>/index.php?page=courses">Browse courses</a></p></div>
             <?php else: ?>
                 <div class="courses-grid">
                     <?php foreach ($enrolled as $c): ?>
@@ -51,7 +51,7 @@ $enrolled = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <span class="progress-text"><?php echo $c['progress']; ?>%</span>
                                 </div>
                                 <p class="course-meta"><?php echo $c['completed_lessons']; ?>/<?php echo $c['lesson_count']; ?> lessons completed</p>
-                                <a href="/index.php?page=course-detail&id=<?php echo $c['id']; ?>" class="btn btn-primary btn-sm">Continue Learning</a>
+                                <a href="<?php echo appBasePath(); ?>/index.php?page=course-detail&id=<?php echo $c['id']; ?>" class="btn btn-primary btn-sm">Continue Learning</a>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -60,7 +60,7 @@ $enrolled = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 </div>
-<script src="/lms_vareen/public/js/auth.js"></script>
+<script src="<?php echo appBasePath(); ?>/public/js/auth.js"></script>
 <script>
 (function(){var s=document.getElementById('studentSidebar'),t=document.getElementById('sidebarToggle'),c=document.getElementById('sidebarClose');if(t&&s)t.addEventListener('click',function(){s.classList.add('active')});if(c&&s)c.addEventListener('click',function(){s.classList.remove('active')});})();
 </script>

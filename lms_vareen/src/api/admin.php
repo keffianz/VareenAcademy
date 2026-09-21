@@ -115,6 +115,7 @@ try {
         case 'courses_list': {
             $stmt = $db->prepare(
                 'SELECT c.id, c.title, c.category, c.is_active, c.teacher_id,
+                        c.price, c.currency, c.duration_weeks, c.delivery_mode, c.level, c.next_cohort,
                         CONCAT(u.first_name, " ", u.last_name) AS teacher_name,
                         (SELECT COUNT(*) FROM enrollments e WHERE e.course_id = c.id) AS enrolled_count,
                         (SELECT COUNT(*) FROM lessons l WHERE l.course_id = c.id AND l.is_active = 1) AS lesson_count
@@ -184,6 +185,33 @@ try {
                                   VALUES (:t, :title, :d, :c, 0, 1)');
             $stmt->execute([':t' => $teacherId ?: null, ':title' => $title, ':d' => $desc, ':c' => $cat]);
             echo json_encode(['success' => true, 'message' => 'Course created', 'id' => (int)$db->lastInsertId()]);
+            break;
+        }
+
+        case 'course_update': {
+            // Admin edit of course metadata incl. pricing (VX-045).
+            // Delegates to Course::updateCourse — single source of truth for the whitelist.
+            require_once __DIR__ . '/../classes/Course.php';
+            $courseId = (int)($_POST['course_id'] ?? 0);
+            if (!$courseId) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'course_id required']);
+                break;
+            }
+            $fields = ['title', 'description', 'category', 'price', 'currency',
+                       'duration_weeks', 'delivery_mode', 'level', 'next_cohort'];
+            $data = [];
+            foreach ($fields as $f) {
+                if (isset($_POST[$f])) {
+                    $data[$f] = ($f === 'price') ? round((float)$_POST[$f], 2) : trim($_POST[$f]);
+                }
+            }
+            if (empty($data)) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'Nothing to update']);
+                break;
+            }
+            echo json_encode((new Course())->updateCourse($courseId, $data));
             break;
         }
 
@@ -489,6 +517,51 @@ try {
         case 'certificate_issue': {
             $certificate = new Certificate();
             $result = $certificate->issueForStudentEmail($_POST['email'] ?? '', (int)($_POST['course_id'] ?? 0));
+            http_response_code($result['success'] ? 200 : 400);
+            echo json_encode($result);
+            break;
+        }
+
+        /* =====================
+         * Admin profile editor (VX-011)
+         * ===================== */
+        case 'admin_profile_update': {
+            $userId = (int)($_POST['user_id'] ?? 0);
+            if (!$userId) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'user_id required']);
+                break;
+            }
+            // Admins may only edit their own profile via this endpoint.
+            if ($userId !== (int)$user['id']) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Access denied']);
+                break;
+            }
+            require_once '../classes/User.php';
+            $u = new User($db);
+            // Accept only safe profile fields.
+            $data = array_filter([
+                'first_name'    => trim($_POST['first_name'] ?? ''),
+                'last_name'     => trim($_POST['last_name'] ?? ''),
+                'phone'         => trim($_POST['phone'] ?? ''),
+                'city'          => trim($_POST['city'] ?? ''),
+                'country'       => trim($_POST['country'] ?? ''),
+                'specialization'=> trim($_POST['specialization'] ?? ''),
+                'bio'           => trim($_POST['bio'] ?? ''),
+            ], fn($v) => $v !== '');
+            // Names must never be submitted empty.
+            if (trim($_POST['first_name'] ?? '') === '') {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'First name cannot be empty']);
+                break;
+            }
+            if (trim($_POST['last_name'] ?? '') === '') {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'Last name cannot be empty']);
+                break;
+            }
+            $result = $u->updateProfile($userId, $data);
             http_response_code($result['success'] ? 200 : 400);
             echo json_encode($result);
             break;

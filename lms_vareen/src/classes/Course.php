@@ -143,6 +143,34 @@ class Course {
                 $updates[] = "price = :price";
                 $params[':price'] = $data['price'];
             }
+            if (isset($data['currency'])) {
+                $updates[] = "currency = :currency";
+                $params[':currency'] = strtoupper(substr($data['currency'], 0, 8));
+            }
+            if (isset($data['duration_weeks'])) {
+                $updates[] = "duration_weeks = :duration_weeks";
+                $params[':duration_weeks'] = (int)$data['duration_weeks'] ?: null;
+            }
+            if (isset($data['delivery_mode'])) {
+                $mode = $data['delivery_mode'];
+                if (!in_array($mode, ['on_campus', 'online', 'hybrid'], true)) {
+                    return ['success' => false, 'message' => 'Invalid delivery mode'];
+                }
+                $updates[] = "delivery_mode = :delivery_mode";
+                $params[':delivery_mode'] = $mode;
+            }
+            if (isset($data['level'])) {
+                $lvl = $data['level'];
+                if (!in_array($lvl, ['beginner', 'intermediate', 'advanced'], true)) {
+                    return ['success' => false, 'message' => 'Invalid level'];
+                }
+                $updates[] = "level = :level";
+                $params[':level'] = $lvl;
+            }
+            if (isset($data['next_cohort'])) {
+                $updates[] = "next_cohort = :next_cohort";
+                $params[':next_cohort'] = $data['next_cohort'] !== '' ? $data['next_cohort'] : null;
+            }
 
             if (empty($updates)) {
                 return ['success' => false, 'message' => 'No data to update'];

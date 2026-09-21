@@ -73,4 +73,4 @@ $pendingReports = (int)$db->query("SELECT COUNT(*) FROM community_reports WHERE 
         </div>
     </div>
 </div>
-<script src="/lms_vareen/public/js/auth.js"></script>
+<script src="<?php echo appBasePath(); ?>/public/js/auth.js"></script>

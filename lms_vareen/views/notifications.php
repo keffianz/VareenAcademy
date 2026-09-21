@@ -77,7 +77,7 @@ $notifications = $notification->getAll($user_id, $page, $limit);
             <!-- Pagination -->
             <div class="pagination">
                 <?php if ($page > 1): ?>
-                    <a href="/index.php?page=notifications&pg=<?php echo $page - 1; ?>" class="btn btn-small">
+                    <a href="<?php echo appBasePath(); ?>/index.php?page=notifications&pg=<?php echo $page - 1; ?>" class="btn btn-small">
                         ← Previous
                     </a>
                 <?php endif; ?>
@@ -85,7 +85,7 @@ $notifications = $notification->getAll($user_id, $page, $limit);
                 <span class="page-info">Page <?php echo $page; ?></span>
 
                 <?php if (count($notifications) >= $limit): ?>
-                    <a href="/index.php?page=notifications&pg=<?php echo $page + 1; ?>" class="btn btn-small">
+                    <a href="<?php echo appBasePath(); ?>/index.php?page=notifications&pg=<?php echo $page + 1; ?>" class="btn btn-small">
                         Next →
                     </a>
                 <?php endif; ?>
@@ -301,24 +301,7 @@ $notifications = $notification->getAll($user_id, $page, $limit);
 </style>
 
 <script>
-function timeAgo(dateString) {
-    const now = new Date();
-    const date = new Date(dateString);
-    const diff = now - date;
-    
-    const seconds = Math.floor(diff / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-
-    if (seconds < 60) return 'just now';
-    if (minutes < 60) return minutes + 'm ago';
-    if (hours < 24) return hours + 'h ago';
-    if (days < 7) return days + 'd ago';
-    
-    return date.toLocaleDateString();
-}
-
+// timeAgo() is rendered server-side by the global helper in src/middleware/auth.php (VX-012)
 function markNotificationRead(notificationId) {
     fetch('<?php echo appBasePath(); ?>/src/api/dashboard.php?action=mark_notification_read', {
         method: 'POST',

@@ -54,7 +54,7 @@ $reference = $_GET['reference'] ?? '';
             } else {
                 el.innerHTML = '<div class="result-box error"><h3>Payment not confirmed</h3>'
                     + '<p>' + esc(r.message || 'Please check your payment or contact support.') + '</p>'
-                    + '<a class="btn" href="<?= appBasePath() ?>/index.php?page=payments">View My Payments</a></div>';
+                    + '<a class="btn" href="<?= appBasePath() ?>/index.php?page=my-payments">View My Payments</a></div>';
             }
         }).catch(function () {
             document.getElementById('callbackResult').innerHTML = '<div class="result-box error">Network error while confirming payment.</div>';

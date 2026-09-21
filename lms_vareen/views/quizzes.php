@@ -90,7 +90,7 @@ requireRole('student');
                 <h3 style="margin:0 0 6px;">${q.title}</h3>
                 <div class="muted">Course ID: ${q.course_id} • Pass Score: ${q.pass_score}${q.time_limit_minutes ? ' • Time: '+q.time_limit_minutes+' min' : ''}</div>
                 <div class="quiz-actions">
-                    <a class="btn btn-primary" href="/index.php?page=quiz-attempt&quiz_id=${q.id}">Start Quiz</a>
+                    <a class="btn btn-primary" href="<?php echo appBasePath(); ?>/index.php?page=quiz-attempt&quiz_id=${q.id}">Start Quiz</a>
                 </div>
             `;
             list.appendChild(card);

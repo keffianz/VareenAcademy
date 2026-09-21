@@ -46,15 +46,15 @@ foreach ($courseList as $c) {
                 </div>
                 <div class="course-progress"><div class="progress-bar"><div class="progress-fill" style="width:<?php echo $c['progress']; ?>%"></div></div><span><?php echo $c['progress']; ?>% complete</span></div>
                 <div class="course-actions">
-                    <a href="/index.php?page=teacher-module-editor&course_id=<?php echo $c['id']; ?>" class="btn btn-sm btn-primary">Manage</a>
-                    <a href="/index.php?page=teacher-students&course_id=<?php echo $c['id']; ?>" class="btn btn-sm btn-secondary">Students</a>
+                    <a href="<?php echo appBasePath(); ?>/index.php?page=teacher-module-editor&course_id=<?php echo $c['id']; ?>" class="btn btn-sm btn-primary">Manage</a>
+                    <a href="<?php echo appBasePath(); ?>/index.php?page=teacher-students&course_id=<?php echo $c['id']; ?>" class="btn btn-sm btn-secondary">Students</a>
                 </div>
             </div>
             <?php endforeach; ?>
         </div><?php endif; ?>
     </div>
 </div>
-<script src="/lms_vareen/public/js/auth.js"></script>
+<script src="<?php echo appBasePath(); ?>/public/js/auth.js"></script>
 <script>
 (function(){var s=document.getElementById('teacherSidebar'),t=document.getElementById('sidebarToggle'),c=document.getElementById('sidebarClose');if(t&&s)t.addEventListener('click',function(){s.classList.add('active')});if(c&&s)c.addEventListener('click',function(){s.classList.remove('active')});})();
 </script>

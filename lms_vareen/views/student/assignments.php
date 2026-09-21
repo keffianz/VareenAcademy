@@ -98,7 +98,7 @@ $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
-<script src="/lms_vareen/public/js/auth.js"></script>
+<script src="<?php echo appBasePath(); ?>/public/js/auth.js"></script>
 <script>
     document.querySelectorAll('.submit-form').forEach(form => {
         form.addEventListener('submit', async (e) => {

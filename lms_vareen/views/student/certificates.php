@@ -95,4 +95,4 @@ $printBase  = appBasePath() . '/index.php?page=certificate-print';
         </section>
     </div>
 </div>
-<script src="/lms_vareen/public/js/auth.js"></script>
+<script src="<?php echo appBasePath(); ?>/public/js/auth.js"></script>

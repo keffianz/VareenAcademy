@@ -140,7 +140,7 @@ $gatewayOk = $paystackStatus || $flutterwaveStatus || $bankTransferStatus;
         </div>
     </div>
 </div>
-<script src="/lms_vareen/public/js/auth.js"></script>
+<script src="<?php echo appBasePath(); ?>/public/js/auth.js"></script>
 <script>
 (function(){
     var timeEl=document.getElementById('liveTime');

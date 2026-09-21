@@ -56,7 +56,7 @@ if ($page === 'verify' || $page === 'instructors' || $page === 'become-instructo
 // so "requires login" never masks "does not exist".
 $knownPages = [
     // Student pages
-    'student-dashboard', 'assignments', 'courses', 'lessons', 'quizzes', 'quiz-attempt',
+    'student-dashboard', 'assignments', 'courses', 'lessons', 'lesson', 'quizzes', 'quiz-attempt',
     'quiz-result', 'live-classes', 'course-detail', 'notifications', 'profile', 'certificates',
     'checkout', 'my-payments', 'payment-callback', 'certificate-print',
     'student-community', 'student-showcase', 'student-ai', 'post-detail',
@@ -71,7 +71,7 @@ $knownPages = [
     'admin-quizzes', 'admin-live', 'admin-reports', 'admin-settings', 'admin-applications',
     'admin-certificates', 'admin-verify', 'admin-payments', 'admin-coupons',
     'admin-community', 'admin-discussions', 'admin-moderation', 'admin-analytics',
-    'admin-activity', 'admin-ai', 'admin-notifications', 'admin-messages',
+    'admin-activity', 'admin-ai', 'admin-notifications', 'admin-messages', 'admin-profile',
 ];
 if ($page !== null && !in_array($page, $knownPages, true)) {
     http_response_code(404);
@@ -112,6 +112,15 @@ switch ($page) {
         render_page('views/student/lessons.php', 'My Lessons');
         break;
 
+    // VX-044: lesson playback was unreachable — views/lesson.php existed and every
+    // link (course-detail.php, next/prev nav in lesson.php) targeted page=lesson,
+    // but there was no allowlist entry and no switch case, so it 404'd.
+    // Teachers/admins need it to preview their own content.
+    case 'lesson':
+        requireRoles(['student', 'teacher', 'admin']);
+        render_page('views/lesson.php', 'Lesson');
+        break;
+
     case 'quizzes':
         requireRole('student');
         render_page('views/student/quizzes.php', 'Quizzes');
@@ -133,7 +142,9 @@ switch ($page) {
         break;
 
     case 'course-detail':
-        requireRole('student');
+        // VX-044: teachers/admins must be able to preview courses they manage;
+        // the enrollment gate inside the view already distinguishes the roles.
+        requireRoles(['student', 'teacher', 'admin']);
         render_page('views/course-detail.php', 'Course Details');
         break;
 
@@ -310,6 +321,11 @@ switch ($page) {
     case 'admin-settings':
         requireRole('admin');
         render_page('views/admin/settings.php', 'Settings');
+        break;
+
+    case 'admin-profile':
+        requireRole('admin');
+        render_page('views/admin/profile.php', 'My Profile');
         break;
 
     case 'admin-applications':

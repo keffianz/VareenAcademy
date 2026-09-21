@@ -1,0 +1,13 @@
+VAREEN-X ROUTE COVERAGE
+============================================================
+Routed pages: 74   Referenced pages: 20
+------------------------------------------------------------
+
+BROKEN LINKS (referenced but NOT routed): 0
+  none
+
+MISSING API FILES (referenced from JS but file absent): 0
+  none
+
+ORPHAN ROUTES (routed but never linked — informational): 54
+  student-dashboard, quizzes, profile, certificates, my-payments, payment-callback, certificate-print, student-showcase, student-ai, teacher-dashboard, teacher-quiz-attempts, teacher-live-classes, teacher-assignments-editor, teacher-attendance, teacher-courses, teacher-community, teacher-discussions, teacher-showcase, teacher-ai, teacher-analytics, teacher-calendar, teacher-profile, teacher-settings, teacher-grades, admin-dashboard, admin-users, admin-courses, admin-reports, admin-settings, admin-profile, admin-applications, admin-messages, admin-certificates, admin-payments, admin-teachers, admin-lessons, admin-quizzes, admin-live, admin-coupons, admin-community, admin-discussions, admin-moderation, admin-analytics, admin-activity, admin-ai, admin-notifications, admin-verify, signup, password-reset, instructors, become-instructor, legal-privacy, legal-terms, legal-refund

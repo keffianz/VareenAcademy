@@ -118,13 +118,13 @@ if (!empty($courseIds)) {
         <div class="dashboard-section">
             <div class="section-header"><h2>Quick Actions</h2></div>
             <div class="quick-action-grid">
-                <a href="/index.php?page=teacher-lesson-editor" class="quick-action-card"><i class="fas fa-plus-circle"></i><span>Add Lesson</span></a>
-                <a href="/index.php?page=teacher-resource-editor" class="quick-action-card"><i class="fas fa-folder-open"></i><span>Add Resource</span></a>
-                <a href="/index.php?page=teacher-assignments-editor" class="quick-action-card"><i class="fas fa-tasks"></i><span>Create Assignment</span></a>
-                <a href="/index.php?page=teacher-quiz-editor" class="quick-action-card"><i class="fas fa-question-circle"></i><span>Create Quiz</span></a>
-                <a href="/index.php?page=teacher-live-classes" class="quick-action-card"><i class="fas fa-video"></i><span>Schedule Class</span></a>
-                <a href="/index.php?page=teacher-community" class="quick-action-card"><i class="fas fa-comments"></i><span>Community</span></a>
-                <a href="/index.php?page=teacher-ai" class="quick-action-card"><i class="fas fa-robot"></i><span>AI Assistant</span></a>
+                <a href="<?php echo appBasePath(); ?>/index.php?page=teacher-lesson-editor" class="quick-action-card"><i class="fas fa-plus-circle"></i><span>Add Lesson</span></a>
+                <a href="<?php echo appBasePath(); ?>/index.php?page=teacher-resource-editor" class="quick-action-card"><i class="fas fa-folder-open"></i><span>Add Resource</span></a>
+                <a href="<?php echo appBasePath(); ?>/index.php?page=teacher-assignments-editor" class="quick-action-card"><i class="fas fa-tasks"></i><span>Create Assignment</span></a>
+                <a href="<?php echo appBasePath(); ?>/index.php?page=teacher-quiz-editor" class="quick-action-card"><i class="fas fa-question-circle"></i><span>Create Quiz</span></a>
+                <a href="<?php echo appBasePath(); ?>/index.php?page=teacher-live-classes" class="quick-action-card"><i class="fas fa-video"></i><span>Schedule Class</span></a>
+                <a href="<?php echo appBasePath(); ?>/index.php?page=teacher-community" class="quick-action-card"><i class="fas fa-comments"></i><span>Community</span></a>
+                <a href="<?php echo appBasePath(); ?>/index.php?page=teacher-ai" class="quick-action-card"><i class="fas fa-robot"></i><span>AI Assistant</span></a>
             </div>
         </div>
         <div class="dashboard-grid">
@@ -154,5 +154,5 @@ if (!empty($courseIds)) {
         </div>
     </div>
 </div>
-<script src="/lms_vareen/public/js/auth.js"></script>
+<script src="<?php echo appBasePath(); ?>/public/js/auth.js"></script>
 <!-- Sidebar drawer handled by shared public/js/admin.js (loaded in layout.php) -->

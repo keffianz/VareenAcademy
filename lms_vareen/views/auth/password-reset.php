@@ -273,7 +273,7 @@ async function sendResetLink() {
     }
 
     try {
-        const response = await fetch('/lms_vareen/src/api/auth.php?action=request_reset', {
+        const response = await fetch('<?php echo appBasePath(); ?>/src/api/auth.php?action=request_reset', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -331,7 +331,7 @@ async function resetPassword() {
     if (!isValid) return;
 
     try {
-        const response = await fetch('/lms_vareen/src/api/auth.php?action=reset_password', {
+        const response = await fetch('<?php echo appBasePath(); ?>/src/api/auth.php?action=reset_password', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -347,7 +347,7 @@ async function resetPassword() {
             document.getElementById('resetSuccess2').style.display = 'block';
             
             setTimeout(() => {
-                window.location.href = '/lms_vareen/index.php?page=login';
+                window.location.href = '<?php echo appBasePath(); ?>/index.php?page=login';
             }, 2000);
         } else {
             document.getElementById('resetError2').textContent = data.message;

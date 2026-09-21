@@ -51,7 +51,7 @@ $available = array_filter($courses, function($c) use ($enrolledIds) {
                                     <span><i class="fas fa-users"></i> <?php echo $c['enrollment_count'] ?? 0; ?> students</span>
                                     <span><i class="fas fa-star"></i> <?php echo number_format($c['rating'] ?? 0, 1); ?></span>
                                 </div>
-                                <a href="/index.php?page=course-detail&id=<?php echo $c['id']; ?>" class="btn btn-primary btn-sm">View Course</a>
+                                <a href="<?php echo appBasePath(); ?>/index.php?page=course-detail&id=<?php echo $c['id']; ?>" class="btn btn-primary btn-sm">View Course</a>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -60,7 +60,7 @@ $available = array_filter($courses, function($c) use ($enrolledIds) {
         </div>
     </div>
 </div>
-<script src="/lms_vareen/public/js/auth.js"></script>
+<script src="<?php echo appBasePath(); ?>/public/js/auth.js"></script>
 <script>
 (function(){var s=document.getElementById('studentSidebar'),t=document.getElementById('sidebarToggle'),c=document.getElementById('sidebarClose');if(t&&s)t.addEventListener('click',function(){s.classList.add('active')});if(c&&s)c.addEventListener('click',function(){s.classList.remove('active')});})();
 </script>

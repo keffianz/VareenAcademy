@@ -99,7 +99,16 @@ if (!empty($courseIds)) {
         <?php else: ?>
             <div class="live-classes-list">
                 <?php foreach ($liveClasses as $lc): ?>
-                    <div class="live-class-item" data-id="<?php echo (int)$lc['id']; ?>">
+                    <?php $lcid = (int)$lc['id']; ?>
+                    <div class="live-class-item" data-id="<?php echo $lcid; ?>"
+                        data-title="<?php echo htmlspecialchars($lc['title']); ?>"
+                        data-description="<?php echo htmlspecialchars($lc['description'] ?? ''); ?>"
+                        data-scheduled-at="<?php echo htmlspecialchars($lc['scheduled_at']); ?>"
+                        data-meeting-platform="<?php echo htmlspecialchars($lc['meeting_platform'] ?? ''); ?>"
+                        data-meeting-url="<?php echo htmlspecialchars($lc['meeting_url'] ?? ''); ?>"
+                        data-duration-minutes="<?php echo (int)($lc['duration_minutes'] ?? 60); ?>"
+                        data-recording-url="<?php echo htmlspecialchars($lc['recording_url'] ?? ''); ?>"
+                        data-status="<?php echo htmlspecialchars($lc['status'] ?? 'scheduled'); ?>">
                         <div>
                             <strong><?php echo htmlspecialchars($lc['title']); ?></strong>
                             <div class="muted"><?php echo htmlspecialchars($lc['course_title']); ?></div>
@@ -107,9 +116,37 @@ if (!empty($courseIds)) {
                             <div class="muted">Status: <?php echo htmlspecialchars($lc['status']); ?></div>
                         </div>
                         <div class="actions">
-                            <button class="btn btn-outline" onclick="loadEdit(<?php echo (int)$lc['id']; ?>)">Edit</button>
-                            <button class="btn btn-danger" onclick="deleteLive(<?php echo (int)$lc['id']; ?>)">Delete</button>
+                            <button class="btn btn-outline" onclick="toggleEditPanel(<?php echo $lcid; ?>)">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteLive(<?php echo $lcid; ?>)">Delete</button>
                         </div>
+
+                        <form class="live-class-edit-panel" id="liveEditPanel<?php echo $lcid; ?>" hidden>
+                            <input type="hidden" name="live_class_id" value="<?php echo $lcid; ?>">
+                            <label>Title</label>
+                            <input type="text" name="title" required value="<?php echo htmlspecialchars($lc['title']); ?>">
+                            <label>Description</label>
+                            <textarea name="description"><?php echo htmlspecialchars($lc['description'] ?? ''); ?></textarea>
+                            <label>Scheduled At (YYYY-MM-DD HH:MM:SS)</label>
+                            <input type="text" name="scheduled_at" required value="<?php echo htmlspecialchars($lc['scheduled_at']); ?>">
+                            <label>Meeting Platform</label>
+                            <input type="text" name="meeting_platform" value="<?php echo htmlspecialchars($lc['meeting_platform'] ?? ''); ?>">
+                            <label>Meeting URL</label>
+                            <input type="text" name="meeting_url" value="<?php echo htmlspecialchars($lc['meeting_url'] ?? ''); ?>">
+                            <label>Duration Minutes</label>
+                            <input type="number" name="duration_minutes" min="1" value="<?php echo (int)($lc['duration_minutes'] ?? 60); ?>">
+                            <label>Recording URL (optional)</label>
+                            <input type="text" name="recording_url" value="<?php echo htmlspecialchars($lc['recording_url'] ?? ''); ?>">
+                            <label>Status</label>
+                            <select name="status">
+                                <?php foreach (['scheduled','live','completed','cancelled'] as $st): ?>
+                                    <option value="<?php echo $st; ?>" <?php echo (($lc['status'] ?? '') === $st) ? 'selected' : ''; ?>><?php echo ucfirst($st); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="panel-actions">
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                <button type="button" class="btn btn-outline" onclick="toggleEditPanel(<?php echo $lcid; ?>)">Cancel</button>
+                            </div>
+                        </form>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -153,16 +190,33 @@ if (!empty($courseIds)) {
         else showToast(data.message || 'Delete failed', 'error');
     }
 
-    // Simple: edit not fully wired in this MVP UI; can be added next.
-    function loadEdit(id) {
-        showToast('Edit UI not implemented in this MVP live-class screen yet.', 'info');
+    function toggleEditPanel(id) {
+        const panel = document.getElementById('liveEditPanel' + id);
+        if (panel) panel.hidden = !panel.hidden;
     }
+
+    // Save edits (teacher_update accepts title, description, scheduled_at,
+    // meeting_platform, meeting_url, duration_minutes, recording_url, status)
+    document.querySelectorAll('.live-class-edit-panel').forEach(panel => {
+        panel.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = formToPayload(panel);
+            const res = await fetch('<?php echo appBasePath(); ?>/src/api/live_classes.php?action=teacher_update', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: new URLSearchParams(payload)
+            });
+            const data = await res.json();
+            if (data.success) location.reload();
+            else showToast(data.message || 'Update failed', 'error');
+        });
+    });
 </script>
             </div>
         </div>
     </main>
 </div>
-<script src="/lms_vareen/public/js/auth.js"></script>
+<script src="<?php echo appBasePath(); ?>/public/js/auth.js"></script>
 <script>
 (function(){var s=document.getElementById('teacherSidebar'),t=document.getElementById('sidebarToggle'),c=document.getElementById('sidebarClose');if(t&&s)t.addEventListener('click',function(){s.classList.add('active')});if(c&&s)c.addEventListener('click',function(){s.classList.remove('active')});})();
 </script>

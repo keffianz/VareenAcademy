@@ -344,7 +344,7 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
     if (!isValid) return;
 
     try {
-        const response = await fetch('/lms_vareen/src/api/auth.php?action=signup', {
+        const response = await fetch('<?php echo appBasePath(); ?>/src/api/auth.php?action=signup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
