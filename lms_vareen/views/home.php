@@ -397,4 +397,27 @@
             grid-template-columns: 1fr;
         }
     }
+    /* Home Courses Section (VX-055) */
+    .home-courses-section{padding:80px 0;background:#fff}
+    .section-subtitle{text-align:center;color:#6c757d;margin-bottom:40px;font-size:18px}
+    .home-courses-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px}
+    .home-course-card{background:#fff;border:1px solid #e9ecef;border-radius:12px;overflow:hidden;transition:box-shadow 0.3s,transform 0.3s;display:flex;flex-direction:column}
+    .home-course-card:hover{box-shadow:0 8px 24px rgba(0,0,0,0.12);transform:translateY(-4px)}
+    .home-course-thumb{position:relative;height:160px;background:#f8f9fa}
+    .home-course-thumb img{width:100%;height:160px;object-fit:cover}
+    .home-course-thumb-placeholder{display:flex;align-items:center;justify-content:center;height:160px;color:#ced4da;font-size:40px}
+    .mode-badge{position:absolute;top:10px;right:10px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;color:#fff;text-transform:uppercase;letter-spacing:0.5px}
+    .mode-badge.on-campus{background:#667eea}
+    .mode-badge.online{background:#28a745}
+    .mode-badge.hybrid{background:#fd7e14}
+    .home-course-mode-badge{position:absolute;top:10px;right:10px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;color:#fff;text-transform:uppercase;letter-spacing:0.5px}
+    .home-course-body{padding:16px 20px 20px;flex:1;display:flex;flex-direction:column}
+    .home-course-card h3,.home-course-card h3 a,.home-course-card h3 a:hover{color:#333;text-decoration:none;line-height:1.3;font-size:16px;margin:0 0 8px}
+    .home-course-desc{color:#6c757d;font-size:13px;line-height:1.5;margin:0 0 12px;flex:1}
+    .home-course-meta{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:#868e96;margin-bottom:12px}
+    .home-course-meta span{display:flex;align-items:center;gap:4px}
+    .home-course-footer{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid #f1f3f5;margin-top:auto}
+    .home-course-price{font-size:18px;font-weight:700;color:#667eea}
+    .empty-courses-msg{text-align:center;padding:40px;color:#868e96;font-size:16px}
+    @media(max-width:768px){.home-courses-section{padding:60px 0}.home-courses-grid{grid-template-columns:1fr}}
 </style>
