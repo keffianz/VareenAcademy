@@ -122,9 +122,74 @@
     </div>
 </section>
 
+<!-- Popular Courses Section (VX-055) -->
+<section class="courses-section">
+    <div class="container">
+        <h2 class="section-title">Popular Courses</h2>
+        <p class="section-subtitle">Start learning with our most popular courses</p>
+        <div class="courses-grid">
+            <?php
+            require_once 'src/classes/Course.php';
+            $homeCourse = new Course();
+            $featuredCourses = $homeCourse->getAllCourses(1, 6);
+            if (!empty($featuredCourses)):
+                foreach ($featuredCourses as $fc):
+                    $price = (float)($fc['price'] ?? 0);
+                    $currency = strtoupper(trim((string)($fc['currency'] ?? 'NGN')));
+                    $symbol = ($currency === 'NGN') ? '₦' : $currency . ' ';
+                    $formattedPrice = $price > 0 ? $symbol . number_format($price) : 'Free';
+                    $modeLabel = [
+                        'on_campus' => '<span class="mode-badge on-campus">On-Campus</span>',
+                        'online' => '<span class="mode-badge online">Online</span>',
+                        'hybrid' => '<span class="mode-badge hybrid">Hybrid</span>',
+                    ];
+            ?>
+                <div class="course-card-home">
+                    <div class="course-card-image">
+                        <?php if (!empty($fc['thumbnail'])): ?>
+                            <img src="<?php echo htmlspecialchars($fc['thumbnail']); ?>" alt="<?php echo htmlspecialchars($fc['title']); ?>">
+                        <?php else: ?>
+                            <div class="course-card-placeholder">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                        <?php endif; ?>
+                        <?php if (!empty($fc['delivery_mode']) && isset($modeLabel[$fc['delivery_mode']])): ?>
+                            <span class="course-mode-badge"><?php echo $modeLabel[$fc['delivery_mode']]; ?></span>
+                        <?php endif; ?>
+                    </div>
+                    <div class="course-card-body">
+                        <h3><a href="<?php echo appBasePath(); ?>/index.php?page=course-detail&id=<?php echo (int)$fc['id']; ?>"><?php echo htmlspecialchars($fc['title']); ?></a></h3>
+                        <p class="course-card-description"><?php echo htmlspecialchars(substr($fc['description'] ?? '', 0, 120)) . (strlen($fc['description'] ?? '') > 120 ? '...' : ''); ?></p>
+                        <div class="course-card-meta">
+                            <span class="course-instructor"><i class="fas fa-user-graduate"></i> <?php echo htmlspecialchars($fc['instructor'] ?? 'Unassigned'); ?></span>
+                            <?php if (!empty($fc['duration_weeks'])): ?>
+                                <span class="course-duration"><i class="fas fa-calendar-alt"></i> <?php echo (int)$fc['duration_weeks']; ?> weeks</span>
+                            <?php endif; ?>
+                            <?php if (!empty($fc['level'])): ?>
+                                <span class="course-level"><?php echo htmlspecialchars(ucfirst($fc['level'])); ?></span>
+                            <?php endif; ?>
+                        </div>
+                        <div class="course-card-footer">
+                            <span class="course-price"><?php echo $formattedPrice; ?></span>
+                            <a href="<?php echo appBasePath(); ?>/index.php?page=course-detail&id=<?php echo (int)$fc['id']; ?>" class="btn btn-primary btn-small">View Course <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            <?php
+                endforeach;
+            else:
+            ?>
+                <div class="empty-courses">
+                    <p>No courses available yet. Check back soon!</p>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>
+
 <style>
-    /* Hero Section */
-    .hero-section {
+    /* Features Section */
+    .features-section {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         padding: 100px 0;

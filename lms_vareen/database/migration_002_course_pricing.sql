@@ -43,13 +43,10 @@ SET @ddl := (SELECT IF(
     'SELECT 1'));
 PREPARE s FROM @ddl; EXECUTE s; DEALLOCATE PREPARE s;
 
--- Allow courses to exist before a teacher is assigned (matches admin API behaviour).
-SET @ddl := (SELECT IF(
-    (SELECT IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS
-      WHERE TABLE_SCHEMA = @db AND TABLE_NAME = 'courses' AND COLUMN_NAME = 'teacher_id') = 'NO',
-    'ALTER TABLE courses MODIFY teacher_id INT NULL DEFAULT NULL',
-    'SELECT 1'));
-PREPARE s FROM @ddl; EXECUTE s; DEALLOCATE PREPARE s;
+-- (No teacher_id MODIFY — foreign key courses_ibfk_1 blocks it, and admin API
+-- already supports courses without a teacher until they are assigned.
+-- If you really need nullable teacher_id on a fresh DB, run this BEFORE
+-- creating the FK: ALTER TABLE courses MODIFY teacher_id INT NULL DEFAULT NULL;)
 
 -- ----------------------------------------------------------------------------
 -- OFFICIAL LAUNCH PRICES (VAREEN Academy — 2026)
@@ -61,13 +58,13 @@ UPDATE courses SET price = 25000.00,  currency = 'NGN', delivery_mode = 'on_camp
 UPDATE courses SET price = 45000.00,  currency = 'NGN', delivery_mode = 'on_campus' WHERE title = 'Microsoft Office Suite';
 UPDATE courses SET price = 70000.00,  currency = 'NGN', delivery_mode = 'on_campus' WHERE title = 'Graphics Design';
 UPDATE courses SET price = 120000.00, currency = 'NGN', delivery_mode = 'on_campus' WHERE title = 'Programming & Web Development';
-UPDATE courses SET price = 60000.00,  currency = 'NGN', delivery_mode = 'on_campus' WHERE title = 'Data Analysis & Advanced Excel';
-UPDATE courses SET price = 80000.00,  currency = 'NGN', delivery_mode = 'on_campus' WHERE title = 'Networking & Hardware';
+UPDATE courses SET price = 60000.00,  currency = 'NGN', delivery_mode = 'on_campus' WHERE title = 'Data Analysis';
+UPDATE courses SET price = 80000.00,  currency = 'NGN', delivery_mode = 'on_campus' WHERE title = 'Networking';
 UPDATE courses SET price = 150000.00, currency = 'NGN', delivery_mode = 'on_campus' WHERE title = 'Mobile App Development';
-UPDATE courses SET price = 70000.00,  currency = 'NGN', delivery_mode = 'on_campus' WHERE title = 'Cybersecurity Basics';
+UPDATE courses SET price = 70000.00,  currency = 'NGN', delivery_mode = 'on_campus' WHERE title = 'Cybersecurity';
 UPDATE courses SET price = 80000.00,  currency = 'NGN', delivery_mode = 'on_campus' WHERE title = 'Database Management';
 UPDATE courses SET price = 85000.00,  currency = 'NGN', delivery_mode = 'on_campus' WHERE title = 'Adobe Graphics Design';
-UPDATE courses SET price = 75000.00,  currency = 'NGN', delivery_mode = 'on_campus' WHERE title = 'Video Editing & Production';
+UPDATE courses SET price = 75000.00,  currency = 'NGN', delivery_mode = 'on_campus' WHERE title = 'Video Editing';
 UPDATE courses SET price = 35000.00,  currency = 'NGN', delivery_mode = 'on_campus' WHERE title = 'Social Media Management';
 
 UPDATE courses SET price = 20000.00,  currency = 'NGN', delivery_mode = 'online' WHERE title = 'Basic Digital Skills';

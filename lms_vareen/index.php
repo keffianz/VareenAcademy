@@ -59,7 +59,7 @@ $knownPages = [
     'student-dashboard', 'assignments', 'courses', 'lessons', 'lesson', 'quizzes', 'quiz-attempt',
     'quiz-result', 'live-classes', 'course-detail', 'notifications', 'profile', 'certificates',
     'checkout', 'my-payments', 'payment-callback', 'certificate-print',
-    'student-community', 'student-showcase', 'student-ai', 'post-detail',
+    'student-community', 'student-showcase', 'student-ai', 'post-detail', 'programs',
     // Teacher pages
     'teacher-dashboard', 'teacher-lesson-editor', 'teacher-module-editor', 'teacher-quiz-editor',
     'teacher-quiz-attempts', 'teacher-resource-editor', 'teacher-live-classes', 'teacher-assignments-editor',

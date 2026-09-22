@@ -20,19 +20,20 @@ class Course {
         try {
             $offset = ($page - 1) * $limit;
 
-            $sql = "SELECT c.*, u.first_name, u.last_name 
+            // LEFT JOIN so courses with no/invalid teacher still appear (VX-055).
+            $sql = "SELECT c.*, u.first_name, u.last_name
                     FROM courses c
-                    JOIN users u ON c.teacher_id = u.id
+                    LEFT JOIN users u ON c.teacher_id = u.id
                     WHERE c.is_active = 1
                     ORDER BY c.created_at DESC
                     LIMIT :limit OFFSET :offset";
-            
+
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
             $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
             $stmt->execute();
-            
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $this->applyDefaults($stmt->fetchAll(PDO::FETCH_ASSOC));
         } catch (PDOException $e) {
             return [];
         }
@@ -58,14 +59,16 @@ class Course {
      */
     public function getCourseById($course_id) {
         try {
-            $sql = "SELECT c.*, u.first_name, u.last_name 
+            // LEFT JOIN so a course with no/invalid teacher still resolves (VX-055).
+            $sql = "SELECT c.*, u.first_name, u.last_name
                     FROM courses c
-                    JOIN users u ON c.teacher_id = u.id
+                    LEFT JOIN users u ON c.teacher_id = u.id
                     WHERE c.id = :id";
-            
+
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':id' => $course_id]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $row ? $this->applyDefaults([$row])[0] : null;
         } catch (PDOException $e) {
             return null;
         }
@@ -76,16 +79,16 @@ class Course {
      */
     public function getEnrolledCourses($student_id) {
         try {
-            $sql = "SELECT c.*, u.first_name, u.last_name, e.progress, e.enrolled_at, e.status
+                        $sql = "SELECT c.*, u.first_name, u.last_name, e.progress, e.enrolled_at, e.status
                     FROM courses c
-                    JOIN users u ON c.teacher_id = u.id
+                    LEFT JOIN users u ON c.teacher_id = u.id
                     JOIN enrollments e ON c.id = e.course_id
                     WHERE e.student_id = :student_id
                     ORDER BY e.enrolled_at DESC";
-            
+
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':student_id' => $student_id]);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $this->applyDefaults($stmt->fetchAll(PDO::FETCH_ASSOC));
         } catch (PDOException $e) {
             return [];
         }
@@ -247,20 +250,72 @@ class Course {
 
             $sql = "SELECT c.*, u.first_name, u.last_name
                     FROM courses c
-                    JOIN users u ON c.teacher_id = u.id
+                    LEFT JOIN users u ON c.teacher_id = u.id
                     WHERE c.is_active = 1 AND (c.title LIKE :search OR c.description LIKE :search)
                     ORDER BY c.created_at DESC
                     LIMIT :limit OFFSET :offset";
-            
+
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':search', $search);
             $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
             $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
             $stmt->execute();
-            
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $this->applyDefaults($stmt->fetchAll(PDO::FETCH_ASSOC));
         } catch (PDOException $e) {
             return [];
         }
     }
+
+    /**
+     * Apply sensible defaults for course display so missing metadata never
+     * breaks the cards / detail / enrolled views (VX-055 task 4).
+     */
+    public function applyDefaults(array $rows): array {
+        foreach ($rows as &$row) {
+            $row['currency'] =
+                trim((string)($row['currency'] ?? '')) !== '' ? strtoupper($row['currency']) : 'NGN';
+            $row['price'] = isset($row['price']) ? (float)$row['price'] : 0.00;
+            $row['duration_weeks'] =
+                array_key_exists('duration_weeks', $row) && $row['duration_weeks'] !== null && $row['duration_weeks'] !== ''
+                    ? (int)$row['duration_weeks'] : null;
+            $row['delivery_mode'] = isset($row['delivery_mode'])
+                ? (in_array($row['delivery_mode'], ['on_campus', 'online', 'hybrid'], true)
+                    ? $row['delivery_mode']
+                    : 'online')
+                : 'online';
+            $row['level'] = isset($row['level'])
+                ? (in_array($row['level'], ['beginner', 'intermediate', 'advanced'], true)
+                    ? $row['level']
+                    : 'beginner')
+                : 'beginner';
+            $row['next_cohort'] = isset($row['next_cohort'])
+                ? ($row['next_cohort'] !== '' ? $row['next_cohort'] : null)
+                : null;
+            // instructor display string: "First Last" or "Unassigned" when no teacher.
+            if (empty($row['first_name']) || empty($row['last_name'])) {
+                $row['instructor'] = 'Unassigned';
+            } else {
+                $row['instructor'] = trim($row['first_name'] . ' ' . $row['last_name']);
+            }
+        }
+        return $rows;
+    }
+
+    /**
+     * Admin-safe full listing for the admin courses panel (VX-055 task 6).
+     * Returns all courses (not just active); callers decide display via is_active.
+     */
+    public function adminList(): array {
+        try {
+            $sql = "SELECT c.*, u.first_name, u.last_name
+                    FROM courses c
+                    LEFT JOIN users u ON c.teacher_id = u.id
+                    ORDER BY c.id ASC";
+            return $this->applyDefaults($this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC));
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+
 }
