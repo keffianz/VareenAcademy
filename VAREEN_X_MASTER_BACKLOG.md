@@ -242,12 +242,12 @@
 
 ## MEDIUM ISSUES
 
-### VX-017: Light Mode/Dark Mode Consistency
-- **File:** `assets/css/main.css`, all HTML pages
-- **Description:** Audit every screen for light/dark mode consistency. Check for white-on-white, black-on-black, invisible text.
+### VX-017: Light Mode/Dark Mode Removed (LMS Portal)
+- **File:** `lms_vareen/views/layout.php`, `lms_vareen/public/css/dark-mode.css` (deleted)
+- **Description:** Per owner request, the LMS portal no longer has any light/dark mode switching — single light theme only. Removed the dark-mode.css link from layout.php and deleted dark-mode.css (the only theme-switching code in the LMS; no toggle JS, no data-theme attribute, no matchMedia logic existed). Marketing-site dark blocks in assets/css/main.css were intentionally left untouched (out of scope).
 - **Priority:** MEDIUM
-- **Status:** OPEN
-- **Verification:** Toggle OS theme, verify all pages render correctly.
+- **Status:** DONE
+- **Verification:** lms_vareen/views/*.php + lms_vareen/public/js/*.js contain zero dark-mode/prefers-color-scheme/data-theme references; portal renders single light theme regardless of OS setting.
 
 ### VX-018: Mobile Responsive Design
 - **File:** All pages and CSS

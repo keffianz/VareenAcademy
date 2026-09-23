@@ -30,8 +30,7 @@
     <link rel="stylesheet" href="<?php echo appBasePath() . '/public/css/dashboard-responsive.css?v=1.0.1'; ?>">
     <?php endif; ?>
 
-    <!-- Automatic dark mode (Phase 5) — follows OS prefers-color-scheme; loaded last so overrides win -->
-    <link rel="stylesheet" href="<?php echo appBasePath() . '/public/css/dark-mode.css?v=1.0.0'; ?>">
+    <!-- Theme modes removed (VX-056) — LMS uses a single light theme; no light/dark switching. -->
 
     <!-- Font Awesome 7.3.1 (self-hosted only — CDN blocked by CSP font-src policy) -->
     <link rel="stylesheet" href="<?php echo appBasePath() . '/public/css/font-awesome-local.css?v=7.3.2'; ?>">
