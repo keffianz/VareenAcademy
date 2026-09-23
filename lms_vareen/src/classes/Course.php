@@ -18,19 +18,27 @@ class Course {
      */
     public function getAllCourses($page = 1, $limit = 10) {
         try {
-            $offset = ($page - 1) * $limit;
+            // $limit <= 0 means "no limit" — the Programs page requests the whole
+            // catalog with getAllCourses(1, 0). A literal `LIMIT 0` would return
+            // zero rows, which is why the Programs page rendered empty (VX-055).
+            $limit = (int)$limit;
+            $offset = $limit > 0 ? ($page - 1) * $limit : 0;
 
             // LEFT JOIN so courses with no/invalid teacher still appear (VX-055).
             $sql = "SELECT c.*, u.first_name, u.last_name
                     FROM courses c
                     LEFT JOIN users u ON c.teacher_id = u.id
                     WHERE c.is_active = 1
-                    ORDER BY c.created_at DESC
-                    LIMIT :limit OFFSET :offset";
+                    ORDER BY c.created_at DESC";
+            if ($limit > 0) {
+                $sql .= " LIMIT :limit OFFSET :offset";
+            }
 
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
-            $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+            if ($limit > 0) {
+                $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+                $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+            }
             $stmt->execute();
 
             return $this->applyDefaults($stmt->fetchAll(PDO::FETCH_ASSOC));
